@@ -1,0 +1,19 @@
+import { create } from "zustand";
+
+interface AppState {
+  portfolioValue: number;
+  userRank: number;
+  winnrScore: number;
+  setPortfolioValue: (val: number) => void;
+  setUserRank: (val: number) => void;
+  setWinnrScore: (val: number) => void;
+}
+
+export const useAppStore = create<AppState>((set) => ({
+  portfolioValue: 42904.12,
+  userRank: 142,
+  winnrScore: 8450,
+  setPortfolioValue: (val) => set({ portfolioValue: val }),
+  setUserRank: (val) => set({ userRank: val }),
+  setWinnrScore: (val) => set({ winnrScore: val }),
+}));
