@@ -39,14 +39,6 @@ export function TopNav() {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <div className="relative w-64 hidden lg:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search markets..."
-            className="w-full h-10 bg-surface-container rounded-md pl-10 pr-4 text-sm font-sans focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground border border-transparent focus:border-primary/50 transition-all text-foreground"
-          />
-        </div>
         <WalletConnectButton />
       </div>
     </nav>

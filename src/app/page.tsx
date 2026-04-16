@@ -8,6 +8,7 @@ import {
   Clock,
   Landmark,
   Rocket,
+  Search,
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
@@ -204,21 +205,32 @@ export default function Home() {
         </Card>
       </Link>
 
-      {/* Categories Row */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-none mask-fade-edges-x">
-        {categories.map((cat) => (
-          <button
-            key={cat.name}
-            type="button"
-            className={`whitespace-nowrap px-6 py-2.5 rounded-md font-sans font-bold text-sm transition-colors ${
-              cat.active
-                ? "bg-primary text-black shadow-[0_0_15px_rgba(159,251,6,0.3)]"
-                : "bg-surface-container-high text-muted-foreground hover:bg-surface-container-highest hover:text-foreground"
-            }`}
-          >
-            {cat.name}
-          </button>
-        ))}
+      {/* Categories and Search Row */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-1">
+        <div className="flex items-center gap-3 overflow-x-auto pb-4 lg:pb-0 scrollbar-none mask-fade-edges-x">
+          {categories.map((cat) => (
+            <button
+              key={cat.name}
+              type="button"
+              className={`whitespace-nowrap px-6 py-2.5 rounded-md font-sans font-bold text-sm transition-colors ${
+                cat.active
+                  ? "bg-primary text-black shadow-[0_0_15px_rgba(159,251,6,0.3)]"
+                  : "bg-surface-container-high text-muted-foreground hover:bg-surface-container-highest hover:text-foreground"
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative w-full lg:w-96 shrink-0">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search markets by title, category, or tag..."
+            className="w-full h-12 bg-surface-container-high border border-surface-container-highest rounded-xl pl-12 pr-4 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground"
+          />
+        </div>
       </div>
 
       {/* Main Grid Content */}
