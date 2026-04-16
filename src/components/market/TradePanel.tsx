@@ -18,7 +18,9 @@ import { formatNumber } from "@/utils";
 interface TradePanelProps {
   marketId: number;
   buyYesPrice: number;
+  sellYesPrice: number;
   buyNoPrice: number;
+  sellNoPrice: number;
   isFrozen: boolean;
   isFullyResolved: boolean;
   isAwaitingResolution: boolean;
@@ -27,11 +29,14 @@ interface TradePanelProps {
 export function TradePanel({
   marketId,
   buyYesPrice,
+  sellYesPrice,
   buyNoPrice,
+  sellNoPrice,
   isFrozen,
   isFullyResolved,
   isAwaitingResolution,
 }: TradePanelProps) {
+  const [tradeSide, setTradeSide] = useState<"BUY" | "SELL">("BUY");
   const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO">("YES");
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Market);
   const [amount, setAmount] = useState<string>("");
@@ -44,8 +49,16 @@ export function TradePanel({
   const userBalance = balanceData ? Number(balanceData) / 10 ** tokens.usdc.decimals : 0;
 
   const parsedAmount = Number(amount) || 0;
-  const currentPrice = selectedOutcome === "YES" ? buyYesPrice : buyNoPrice;
+
+  // Determine which price to show based on Side and Outcome
+  const displayYesPrice = tradeSide === "BUY" ? buyYesPrice : sellYesPrice;
+  const displayNoPrice = tradeSide === "BUY" ? buyNoPrice : sellNoPrice;
+
+  const currentPrice = selectedOutcome === "YES" ? displayYesPrice : displayNoPrice;
   const effectivePrice = orderType === OrderType.Market ? currentPrice : Number(limitPrice) || 0;
+
+  // For Sell orders, if they are entering USD, we still calculate shares to sell.
+  // In a real app, selling might involve entering shares directly.
   const shares = effectivePrice > 0 ? Math.floor(parsedAmount / (effectivePrice / 100)) : 0;
   const maxPayout = shares;
   const potentialReturn = parsedAmount > 0 ? ((maxPayout - parsedAmount) / parsedAmount) * 100 : 0;
@@ -67,7 +80,7 @@ export function TradePanel({
     const orderPromise = placeOrder.mutateAsync({
       marketId,
       outcome: selectedOutcome === "YES" ? Outcome.Yes : Outcome.No,
-      side: Side.Bid,
+      side: tradeSide === "BUY" ? Side.Bid : Side.Ask,
       price: effectivePrice,
       quantity: Math.floor(shares),
       orderType: orderType,
@@ -75,7 +88,7 @@ export function TradePanel({
 
     toast.promise(orderPromise, {
       loading: "Placing order...",
-      success: `Successfully bought ${formatNumber(shares, 0, 0)} shares!`,
+      success: `Successfully ${tradeSide === "BUY" ? "bought" : "sold"} ${formatNumber(shares, 0, 0)} shares!`,
       error: (err) => `Order failed: ${err.message || "Unknown error"}`,
     });
   };
@@ -83,28 +96,55 @@ export function TradePanel({
   return (
     <Card className="bg-surface-container-high border-0 shadow-none p-6 sticky top-6 relative">
       <div className="flex justify-between items-center mb-6">
-        <Heading className="text-xl">TAKE POSITION</Heading>
+        <div className="flex bg-surface-container-low p-1 rounded-sm">
+          <button
+            type="button"
+            disabled={isFrozen}
+            onClick={() => setTradeSide("BUY")}
+            className={`text-[10px] font-bold font-sans uppercase tracking-widest px-4 py-1.5 rounded-sm transition-all ${
+              tradeSide === "BUY"
+                ? "bg-primary text-black shadow-[0_0_10px_rgba(159,251,6,0.2)]"
+                : "text-muted-foreground hover:text-foreground"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            Buy
+          </button>
+          <button
+            type="button"
+            disabled={isFrozen}
+            onClick={() => setTradeSide("SELL")}
+            className={`text-[10px] font-bold font-sans uppercase tracking-widest px-4 py-1.5 rounded-sm transition-all ${
+              tradeSide === "SELL"
+                ? "bg-destructive text-white shadow-[0_0_10px_rgba(255,50,50,0.2)]"
+                : "text-muted-foreground hover:text-foreground"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            Sell
+          </button>
+        </div>
 
         <div className="flex bg-surface-container-low p-1 rounded-sm">
           <button
             type="button"
+            disabled={isFrozen}
             onClick={() => setOrderType(OrderType.Market)}
             className={`text-[10px] font-bold font-sans uppercase tracking-widest px-3 py-1.5 rounded-sm transition-all ${
               orderType === OrderType.Market
                 ? "bg-surface-container-high text-primary shadow-[0_0_10px_rgba(159,251,6,0.1)]"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             Market
           </button>
           <button
             type="button"
+            disabled={isFrozen}
             onClick={() => setOrderType(OrderType.Limit)}
             className={`text-[10px] font-bold font-sans uppercase tracking-widest px-3 py-1.5 rounded-sm transition-all ${
               orderType === OrderType.Limit
                 ? "bg-surface-container-high text-primary shadow-[0_0_10px_rgba(159,251,6,0.1)]"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             Limit
           </button>
@@ -132,50 +172,92 @@ export function TradePanel({
       <div className="flex gap-4 mb-8">
         <button
           type="button"
+          disabled={isFrozen}
           onClick={() => setSelectedOutcome("YES")}
           className={`flex-1 rounded-lg p-4 border text-center cursor-pointer relative transition-all duration-200 ${
             selectedOutcome === "YES"
-              ? "bg-surface-container-low border-primary shadow-[0_0_15px_rgba(159,251,6,0.15)]"
+              ? tradeSide === "BUY"
+                ? "bg-surface-container-low border-primary shadow-[0_0_15px_rgba(159,251,6,0.15)]"
+                : "bg-surface-container-low border-destructive shadow-[0_0_15px_rgba(255,50,50,0.15)]"
               : "bg-surface-container-lowest border-transparent hover:bg-surface-container-low"
-          }`}
+          } disabled:opacity-70 disabled:cursor-not-allowed`}
         >
           <div
-            className={`font-heading font-bold text-xl mb-1 ${selectedOutcome === "YES" ? "text-primary" : "text-foreground"}`}
+            className={`font-heading font-bold text-xl mb-1 ${
+              selectedOutcome === "YES"
+                ? tradeSide === "BUY"
+                  ? "text-primary"
+                  : "text-destructive"
+                : "text-foreground"
+            }`}
           >
             YES
           </div>
           <div
-            className={`text-xs font-sans ${selectedOutcome === "YES" ? "text-primary" : "text-muted-foreground"}`}
+            className={`text-xs font-sans ${
+              selectedOutcome === "YES"
+                ? tradeSide === "BUY"
+                  ? "text-primary"
+                  : "text-destructive"
+                : "text-muted-foreground"
+            }`}
           >
-            {buyYesPrice.toFixed(1)}¢
+            {displayYesPrice.toFixed(1)}¢
           </div>
           {/* Glow active indicator */}
-          {selectedOutcome === "YES" && (
-            <div className="absolute top-0 right-0 size-2 rounded-full bg-primary shadow-[0_0_8px_rgba(159,251,6,1)] m-2 animate-pulse"></div>
+          {selectedOutcome === "YES" && !isFrozen && (
+            <div
+              className={`absolute top-0 right-0 size-2 rounded-full m-2 animate-pulse ${
+                tradeSide === "BUY"
+                  ? "bg-primary shadow-[0_0_8px_rgba(159,251,6,1)]"
+                  : "bg-destructive shadow-[0_0_8px_rgba(255,50,50,1)]"
+              }`}
+            ></div>
           )}
         </button>
         <button
           type="button"
+          disabled={isFrozen}
           onClick={() => setSelectedOutcome("NO")}
           className={`flex-1 rounded-lg p-4 border text-center cursor-pointer relative transition-all duration-200 ${
             selectedOutcome === "NO"
-              ? "bg-surface-container-low border-destructive shadow-[0_0_15px_rgba(255,50,50,0.15)]"
+              ? tradeSide === "BUY"
+                ? "bg-surface-container-low border-primary shadow-[0_0_15px_rgba(159,251,6,0.15)]"
+                : "bg-surface-container-low border-destructive shadow-[0_0_15px_rgba(255,50,50,0.15)]"
               : "bg-surface-container-lowest border-transparent hover:bg-surface-container-low"
-          }`}
+          } disabled:opacity-70 disabled:cursor-not-allowed`}
         >
           <div
-            className={`font-heading font-bold text-xl mb-1 ${selectedOutcome === "NO" ? "text-destructive" : "text-foreground"}`}
+            className={`font-heading font-bold text-xl mb-1 ${
+              selectedOutcome === "NO"
+                ? tradeSide === "BUY"
+                  ? "text-primary"
+                  : "text-destructive"
+                : "text-foreground"
+            }`}
           >
             NO
           </div>
           <div
-            className={`text-xs font-sans ${selectedOutcome === "NO" ? "text-destructive" : "text-muted-foreground"}`}
+            className={`text-xs font-sans ${
+              selectedOutcome === "NO"
+                ? tradeSide === "BUY"
+                  ? "text-primary"
+                  : "text-destructive"
+                : "text-muted-foreground"
+            }`}
           >
-            {buyNoPrice.toFixed(1)}¢
+            {displayNoPrice.toFixed(1)}¢
           </div>
           {/* Glow active indicator */}
-          {selectedOutcome === "NO" && (
-            <div className="absolute top-0 right-0 size-2 rounded-full bg-destructive shadow-[0_0_8px_rgba(255,50,50,1)] m-2 animate-pulse"></div>
+          {selectedOutcome === "NO" && !isFrozen && (
+            <div
+              className={`absolute top-0 right-0 size-2 rounded-full m-2 animate-pulse ${
+                tradeSide === "BUY"
+                  ? "bg-primary shadow-[0_0_8px_rgba(159,251,6,1)]"
+                  : "bg-destructive shadow-[0_0_8px_rgba(255,50,50,1)]"
+              }`}
+            ></div>
           )}
         </button>
       </div>
@@ -195,7 +277,10 @@ export function TradePanel({
                 min="1"
                 max="99"
                 step="1"
-                className="h-16 text-3xl font-heading bg-background font-bold border-b-2 border-primary pt-0 pb-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                disabled={isFrozen}
+                className={`h-16 text-3xl font-heading bg-background font-bold border-b-2 pt-0 pb-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                  tradeSide === "BUY" ? "border-primary" : "border-destructive"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
                 placeholder="0"
                 value={limitPrice}
                 onChange={(e) => {
@@ -223,12 +308,15 @@ export function TradePanel({
         <div className="mb-2">
           <div className="flex justify-between items-center mb-2">
             <span className="text-[10px] font-bold font-sans text-foreground tracking-widest uppercase">
-              STAKE AMOUNT
+              {tradeSide === "BUY" ? "STAKE AMOUNT" : "AMOUNT TO SELL"}
             </span>
             <button
               type="button"
+              disabled={isFrozen}
               onClick={() => setAmount(userBalance.toString())}
-              className="text-[10px] font-bold font-sans text-primary tracking-widest uppercase cursor-pointer hover:underline text-right"
+              className={`text-[10px] font-bold font-sans tracking-widest uppercase cursor-pointer hover:underline text-right ${
+                tradeSide === "BUY" ? "text-primary" : "text-destructive"
+              } disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline`}
             >
               BAL: ${formatNumber(userBalance)}
             </button>
@@ -239,7 +327,10 @@ export function TradePanel({
               min="0"
               max={userBalance}
               step="0.01"
-              className="h-16 text-3xl font-heading bg-background font-bold border-b-2 border-primary pt-0 pb-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              disabled={isFrozen}
+              className={`h-16 text-3xl font-heading bg-background font-bold border-b-2 pt-0 pb-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                tradeSide === "BUY" ? "border-primary" : "border-destructive"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -255,7 +346,7 @@ export function TradePanel({
           <div className="w-full h-8 relative flex items-center group">
             <div className="w-full h-2 bg-surface-container-highest rounded-full absolute top-1/2 -translate-y-1/2 pointer-events-none overflow-hidden">
               <div
-                className={`h-full ${selectedOutcome === "YES" ? "bg-primary/60" : "bg-destructive/60"}`}
+                className={`h-full ${tradeSide === "BUY" ? "bg-primary/60" : "bg-destructive/60"}`}
                 style={{
                   width: `${Math.min(100, Math.max(0, (Number(amount || 0) / userBalance) * 100))}%`,
                 }}
@@ -266,16 +357,17 @@ export function TradePanel({
               min="0"
               max={userBalance}
               step="0.01"
+              disabled={isFrozen}
               value={amount || 0}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full absolute inset-0 opacity-0 cursor-pointer z-10"
+              className="w-full absolute inset-0 opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
             />
             <div
               className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-4 rounded-full pointer-events-none transition-all duration-75 ${
-                selectedOutcome === "YES"
+                tradeSide === "BUY"
                   ? "bg-primary shadow-[0_0_8px_rgba(159,251,6,0.8)]"
                   : "bg-destructive shadow-[0_0_8px_rgba(255,50,50,0.8)]"
-              }`}
+              } ${isFrozen ? "opacity-50" : ""}`}
               style={{
                 left: `${Math.min(100, Math.max(0, (Number(amount || 0) / userBalance) * 100))}%`,
               }}
@@ -286,18 +378,17 @@ export function TradePanel({
               <button
                 type="button"
                 key={pct}
+                disabled={isFrozen}
                 onClick={() =>
                   setAmount(
-                    pct === 100
-                      ? userBalance.toString()
-                      : ((userBalance * pct) / 100).toFixed(2),
+                    pct === 100 ? userBalance.toString() : ((userBalance * pct) / 100).toFixed(2),
                   )
                 }
                 className={`flex-1 bg-surface-container px-0 py-2 rounded text-center text-[10px] font-bold font-sans text-muted-foreground cursor-pointer transition-colors ${
-                  selectedOutcome === "YES"
+                  tradeSide === "BUY"
                     ? "hover:bg-primary/20 hover:text-primary"
                     : "hover:bg-destructive/20 hover:text-destructive"
-                }`}
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {pct === 100 ? "MAX" : `${pct}%`}
               </button>
@@ -308,22 +399,30 @@ export function TradePanel({
         {/* Stats Summary */}
         <div className="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 mt-4">
           <div className="flex justify-between text-sm font-sans text-muted-foreground">
-            <span>Est. Shares</span>
+            <span>{tradeSide === "BUY" ? "Est. Shares" : "Shares to Sell"}</span>
             <span className="font-bold text-foreground font-mono">
               {formatNumber(shares, 0, 0)}
             </span>
           </div>
           <div className="flex justify-between text-sm font-sans text-muted-foreground">
-            <span>Max Payout</span>
-            <span className="font-bold text-primary font-mono">
+            <span>{tradeSide === "BUY" ? "Max Payout" : "Total Proceeds"}</span>
+            <span
+              className={`font-bold font-mono ${
+                tradeSide === "BUY" ? "text-primary" : "text-destructive"
+              }`}
+            >
               ${formatNumber(maxPayout)}
             </span>
           </div>
-          <div className="w-full border-t border-surface-container-highest my-1"></div>
-          <div className="flex justify-between text-sm font-sans text-foreground font-bold">
-            <span>Potential Return</span>
-            <span className="text-primary font-mono">+{potentialReturn.toFixed(1)}%</span>
-          </div>
+          {tradeSide === "BUY" && (
+            <>
+              <div className="w-full border-t border-surface-container-highest my-1"></div>
+              <div className="flex justify-between text-sm font-sans text-foreground font-bold">
+                <span>Potential Return</span>
+                <span className="text-primary font-mono">+{potentialReturn.toFixed(1)}%</span>
+              </div>
+            </>
+          )}
         </div>
 
         <Button
@@ -336,41 +435,28 @@ export function TradePanel({
             (orderType === OrderType.Limit &&
               (!limitPrice || Number(limitPrice) <= 0 || Number(limitPrice) >= 100))
           }
-          className="w-full h-16 text-xl tracking-wide uppercase shadow-[0_0_20px_rgba(159,251,6,0.25)] hover:shadow-[0_0_30px_rgba(159,251,6,0.4)] disabled:shadow-none"
+          className={`w-full h-16 text-xl tracking-wide uppercase disabled:shadow-none transition-all ${
+            tradeSide === "BUY"
+              ? "bg-primary text-black shadow-[0_0_20px_rgba(159,251,6,0.25)] hover:shadow-[0_0_30_px_rgba(159,251,6,0.4)]"
+              : "bg-destructive text-white shadow-[0_0_20px_rgba(255,50,50,0.25)] hover:shadow-[0_0_30px_rgba(255,50,50,0.4)]"
+          }`}
         >
           {placeOrder.isPending ? (
             <>
               <Loader2 className="mr-2 size-5 animate-spin" />
-              PLACING ORDER...
+              {tradeSide === "BUY" ? "PLACING ORDER..." : "SELLING SHARES..."}
             </>
+          ) : isFullyResolved ? (
+            "MARKET RESOLVED"
+          ) : isAwaitingResolution ? (
+            "AWAITING RESOLUTION"
+          ) : isFrozen ? (
+            "TRADING HALTED"
           ) : (
-            "CONFIRM POSITION"
+            `${tradeSide?.toUpperCase()} ${selectedOutcome?.toUpperCase()}`
           )}
         </Button>
       </div>
-
-      {/* Frozen Overlay */}
-      {isFrozen && (
-        <div className="absolute inset-0 bg-surface-container-high/80 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center gap-3 z-20">
-          {isFullyResolved ? (
-            <Lock className="size-8 text-muted-foreground" />
-          ) : (
-            <Hourglass className="size-8 text-yellow-500 animate-pulse" />
-          )}
-          <span
-            className={`text-sm font-bold font-sans uppercase tracking-widest ${
-              isFullyResolved ? "text-muted-foreground" : "text-yellow-500"
-            }`}
-          >
-            {isFullyResolved ? "Market Resolved" : "Awaiting Resolution"}
-          </span>
-          <span className="text-xs font-sans text-muted-foreground">
-            {isFullyResolved
-              ? "Trading is no longer available"
-              : "Market has closed — pending outcome"}
-          </span>
-        </div>
-      )}
     </Card>
   );
 }

@@ -60,7 +60,10 @@ export default function MarketPage() {
 
   // Computed prices for the trade panel
   const buyYesPrice = lowestAsk !== null ? lowestAsk : parseFloat(market.yesPrice);
+  const sellYesPrice = highestBid !== null ? highestBid : parseFloat(market.yesPrice);
+
   const buyNoPrice = highestBid !== null ? 100 - highestBid : parseFloat(market.noPrice);
+  const sellNoPrice = lowestAsk !== null ? 100 - lowestAsk : parseFloat(market.noPrice);
 
   // Format chart data
   const formattedChartData = chartData.map((d) => {
@@ -123,7 +126,9 @@ export default function MarketPage() {
           <TradePanel
             marketId={marketId}
             buyYesPrice={buyYesPrice}
+            sellYesPrice={sellYesPrice}
             buyNoPrice={buyNoPrice}
+            sellNoPrice={sellNoPrice}
             isFrozen={isFrozen}
             isFullyResolved={isFullyResolved}
             isAwaitingResolution={isAwaitingResolution}
