@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
+import { Logo } from "@/components/ui/logo";
 
 export function TopNav() {
   return (
     <nav className="flex items-center justify-between px-6 bg-background pt-4 border-b border-white/[0.05]">
       <div className="flex items-center gap-12 h-10">
-        <Link href="/" className="flex items-center gap-1">
+        <Link href="/" className="flex items-center gap-2 pb-4 hover:opacity-80 transition-opacity">
+          <Logo className="w-8 h-8 text-primary" />
           <span className="text-xl font-sans font-extrabold text-foreground tracking-tight lowercase">
             winnr
           </span>
