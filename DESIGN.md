@@ -1,83 +1,90 @@
-# Design System Strategy: The Kinetic Forest
-
+# Design System Strategy: Veridian Frost
+ 
 ## 1. Overview & Creative North Star
-The Creative North Star for this design system is **"The Kinetic Forest."** 
-
-In a prediction market, users require the absolute stability of a deep-rooted institution (The Forest) paired with the high-velocity, electric energy of real-time gains (The Kinetic). This system rejects the "standard dashboard" aesthetic in favor of a high-end, editorial experience. We break the rigid grid through **intentional asymmetry**, where data-heavy modules are offset by expansive, breathable "brand moments" using large-scale typography. 
-
-The goal is to move away from "flat UI" and toward a multi-layered, tactile environment that feels like a premium physical device—where depth is communicated through light and transparency rather than lines and boxes.
-
+**The Creative North Star: "The Kinetic Glade"**
+ 
+This design system moves beyond traditional dashboard aesthetics to create a high-end, editorial environment that feels like a precision instrument forged in a digital forest. We are blending the "serious and professional" with a "sophisticated gamification" layer. The goal is "Kinetic Forest"—a UI that feels alive and deep, yet remains coolly analytical.
+ 
+We break the "template" look through:
+*   **Asymmetric Precision:** Avoiding perfectly centered layouts in favor of intentional, high-contrast white space and off-grid typography placement.
+*   **Atmospheric Depth:** Using a "Veridian Frost" palette to create a sense of environmental layering, as if the UI is viewed through sheets of chilled glass in a twilight grove.
+*   **High-Tech Editorial:** Large, aggressive `display` type paired with utilitarian `label` styles to create a hierarchy that feels like a premium financial or performance-tracking journal.
+ 
 ---
-
-## 2. Colors: The Monochromatic Spectrum
-We utilize a monochromatic green palette to establish a singular, powerful brand identity. By removing the distraction of a multi-color wheel, we force the user to focus on **luminance** as the primary indicator of value and action.
-
+ 
+## 2. Colors & Surface Philosophy
+The palette is rooted in the depth of deep teals (`#07100e`) contrasted against the crystalline vibrance of mint highlights (`#acead3`).
+ 
 ### The "No-Line" Rule
-**Explicit Instruction:** Designers are prohibited from using 1px solid borders for sectioning or containment. Structural boundaries must be defined solely through background color shifts. 
-- A card should not have a border; it should be a `surface-container-high` element sitting on a `surface` background. 
-- Use the 1.3rem (`spacing-6`) or 1.75rem (`spacing-8`) gaps to let the background "bleed" through, creating natural separation.
-
+**Lines are prohibited for sectioning.** We do not use 1px borders to separate content. Boundaries must be defined strictly through:
+*   **Tonal Shifts:** Placing a `surface-container-low` component on a `surface` background.
+*   **Negative Space:** Using the spacing scale to create clear mental models of content grouping.
+ 
 ### Surface Hierarchy & Nesting
-Treat the UI as a series of stacked, semi-translucent plates.
-- **Base Layer:** `surface` (#0c160c) – The deep, forest floor.
-- **Sectioning:** `surface-container-low` (#141e14) – Subsurface regions.
-- **Interactive Elements:** `surface-container-high` (#222d22) – Raised tactile surfaces.
-- **Floating/Active:** `surface-bright` (#313c31) – Elements requesting immediate attention.
-
+Treat the UI as a series of nested physical layers. 
+*   **Base:** `surface` (#07100e)
+*   **Lowered Areas:** `surface-container-low` (#0b1513) for recessed backgrounds.
+*   **Floating Elements:** `surface-container-highest` (#1b2825) for high-priority cards.
+*   **Interactive Layers:** Use `surface-bright` (#212f2c) to indicate active or "lit" zones within the dark environment.
+ 
 ### The "Glass & Gradient" Rule
-To achieve a "gamified" premium feel, use Glassmorphism for floating overlays (Modals, Hover Tooltips). Use a `surface-variant` color at 60% opacity with a `backdrop-filter: blur(20px)`. 
-**Signature Texture:** For primary CTAs, apply a linear gradient from `primary_fixed` (#9ffb06) to `secondary_fixed_dim` (#91d78a) at a 135-degree angle. This creates a "glow" that feels liquid and alive.
-
+To achieve the "Frost" aesthetic, floating elements should utilize **Glassmorphism**. Apply `surface-variant` with a 60-80% opacity and a 16px-24px `backdrop-blur`. 
+**Signature Texture:** Primary CTAs should not be flat. Use a linear gradient (135°) from `primary` (#acead3) to `primary-container` (#70ac97) to provide a metallic, high-tech sheen.
+ 
 ---
-
-## 3. Typography: Authority Meets Precision
-The system uses a dual-font strategy to balance brand character with data density.
-
-*   **Display & Headlines (Space Grotesk):** This is our "Character" font. It is wide, bold, and modern. Use `display-lg` (3.5rem) for major market outcomes and `headline-md` (1.75rem) for section titles. Its geometric nature feels "engineered," reinforcing the "serious" aspect of the prediction market.
-*   **Body & Titles (Manrope):** A high-readability sans-serif. Used for the "serious" work—market descriptions, terms, and conditions.
-*   **Data & Labels (Inter):** Reserved for the high-density dashboard. Inter’s tall x-height and neutral personality ensure that even at `label-sm` (0.6875rem), numeric data remains surgical and clear.
-
+ 
+## 3. Typography
+The type system is a dialogue between the technical geometry of **Space Grotesk** and the humanistic clarity of **Manrope**.
+ 
+*   **Space Grotesk (Display/Headline/Label):** Used for "The Machine." This is your data, your scores, and your high-impact statements. Use `display-lg` (3.5rem) with tight letter-spacing (-0.02em) for hero moments to command authority.
+*   **Manrope (Title/Body):** Used for "The Narrative." This handles descriptions and long-form content. It provides the "professional" counterbalance to the high-tech display face.
+ 
+**Hierarchy Tip:** Use `label-md` in Space Grotesk with `letter-spacing: 0.1em` and `text-transform: uppercase` for all category headers to reinforce the "instrumental" feel.
+ 
 ---
-
-## 4. Elevation & Depth: Tonal Layering
-Traditional shadows are too "dirty" for this clean, green aesthetic. We use **Luminous Depth**.
-
-*   **The Layering Principle:** Instead of a drop shadow, elevate an element by moving it one step up the surface-container tier. An active market card should move from `surface-container-low` to `surface-container-highest`.
-*   **Ambient Shadows:** If a floating state (like a dropdown) requires a shadow, use a large 40px blur with 8% opacity using the `on-secondary-fixed` color (#002203). This creates a dark-green ambient occlusion rather than a grey shadow, maintaining the "all green" theme.
-*   **The "Ghost Border" Fallback:** If accessibility requires a stroke (e.g., in high-contrast modes), use the `outline-variant` (#414a34) at 15% opacity. It should be felt, not seen.
-*   **Winning States:** When a prediction is successful, apply an outer glow using `primary_container` (#9ffb06) with a spread of 15px and a 30% opacity, accompanied by a subtle pulse animation.
-
+ 
+## 4. Elevation & Depth
+In this system, elevation is a function of light and tone, not structure.
+ 
+*   **Tonal Layering:** Depth is achieved by "stacking" the tiers. A `surface-container-lowest` card placed on a `surface-container-low` section creates a natural "drop" without a single line of CSS border.
+*   **Ambient Shadows:** Use shadows sparingly. When required, use a large blur (32px+) and low opacity (6%). The shadow color must be a tinted dark teal (`#000000` with a hint of `primary_dim`) rather than neutral grey.
+*   **The "Ghost Border" Fallback:** If a border is required for accessibility, use the `outline-variant` token at **15% opacity**. This creates a suggestion of an edge that feels integrated into the "Frost" atmosphere.
+ 
 ---
-
+ 
 ## 5. Components
-
+ 
 ### Buttons
-*   **Primary:** No border. Background: `primary_fixed` (#9ffb06). Text: `on-primary-fixed` (#102000). Use `rounded-md` (0.375rem). On hover, add a subtle box-shadow glow of the same color.
-*   **Secondary (Tactile):** Background: `secondary_container` (#0f5518). Text: `on-secondary-container` (#84c97d).
-*   **Tertiary:** Ghost style. No background. `label-md` weight. Text: `primary_fixed`.
-
+*   **Primary:** Gradient of `primary` to `primary-container`. `radius-sm` (0.125rem) for a sharp, professional edge. Text is `on-primary-container`.
+*   **Secondary:** Ghost style. `outline` color at 20% opacity. On hover, fills to `surface-bright`.
+*   **Kinetic State:** On click, use a subtle `primary` outer glow (4px blur) to simulate a "power-on" state.
+ 
 ### Input Fields
-*   **Standard State:** Background: `surface-container-lowest`. No border. Bottom-heavy padding (`spacing-4`).
-*   **Active State:** Background: `surface-container-low`. A 2px bottom-border of `primary_fixed` is the only "line" allowed in the system.
-
-### Cards & Dashboards
-*   **The Data Grid:** Markets are displayed in cards using `surface-container-high`. 
-*   **No Dividers:** Separate "Current Odds" from "Volume" using a 1.1rem (`spacing-5`) vertical gap and a slight weight change in the Inter font.
-*   **Predictive Sliders:** Use a `tertiary_container` track with a `primary_fixed` thumb. The thumb should have a small `primary_fixed` glow to make it feel "charged."
-
-### High-Density Market Ticker
-A custom component for this system. A horizontal scrolling list of `surface-container-highest` chips. It uses `label-sm` for the asset name and `title-sm` (Manrope) for the price, creating a clear "Editorial" hierarchy within a small space.
-
+*   **Styling:** No borders. Use `surface-container-high` as the background. 
+*   **Active State:** A bottom-only 2px bar of `primary`.
+*   **Error:** Use `error_dim` (#d7383b) for the accent, never a full red box.
+ 
+### Cards & Lists
+*   **Rule:** Forbid divider lines.
+*   **Implementation:** Use a 4px vertical bar of `secondary` on the left side of a list item to indicate selection or "active" status. Use `surface-container-low` and `surface-container-high` to distinguish between alternating list items.
+ 
+### Chips
+*   **Visual:** Pill-shaped (`radius-full`). 
+*   **Style:** `surface-variant` background with `on-surface-variant` text. High-contrast mint `primary` text for "success" or "active" chips.
+ 
+### Additional Component: The "Progress Glade"
+A custom progress visualization. Instead of a standard bar, use a series of vertical dashes using the `primary` token, where the background "glows" using a `primary_container` blur effect behind the current progress point.
+ 
 ---
-
+ 
 ## 6. Do's and Don'ts
-
+ 
 ### Do
-*   **Use Asymmetry:** Offset your headline `display-md` to the left while keeping data right-aligned to create an editorial, high-end feel.
-*   **Embrace Dark Space:** Use `surface` (#0c160c) generously. The "Forest" needs depth to make the "Kinetic" neon pops feel valuable.
-*   **Layer Surfaces:** Always place a "High" container on a "Low" container to create hierarchy.
-
+*   **Do** use asymmetrical margins. A 2/3 vs 1/3 grid split creates a high-end editorial feel.
+*   **Do** embrace the dark. Ensure `surface` (#07100e) is the dominant color to make `primary` highlights feel truly "kinetic."
+*   **Do** use `radius-sm` for most containers. Sharp corners feel more "professional" and "serious" than rounded ones.
+ 
 ### Don't
-*   **Don't use 100% White:** Even "white" text should be `on-surface` (#dae6d6), which is a very pale green-grey, to keep the palette harmonious.
-*   **Don't use sharp corners:** While serious, the system is tactile. Stick to the `md` (0.375rem) or `lg` (0.5rem) roundedness scale. 
-*   **Don't use standard Dividers:** If you feel the need to draw a line, try adding `0.4rem` of whitespace instead. If that fails, use a subtle background shift.
+*   **Don't** use 100% white. Use `on-surface` (#f4fffa) for text; it is a soft mint-white that prevents eye strain in dark mode.
+*   **Don't** use pure black shadows. They muddy the deep teal tones of the "Veridian Frost."
+*   **Don't** use standard icons. Use "Thin" or "Light" weight stroke icons to match the refined Space Grotesk typeface.ce.

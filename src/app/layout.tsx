@@ -23,8 +23,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Winnr - Kinetic Forest",
-  description: "Prediction market platform",
+  title: "Winnr - Veridian Frost",
+  description: "Prediction market platform designed with atmospheric depth.",
 };
 
 export default function RootLayout({

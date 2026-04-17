@@ -12,6 +12,7 @@ import {
   RecentActivity,
   TradePanel,
 } from "@/components/market";
+import { OpenOrdersList } from "@/components/market/OpenOrdersList";
 
 export default function MarketPage() {
   const params = useParams();
@@ -102,7 +103,7 @@ export default function MarketPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left/Main Column: Chart & Info */}
-        <div className="lg:col-span-2 flex gap-6 flex-col">
+        <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Main Chart Card */}
           <MarketPriceChart
             chartData={formattedChartData}
@@ -113,15 +114,10 @@ export default function MarketPage() {
             liquidity={market.liquidity}
             resolutionDate={market.resolutionDate}
           />
-
-          {/* Under Chart: Order Book & Activity */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-            <OrderBook bids={bids} asks={asks} />
-            <RecentActivity yesPrice={market.yesPrice} noPrice={market.noPrice} />
-          </div>
+          <OpenOrdersList marketId={marketId} />
         </div>
 
-        {/* Right Column: Take Position Panel */}
+        {/* Right Column: Take Position Panel & Order Book */}
         <div className="flex flex-col gap-6">
           <TradePanel
             marketId={marketId}
@@ -133,7 +129,32 @@ export default function MarketPage() {
             isFullyResolved={isFullyResolved}
             isAwaitingResolution={isAwaitingResolution}
           />
+          <OrderBook bids={bids} asks={asks} />
+
+          {/* Static Vault Integration Card from Design */}
+          <div className="bg-surface-container border-0 rounded-sm p-6 relative overflow-hidden flex flex-col items-center text-center mt-2 group cursor-pointer">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(172,234,211,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="size-32 rounded-full border border-primary/20 bg-primary/5 flex items-center justify-center mb-6 relative">
+              <div className="absolute inset-0 border border-primary/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
+              <div className="absolute inset-2 border border-primary/20 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+              <div className="size-2 bg-primary rounded-full shadow-[0_0_15px_rgba(172,234,211,0.8)]"></div>
+            </div>
+            <h4 className="text-lg font-heading font-bold text-white mb-2 relative z-10">
+              Vault Integration
+            </h4>
+            <p className="text-xs text-muted-foreground font-sans mb-4 relative z-10 leading-relaxed">
+              Auto-hedge your positions through our managed liquidity vaults.
+            </p>
+            <span className="text-[9px] font-sans font-bold text-primary tracking-widest uppercase relative z-10">
+              Explore Vaults →
+            </span>
+          </div>
         </div>
+      </div>
+
+      {/* Full Width Recent Activity Row */}
+      <div className="mt-8">
+        <RecentActivity yesPrice={market.yesPrice} noPrice={market.noPrice} />
       </div>
     </div>
   );

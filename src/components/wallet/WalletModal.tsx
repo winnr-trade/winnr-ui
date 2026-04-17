@@ -4,6 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -49,10 +50,10 @@ export function WalletModal() {
             </div>
           ) : (
             wallets.map((wallet) => (
-              <button
-                type="button"
+              <Button
+                variant="wallet"
+                size="wallet"
                 key={wallet.adapter.name}
-                className="w-full flex items-center justify-start gap-4 h-16 p-4 rounded-lg bg-surface-container hover:bg-surface-container-lowest transition-colors border border-transparent hover:border-primary/20 hover:shadow-[0_0_15px_rgba(159,251,6,0.15)] group focus:outline-none cursor-pointer"
                 onClick={() => {
                   select(wallet.adapter.name);
                 }}
@@ -78,7 +79,7 @@ export function WalletModal() {
                     Detected
                   </span>
                 )}
-              </button>
+              </Button>
             ))
           )}
         </div>

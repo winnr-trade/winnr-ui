@@ -1,4 +1,5 @@
 import { Area, AreaChart } from "recharts";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   type ChartConfig,
@@ -10,7 +11,7 @@ import {
 const chartConfig = {
   price: {
     label: "Price (¢)",
-    color: "#9ffb06",
+    color: "#acead3",
   },
 } satisfies ChartConfig;
 
@@ -46,20 +47,21 @@ export function MarketPriceChart({
     <Card className="bg-surface-container-high border-0 shadow-none overflow-hidden flex flex-col relative h-[450px]">
       {/* Chart Header */}
       <div className="p-6 flex justify-between items-center z-10">
-        <div className="flex gap-4 text-xs font-sans font-bold">
+        <div className="flex gap-2 text-xs font-sans font-bold">
           {RESOLUTION_OPTIONS.map((res) => (
-            <button
-              type="button"
+            <Button
               key={res.val}
+              variant="ghost"
+              size="xs"
               onClick={() => onResolutionChange(res.val)}
               className={
                 resolution === res.val
-                  ? "bg-surface-container-highest px-3 py-1.5 rounded-sm text-primary cursor-pointer active"
-                  : "text-muted-foreground hover:text-foreground cursor-pointer px-3 py-1.5"
+                  ? "bg-surface-container-highest text-primary"
+                  : ""
               }
             >
               {res.label}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="flex items-center gap-2">
@@ -73,7 +75,7 @@ export function MarketPriceChart({
       </div>
 
       {/* Chart Graphic Area */}
-      <div className="flex-1 w-full relative px-0 pb-0 flex mt-4 drop-shadow-[0_0_15px_rgba(159,251,6,0.3)]">
+      <div className="flex-1 w-full relative px-0 pb-0 flex mt-4 drop-shadow-[0_0_15px_rgba(172,234,211,0.3)]">
         <ChartContainer
           config={chartConfig}
           className="absolute inset-0 size-full z-0 h-full w-full"
@@ -99,7 +101,7 @@ export function MarketPriceChart({
               stroke="var(--color-price)"
               fillOpacity={1}
               fill="url(#chartGradient)"
-              strokeWidth={4}
+              strokeWidth={2}
             />
           </AreaChart>
         </ChartContainer>

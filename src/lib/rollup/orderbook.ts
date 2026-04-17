@@ -40,6 +40,27 @@ export class Orderbook {
     return this.rollup.call(callMessage, { signer });
   }
 
+  async cancelOrder(params: { orderId: number }, signer: Signer) {
+    const callMessage = {
+      orderbook: {
+        cancel_order: {
+          order_id: params.orderId,
+        },
+      },
+    };
+
+    return this.rollup.call(callMessage, { signer });
+  }
+
+  async getUserOrders(params: { userAddress: string; marketId?: number }) {
+    const query = new URLSearchParams();
+    query.set("user_address", params.userAddress);
+    if (params.marketId) {
+      query.set("market_id", params.marketId.toString());
+    }
+    return this.rollup.http.get(`${this.prefix}/user-orders?${query.toString()}`);
+  }
+
   // Fetch market module status
   async status() {
     return this.rollup.http.get(`${this.prefix}/status`);

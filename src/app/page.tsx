@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock,
   Landmark,
+  Plus,
   Rocket,
   Search,
   Trophy,
@@ -106,301 +107,163 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto p-6 md:p-8 flex flex-col gap-10 max-w-[1400px]">
+    <div className="container mx-auto p-6 md:p-8 flex flex-col gap-16 max-w-[1400px]">
       {/* Featured Market Hero */}
       <Link href={`/markets/${featuredMarket.id}`} className="block">
-        <Card className="bg-surface-container border-0 rounded-2xl overflow-hidden relative flex flex-col lg:flex-row shadow-none p-0 group hover:opacity-95 transition-opacity">
-          <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center z-10">
-            <div className="flex items-center gap-4 mb-6">
-              <span className="px-3 py-1 rounded-sm bg-primary/10 text-primary text-[10px] font-sans font-bold tracking-widest uppercase border border-primary/20">
-                {featuredMarket.tag}
-              </span>
-              <span className="text-xs font-sans text-muted-foreground flex items-center gap-1.5">
-                <Activity className="size-3" /> {featuredMarket.volume}
+        <Card className="bg-surface-container border-0 rounded-sm overflow-hidden relative shadow-none p-0 group">
+          {/* Faux Background for Hero */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-linear-to-r from-background via-surface/80 to-transparent z-10 w-2/3"></div>
+            {/* This simulates the crystal background from the image */}
+            <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-linear-to-tr from-primary/5 to-primary/20 opacity-30 skew-x-12 blur-3xl"></div>
+          </div>
+
+          <div className="relative z-10 p-10 lg:p-16 flex flex-col justify-center max-w-3xl">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_rgba(172,234,211,0.8)]"></div>
+              <span className="text-[10px] font-sans font-bold text-primary uppercase tracking-[0.2em]">
+                {featuredMarket.tag || "FEATURED HIGH-VOLUME MARKET"}
               </span>
             </div>
 
-            <h1 className="text-4xl lg:text-5xl font-heading font-extrabold leading-tight mb-8 max-w-xl">
-              {featuredMarket.titlePrefix}
-              <span className="text-primary drop-shadow-[0_0_15px_rgba(159,251,6,0.3)]">
-                {featuredMarket.titleHighlight}
-              </span>
+            <h1 className="text-5xl lg:text-[5.5rem] font-heading font-extrabold leading-[0.95] mb-12 tracking-tight text-[#f4fffa]">
+              {featuredMarket.titlePrefix}{" "}
+              <span className="text-primary">{featuredMarket.titleHighlight}</span>{" "}
               {featuredMarket.titleSuffix}
             </h1>
 
-            <div className="flex items-center gap-12 mb-8">
+            <div className="flex items-center gap-16 mb-12">
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
-                  Probability
+                  YES PROBABILITY
                 </span>
-                <span className="text-5xl font-heading font-bold text-primary">
+                <span className="text-4xl font-heading font-bold text-primary">
                   {featuredMarket.probability}
                 </span>
               </div>
+              <div className="w-px h-12 bg-white/10"></div>
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
-                  Ends In
+                  TOTAL VOLUME
                 </span>
-                <span className="text-2xl font-heading font-bold text-white mt-1">
-                  {featuredMarket.endsIn}
+                <span className="text-4xl font-heading font-bold text-[#f4fffa]">
+                  {featuredMarket.volume}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <Button className="h-14 px-8 text-xl group relative overflow-hidden">
-                <span className="relative z-10 flex items-center gap-2">
-                  YES {featuredMarket.yesPrice}{" "}
-                  <ArrowUp className="size-5 transition-transform group-hover:-translate-y-1" />
-                </span>
+              <Button
+                size="lg"
+                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-sm bg-primary text-black hover:bg-primary/90 flex items-center gap-2"
+              >
+                PREDICT NOW <ArrowUp className="size-4 rotate-45" />
               </Button>
               <Button
-                variant="secondary"
-                className="h-14 px-8 text-xl bg-surface-container-highest hover:bg-surface-container-high text-neutral-300 border-0"
+                variant="outline"
+                size="lg"
+                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-sm bg-white/5 border-0 hover:bg-white/10 text-white"
               >
-                NO {featuredMarket.noPrice}
+                ANALYSIS
               </Button>
-            </div>
-          </div>
-
-          {/* Hero Chart Section */}
-          <div className="flex-1 relative min-h-[300px] lg:min-h-full">
-            <div className="absolute inset-0 bg-gradient-to-r from-surface-container to-transparent z-10 lg:w-32"></div>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-8 lg:p-12 overflow-hidden">
-              {/* Glowing Current Odds Badge */}
-              <div className="absolute right-12 top-1/4 z-20 border border-surface-container-highest bg-surface-container/80 backdrop-blur-sm rounded-lg p-3 text-center pointer-events-auto">
-                <div className="text-[9px] uppercase tracking-widest font-sans text-muted-foreground mb-1">
-                  Current Odds
-                </div>
-                <div className="text-primary font-heading font-bold text-xl">
-                  {featuredMarket.currentOdds}
-                </div>
-              </div>
-
-              <svg
-                className="w-full h-full drop-shadow-[0_0_20px_rgba(159,251,6,0.5)] z-0"
-                viewBox="0 0 500 300"
-                preserveAspectRatio="none"
-                role="img"
-                aria-label="Market Trajectory"
-              >
-                <title>Featured Market Trajectory</title>
-                <path
-                  d="M 10,220 C 150,210 250,180 350,100 C 420,60 480,40 500,40"
-                  fill="none"
-                  stroke="var(--primary-fixed)"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-                <circle
-                  cx="500"
-                  cy="40"
-                  r="6"
-                  fill="var(--primary-fixed)"
-                  className="drop-shadow-[0_0_10px_rgba(159,251,6,1)]"
-                />
-              </svg>
             </div>
           </div>
         </Card>
       </Link>
 
       {/* Categories and Search Row */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-1">
-        <div className="flex items-center gap-3 overflow-x-auto pb-4 lg:pb-0 scrollbar-none mask-fade-edges-x">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-8 py-4 px-1">
+        <div className="flex items-center gap-3 overflow-x-auto pb-4 lg:pb-0 scrollbar-none justify-center w-full">
           {categories.map((cat) => (
-            <button
+            <Button
               key={cat.name}
-              type="button"
-              className={`whitespace-nowrap px-6 py-2.5 rounded-md font-sans font-bold text-sm transition-colors ${
-                cat.active
-                  ? "bg-primary text-black shadow-[0_0_15px_rgba(159,251,6,0.3)]"
-                  : "bg-surface-container-high text-muted-foreground hover:bg-surface-container-highest hover:text-foreground"
-              }`}
+              variant="pill"
+              size="pill"
+              data-active={cat.active}
             >
               {cat.name}
-            </button>
+            </Button>
           ))}
-        </div>
-
-        <div className="relative w-full lg:w-96 shrink-0">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search markets by title, category, or tag..."
-            className="w-full h-12 bg-surface-container-high border border-surface-container-highest rounded-xl pl-12 pr-4 text-sm font-sans focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground"
-          />
         </div>
       </div>
 
       {/* Main Grid Content */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Left Column (Main Feeds) */}
-        <div className="xl:col-span-2 flex flex-col gap-10">
-          {/* Trending Markets */}
-          <section className="flex flex-col gap-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
-              <div>
-                <Heading>Trending Markets</Heading>
-                <p className="text-muted-foreground font-sans text-sm mt-1">
-                  Highest activity in the last 24 hours
-                </p>
-              </div>
-              <button
-                type="button"
-                className="text-primary font-sans font-bold text-sm flex items-center gap-1 hover:underline"
-              >
-                View All <ArrowRight className="size-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {trendingMarkets.map((market) => (
-                <Link key={market.id} href={`/markets/${market.id}`} className="block">
-                  <Card className="bg-[#131b14] border-0 shadow-none hover:bg-surface-container transition-colors p-5 flex flex-col gap-4 h-full">
-                    <div className="flex justify-between items-start">
-                      <div className="size-10 rounded-md bg-surface-container-highest flex items-center justify-center">
-                        {getIconByName(market.iconName)}
-                      </div>
-                      <span className="text-[10px] font-sans text-muted-foreground">
-                        {market.category}
-                      </span>
-                    </div>
-                    <h3 className="font-heading font-bold text-lg leading-snug flex-1">
-                      {market.title}
-                    </h3>
-                    <div className="flex justify-between items-end mt-4">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-sans font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                          Chance
-                        </span>
-                        <span className="text-2xl font-heading font-bold text-primary">
-                          {market.chance}
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-sans font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                          Vol
-                        </span>
-                        <span className="text-sm font-sans font-semibold text-white">
-                          {market.volume}
-                        </span>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Newest Markets */}
-          <section className="flex flex-col gap-6">
-            <Heading>Newest Markets</Heading>
-            <div className="flex flex-col gap-4">
-              {newestMarkets.map((market) => (
-                <Link key={market.id} href={`/markets/${market.id}`} className="block">
-                  <Card className="bg-surface-container border-0 shadow-none hover:bg-surface-container-high transition-colors p-4 flex items-center gap-6">
-                    <div className="size-12 rounded-md bg-surface-container-highest flex items-center justify-center shrink-0">
-                      {getIconByName(market.iconName)}
-                    </div>
-                    <div className="flex-1 flex flex-col justify-center">
-                      <h4 className="font-heading font-bold text-lg">{market.title}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs font-sans text-muted-foreground">
-                          {market.tags[0]}
-                        </span>
-                        <span className="text-xs text-muted-foreground">•</span>
-                        <span className="text-xs font-sans text-muted-foreground">
-                          {market.tags[1]}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end shrink-0">
-                      <span className="text-[10px] font-sans font-bold text-muted-foreground uppercase tracking-wider mb-1">
-                        {market.metricLabel}
-                      </span>
-                      <span className={`text-xl font-heading font-bold ${market.metricColor}`}>
-                        {market.metricValue}
-                      </span>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </section>
+      <section className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-2">
+          <div>
+            <Heading className="font-heading text-3xl font-bold tracking-tight text-[#f4fffa] mb-2">
+              Trending Markets
+            </Heading>
+          </div>
+          <Button
+            variant="link"
+            size="tab"
+            className="flex items-center gap-1.5 mb-2 hover:opacity-70"
+          >
+            VIEW ALL ACTIVITY <ArrowRight className="size-3" />
+          </Button>
         </div>
 
-        {/* Right Column (Sidebars) */}
-        <div className="flex flex-col gap-8">
-          {/* Closing Soon */}
-          <Card className="bg-surface-container border-0 shadow-none p-6 flex flex-col gap-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="size-5 text-red-400" />
-              <Heading className="text-xl">Closing Soon</Heading>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {trendingMarkets.map((market) => (
+            <Link key={market.id} href={`/markets/${market.id}`} className="block">
+              <Card className="bg-surface-container-low border border-white/[0.02] hover:bg-surface-container transition-colors p-6 flex flex-col gap-6 h-full rounded-sm shadow-none">
+                <div className="flex justify-between items-center">
+                  <span className="px-2 py-1 bg-surface-container-highest text-primary font-sans font-bold text-[9px] uppercase tracking-widest rounded-sm">
+                    {market.category}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-sans">Ends Dec 12</span>
+                </div>
 
-            <div className="flex flex-col gap-6">
-              {closingSoon.map((item) => (
-                <Link key={item.id} href={`/markets/${item.id}`} className="block group">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center">
-                      <span
-                        className={`text-[10px] font-sans font-bold tracking-widest uppercase ${item.tagColor}`}
-                      >
-                        {item.tag}
-                      </span>
-                      <span className="text-[10px] font-sans text-muted-foreground">
-                        {item.time}
-                      </span>
-                    </div>
-                    <p className="font-heading font-semibold text-sm leading-snug text-neutral-200 group-hover:text-primary transition-colors">
-                      {item.title}
-                    </p>
-                    <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden mt-1">
-                      <div
-                        className="h-full bg-surface-container-low transition-all"
-                        style={{ width: `${item.progress}%` }}
-                      ></div>
-                    </div>
+                <h3 className="font-heading font-bold text-lg leading-snug flex-1 text-[#f4fffa]">
+                  {market.title}
+                </h3>
+
+                {/* Probabilities Bar */}
+                <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex justify-between text-[9px] font-sans font-bold uppercase tracking-widest text-[#f4fffa]/40">
+                    <span>YES {market.chance}</span>
+                    <span>NO 62%</span>
                   </div>
-                </Link>
-              ))}
+                  <div className="w-full h-[3px] flex bg-[#362727] rounded-none">
+                    <div className="h-full bg-primary" style={{ width: market.chance }}></div>
+                    <div className="h-full bg-[#f4fffa]/20" style={{ width: "2px" }}></div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-1">
+                  <Button variant="tech" size="outcome" className="flex-1 h-10">
+                    PREDICT YES
+                  </Button>
+                  <Button variant="tech" size="outcome" className="flex-1 h-10">
+                    PREDICT NO
+                  </Button>
+                </div>
+              </Card>
+            </Link>
+          ))}
+
+          {/* Propose a Market Card */}
+          <Card className="bg-surface-container border border-surface-bright shadow-[inset_0px_50px_100px_rgba(172,234,211,0.05)] p-8 flex flex-col justify-center items-center text-center gap-4 h-full rounded-sm min-h-[300px]">
+            <div className="size-12 rounded-lg bg-surface-bright flex items-center justify-center mb-2">
+              <Plus className="size-6 text-primary" />
             </div>
 
-            <Button
-              variant="secondary"
-              className="w-full mt-2 bg-[#1b251b] hover:bg-surface-container-highest text-white border-0 h-12"
-            >
-              View Resolution Feed
+            <div>
+              <h3 className="font-heading font-bold text-xl text-[#f4fffa] mb-2">
+                Propose a Market
+              </h3>
+              <p className="text-muted-foreground font-sans text-sm leading-relaxed max-w-[80%] mx-auto mb-2">
+                Staked users can submit new market ideas for community governance.
+              </p>
+            </div>
+
+            <Button className="w-full bg-primary hover:bg-primary/90 text-black border-0 h-12 rounded-sm font-sans font-bold text-[10px] tracking-widest uppercase mt-4">
+              SUBMIT PROPOSAL
             </Button>
           </Card>
-
-          {/* Market Stats */}
-          <Card className="bg-surface-container border-0 shadow-none p-6 flex flex-col gap-6">
-            <Heading className="text-xl">Market Stats</Heading>
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-sans text-muted-foreground">24h Traders</span>
-                <span className="text-sm font-sans font-bold text-primary">
-                  {marketStats.traders24h}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-sans text-muted-foreground">Total TVL</span>
-                <span className="text-sm font-sans font-bold text-primary">
-                  {marketStats.totalTvl}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-sans text-muted-foreground">Active Markets</span>
-                <span className="text-sm font-sans font-bold text-primary">
-                  {marketStats.activeMarkets}
-                </span>
-              </div>
-            </div>
-          </Card>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -94,369 +94,185 @@ export function TradePanel({
   };
 
   return (
-    <Card className="bg-surface-container-high border-0 shadow-none p-6 sticky top-6 relative">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex bg-surface-container-low p-1 rounded-sm">
-          <button
-            type="button"
-            disabled={isFrozen}
-            onClick={() => setTradeSide("BUY")}
-            className={`text-[10px] font-bold font-sans uppercase tracking-widest px-4 py-1.5 rounded-sm transition-all ${
-              tradeSide === "BUY"
-                ? "bg-primary text-black shadow-[0_0_10px_rgba(159,251,6,0.2)]"
-                : "text-muted-foreground hover:text-foreground"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            Buy
-          </button>
-          <button
-            type="button"
-            disabled={isFrozen}
-            onClick={() => setTradeSide("SELL")}
-            className={`text-[10px] font-bold font-sans uppercase tracking-widest px-4 py-1.5 rounded-sm transition-all ${
-              tradeSide === "SELL"
-                ? "bg-destructive text-white shadow-[0_0_10px_rgba(255,50,50,0.2)]"
-                : "text-muted-foreground hover:text-foreground"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            Sell
-          </button>
-        </div>
-
-        <div className="flex bg-surface-container-low p-1 rounded-sm">
-          <button
-            type="button"
-            disabled={isFrozen}
-            onClick={() => setOrderType(OrderType.Market)}
-            className={`text-[10px] font-bold font-sans uppercase tracking-widest px-3 py-1.5 rounded-sm transition-all ${
-              orderType === OrderType.Market
-                ? "bg-surface-container-high text-primary shadow-[0_0_10px_rgba(159,251,6,0.1)]"
-                : "text-muted-foreground hover:text-foreground"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            Market
-          </button>
-          <button
-            type="button"
-            disabled={isFrozen}
-            onClick={() => setOrderType(OrderType.Limit)}
-            className={`text-[10px] font-bold font-sans uppercase tracking-widest px-3 py-1.5 rounded-sm transition-all ${
-              orderType === OrderType.Limit
-                ? "bg-surface-container-high text-primary shadow-[0_0_10px_rgba(159,251,6,0.1)]"
-                : "text-muted-foreground hover:text-foreground"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            Limit
-          </button>
-        </div>
-      </div>
-
-      {/* User Position */}
-      {address && (
-        <div className="bg-surface-container-low rounded-lg p-3 mb-6 flex justify-between items-center text-sm font-sans border border-surface-container">
-          <span className="text-muted-foreground uppercase tracking-widest font-bold text-[10px]">
-            YOUR POSITION
+    <div className="flex flex-col gap-6 w-full">
+      <div className="bg-surface-container border-0 p-6 sm:p-8 rounded-sm shadow-none flex flex-col gap-6 text-[#f4fffa]">
+        {/* Header Row: Title & Action Toggles */}
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
+            POSITION ENTRY
           </span>
-          <div className="flex gap-3">
-            <span className="text-primary font-mono font-bold">
-              {formatNumber(sharesData?.yes || 0, 0, 0)} YES
-            </span>
-            <span className="text-destructive font-mono font-bold">
-              {formatNumber(sharesData?.no || 0, 0, 0)} NO
-            </span>
+          <div className="flex gap-4">
+            <div className="flex gap-2 text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground">
+              <Button
+                variant="tab"
+                size="tab"
+                disabled={isFrozen}
+                onClick={() => setTradeSide("BUY")}
+                data-active={tradeSide === "BUY"}
+              >
+                BUY
+              </Button>
+              <Button
+                variant="tab"
+                size="tab"
+                disabled={isFrozen}
+                onClick={() => setTradeSide("SELL")}
+                data-active={tradeSide === "SELL"}
+              >
+                SELL
+              </Button>
+            </div>
+            <div className="flex gap-2 text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground border-l border-white/10 pl-4">
+              <Button
+                variant="tabWhite"
+                size="tab"
+                disabled={isFrozen}
+                onClick={() => setOrderType(OrderType.Market)}
+                data-active={orderType === OrderType.Market}
+              >
+                MARKET
+              </Button>
+              <Button
+                variant="tabWhite"
+                size="tab"
+                disabled={isFrozen}
+                onClick={() => setOrderType(OrderType.Limit)}
+                data-active={orderType === OrderType.Limit}
+              >
+                LIMIT
+              </Button>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Action Toggle */}
-      <div className="flex gap-4 mb-8">
-        <button
-          type="button"
-          disabled={isFrozen}
-          onClick={() => setSelectedOutcome("YES")}
-          className={`flex-1 rounded-lg p-4 border text-center cursor-pointer relative transition-all duration-200 ${
-            selectedOutcome === "YES"
-              ? tradeSide === "BUY"
-                ? "bg-surface-container-low border-primary shadow-[0_0_15px_rgba(159,251,6,0.15)]"
-                : "bg-surface-container-low border-destructive shadow-[0_0_15px_rgba(255,50,50,0.15)]"
-              : "bg-surface-container-lowest border-transparent hover:bg-surface-container-low"
-          } disabled:opacity-70 disabled:cursor-not-allowed`}
-        >
-          <div
-            className={`font-heading font-bold text-xl mb-1 ${
-              selectedOutcome === "YES"
-                ? tradeSide === "BUY"
-                  ? "text-primary"
-                  : "text-destructive"
-                : "text-foreground"
-            }`}
+        {/* YES / NO Toggle Block  */}
+        <div className="flex w-full h-12 bg-[#0a110f] rounded-sm p-1 border border-white/[0.02]">
+          <Button
+            variant="outcome"
+            size="outcome"
+            disabled={isFrozen}
+            onClick={() => setSelectedOutcome("YES")}
+            data-active={selectedOutcome === "YES"}
           >
             YES
-          </div>
-          <div
-            className={`text-xs font-sans ${
-              selectedOutcome === "YES"
-                ? tradeSide === "BUY"
-                  ? "text-primary"
-                  : "text-destructive"
-                : "text-muted-foreground"
-            }`}
-          >
-            {displayYesPrice.toFixed(1)}¢
-          </div>
-          {/* Glow active indicator */}
-          {selectedOutcome === "YES" && !isFrozen && (
-            <div
-              className={`absolute top-0 right-0 size-2 rounded-full m-2 animate-pulse ${
-                tradeSide === "BUY"
-                  ? "bg-primary shadow-[0_0_8px_rgba(159,251,6,1)]"
-                  : "bg-destructive shadow-[0_0_8px_rgba(255,50,50,1)]"
-              }`}
-            ></div>
-          )}
-        </button>
-        <button
-          type="button"
-          disabled={isFrozen}
-          onClick={() => setSelectedOutcome("NO")}
-          className={`flex-1 rounded-lg p-4 border text-center cursor-pointer relative transition-all duration-200 ${
-            selectedOutcome === "NO"
-              ? tradeSide === "BUY"
-                ? "bg-surface-container-low border-primary shadow-[0_0_15px_rgba(159,251,6,0.15)]"
-                : "bg-surface-container-low border-destructive shadow-[0_0_15px_rgba(255,50,50,0.15)]"
-              : "bg-surface-container-lowest border-transparent hover:bg-surface-container-low"
-          } disabled:opacity-70 disabled:cursor-not-allowed`}
-        >
-          <div
-            className={`font-heading font-bold text-xl mb-1 ${
-              selectedOutcome === "NO"
-                ? tradeSide === "BUY"
-                  ? "text-primary"
-                  : "text-destructive"
-                : "text-foreground"
-            }`}
+          </Button>
+          <Button
+            variant="outcome"
+            size="outcome"
+            disabled={isFrozen}
+            onClick={() => setSelectedOutcome("NO")}
+            data-active={selectedOutcome === "NO"}
           >
             NO
-          </div>
-          <div
-            className={`text-xs font-sans ${
-              selectedOutcome === "NO"
-                ? tradeSide === "BUY"
-                  ? "text-primary"
-                  : "text-destructive"
-                : "text-muted-foreground"
-            }`}
-          >
-            {displayNoPrice.toFixed(1)}¢
-          </div>
-          {/* Glow active indicator */}
-          {selectedOutcome === "NO" && !isFrozen && (
-            <div
-              className={`absolute top-0 right-0 size-2 rounded-full m-2 animate-pulse ${
-                tradeSide === "BUY"
-                  ? "bg-primary shadow-[0_0_8px_rgba(159,251,6,1)]"
-                  : "bg-destructive shadow-[0_0_8px_rgba(255,50,50,1)]"
-              }`}
-            ></div>
-          )}
-        </button>
-      </div>
+          </Button>
+        </div>
 
-      {/* Input Form */}
-      <div className="flex flex-col gap-6">
         {orderType === OrderType.Limit && (
-          <div className="mb-2">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-[10px] font-bold font-sans text-foreground tracking-widest uppercase">
-                LIMIT PRICE (¢)
-              </span>
-            </div>
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              LIMIT PRICE (¢)
+            </span>
             <div className="relative">
               <Input
                 type="number"
-                min="1"
-                max="99"
-                step="1"
                 disabled={isFrozen}
-                className={`h-16 text-3xl font-heading bg-background font-bold border-b-2 pt-0 pb-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                  tradeSide === "BUY" ? "border-primary" : "border-destructive"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-                placeholder="0"
                 value={limitPrice}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "") {
-                    setLimitPrice("");
-                    return;
-                  }
-                  if (!/^\d+$/.test(val)) return;
-                  const parsed = parseInt(val, 10);
-                  if (parsed > 99) {
-                    setLimitPrice("99");
-                  } else {
-                    setLimitPrice(parsed.toString());
-                  }
-                }}
+                onChange={(e) => setLimitPrice(e.target.value)}
+                className="w-full h-14 bg-[#0a110f] border border-white/[0.02] text-xl font-heading font-bold rounded-sm px-4 focus-visible:border-primary/50 text-[#f4fffa]"
+                placeholder="0"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 font-heading font-bold text-lg text-muted-foreground pointer-events-none">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-sans text-muted-foreground">
                 ¢
               </span>
             </div>
           </div>
         )}
 
-        <div className="mb-2">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] font-bold font-sans text-foreground tracking-widest uppercase">
-              {tradeSide === "BUY" ? "STAKE AMOUNT" : "AMOUNT TO SELL"}
+        {/* Amount Input */}
+        <div className="flex flex-col gap-3">
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              {tradeSide === "BUY" ? "AMOUNT TO BET (USDC)" : "SHARES TO SELL"}
             </span>
-            <button
-              type="button"
-              disabled={isFrozen}
-              onClick={() => setAmount(userBalance.toString())}
-              className={`text-[10px] font-bold font-sans tracking-widest uppercase cursor-pointer hover:underline text-right ${
-                tradeSide === "BUY" ? "text-primary" : "text-destructive"
-              } disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline`}
-            >
-              BAL: ${formatNumber(userBalance)}
-            </button>
+            <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
+              BAL: {formatNumber(userBalance)}
+            </span>
           </div>
-          <div className="relative">
+          <div className="relative flex items-center">
             <Input
               type="number"
-              min="0"
-              max={userBalance}
-              step="0.01"
               disabled={isFrozen}
-              className={`h-16 text-3xl font-heading bg-background font-bold border-b-2 pt-0 pb-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-                tradeSide === "BUY" ? "border-primary" : "border-destructive"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-              placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full h-14 bg-[#0a110f] border border-white/[0.02] text-xl font-heading font-bold rounded-sm pl-4 pr-[120px] focus-visible:border-primary/50 text-[#f4fffa]"
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 font-heading font-bold text-lg text-muted-foreground pointer-events-none">
-              USD
-            </span>
-          </div>
-        </div>
-
-        {/* Slider / Percentages */}
-        <div className="flex flex-col gap-4">
-          <div className="w-full h-8 relative flex items-center group">
-            <div className="w-full h-2 bg-surface-container-highest rounded-full absolute top-1/2 -translate-y-1/2 pointer-events-none overflow-hidden">
-              <div
-                className={`h-full ${tradeSide === "BUY" ? "bg-primary/60" : "bg-destructive/60"}`}
-                style={{
-                  width: `${Math.min(100, Math.max(0, (Number(amount || 0) / userBalance) * 100))}%`,
-                }}
-              ></div>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max={userBalance}
-              step="0.01"
-              disabled={isFrozen}
-              value={amount || 0}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full absolute inset-0 opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
-            />
-            <div
-              className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 size-4 rounded-full pointer-events-none transition-all duration-75 ${
-                tradeSide === "BUY"
-                  ? "bg-primary shadow-[0_0_8px_rgba(159,251,6,0.8)]"
-                  : "bg-destructive shadow-[0_0_8px_rgba(255,50,50,0.8)]"
-              } ${isFrozen ? "opacity-50" : ""}`}
-              style={{
-                left: `${Math.min(100, Math.max(0, (Number(amount || 0) / userBalance) * 100))}%`,
-              }}
-            ></div>
-          </div>
-          <div className="flex gap-2">
-            {[25, 50, 75, 100].map((pct) => (
-              <button
-                type="button"
-                key={pct}
-                disabled={isFrozen}
-                onClick={() =>
-                  setAmount(
-                    pct === 100 ? userBalance.toString() : ((userBalance * pct) / 100).toFixed(2),
-                  )
-                }
-                className={`flex-1 bg-surface-container px-0 py-2 rounded text-center text-[10px] font-bold font-sans text-muted-foreground cursor-pointer transition-colors ${
-                  tradeSide === "BUY"
-                    ? "hover:bg-primary/20 hover:text-primary"
-                    : "hover:bg-destructive/20 hover:text-destructive"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+            <div className="absolute right-2 flex gap-1">
+              <Button
+                variant="tech"
+                size="xs"
+                className="shadow-none"
+                onClick={() => setAmount(((userBalance * 25) / 100).toFixed(2))}
               >
-                {pct === 100 ? "MAX" : `${pct}%`}
-              </button>
-            ))}
+                25%
+              </Button>
+              <Button
+                variant="tech"
+                size="xs"
+                className="shadow-none"
+                onClick={() => setAmount(userBalance.toString())}
+              >
+                MAX
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Stats Summary */}
-        <div className="bg-surface-container-low rounded-lg p-4 flex flex-col gap-3 mt-4">
-          <div className="flex justify-between text-sm font-sans text-muted-foreground">
-            <span>{tradeSide === "BUY" ? "Est. Shares" : "Shares to Sell"}</span>
-            <span className="font-bold text-foreground font-mono">
-              {formatNumber(shares, 0, 0)}
+        {/* Stats List */}
+        <div className="flex flex-col gap-3 mt-2">
+          <div className="flex justify-between items-center border-b border-white/[0.05] pb-3">
+            <span className="text-[11px] font-sans text-muted-foreground">
+              {tradeSide === "BUY" ? "Potential Payout" : "Total Proceeds"}
             </span>
-          </div>
-          <div className="flex justify-between text-sm font-sans text-muted-foreground">
-            <span>{tradeSide === "BUY" ? "Max Payout" : "Total Proceeds"}</span>
             <span
-              className={`font-bold font-mono ${
-                tradeSide === "BUY" ? "text-primary" : "text-destructive"
-              }`}
+              className={`text-[13px] font-heading font-bold ${tradeSide === "BUY" ? "text-primary" : "text-[#f4fffa]"}`}
             >
               ${formatNumber(maxPayout)}
             </span>
           </div>
-          {tradeSide === "BUY" && (
-            <>
-              <div className="w-full border-t border-surface-container-highest my-1"></div>
-              <div className="flex justify-between text-sm font-sans text-foreground font-bold">
-                <span>Potential Return</span>
-                <span className="text-primary font-mono">+{potentialReturn.toFixed(1)}%</span>
-              </div>
-            </>
-          )}
+          <div className="flex justify-between items-center border-b border-white/[0.05] pb-3">
+            <span className="text-[11px] font-sans text-muted-foreground">Price per share</span>
+            <span className="text-[13px] font-heading font-bold text-[#f4fffa]">
+              ${(effectivePrice / 100).toFixed(3)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-[11px] font-sans text-muted-foreground">Slippage</span>
+            <span className="text-[13px] font-heading font-bold text-[#f4fffa]">0.05%</span>
+          </div>
         </div>
 
+        {/* Submit Button */}
         <Button
           onClick={handleConfirmPosition}
-          disabled={
-            isFrozen ||
-            placeOrder.isPending ||
-            !signer ||
-            parsedAmount <= 0 ||
-            (orderType === OrderType.Limit &&
-              (!limitPrice || Number(limitPrice) <= 0 || Number(limitPrice) >= 100))
-          }
-          className={`w-full h-16 text-xl tracking-wide uppercase disabled:shadow-none transition-all ${
-            tradeSide === "BUY"
-              ? "bg-primary text-black shadow-[0_0_20px_rgba(159,251,6,0.25)] hover:shadow-[0_0_30_px_rgba(159,251,6,0.4)]"
-              : "bg-destructive text-white shadow-[0_0_20px_rgba(255,50,50,0.25)] hover:shadow-[0_0_30px_rgba(255,50,50,0.4)]"
-          }`}
+          disabled={isFrozen || placeOrder.isPending || !signer || parsedAmount <= 0}
+          className="w-full h-14 bg-primary hover:bg-primary/90 text-black border-0 rounded-sm mt-4 tracking-[0.3em] font-sans font-bold text-[11px] uppercase transition-all shadow-none"
         >
           {placeOrder.isPending ? (
-            <>
-              <Loader2 className="mr-2 size-5 animate-spin" />
-              {tradeSide === "BUY" ? "PLACING ORDER..." : "SELLING SHARES..."}
-            </>
+            <Loader2 className="size-4 animate-spin" />
           ) : isFullyResolved ? (
-            "MARKET RESOLVED"
+            "R E S O L V E D"
           ) : isAwaitingResolution ? (
-            "AWAITING RESOLUTION"
+            "A W A I T I N G"
           ) : isFrozen ? (
-            "TRADING HALTED"
+            "H A L T E D"
+          ) : tradeSide === "BUY" ? (
+            "C O N F I R M  P O S I T I O N"
           ) : (
-            `${tradeSide?.toUpperCase()} ${selectedOutcome?.toUpperCase()}`
+            "S E L L  P O S I T I O N"
           )}
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }
