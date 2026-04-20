@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
-import { WalletModal } from "@/components/wallet/WalletModal";
 import { Toaster } from "@/components/ui/sonner";
+import { WalletModal } from "@/components/wallet/WalletModal";
 import QueryProvider from "@/providers/QueryProvider";
 import SolanaProvider from "@/providers/SolanaProvider";
 
@@ -23,8 +23,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Winnr - Veridian Frost",
-  description: "Prediction market platform designed with atmospheric depth.",
+  title: "Winnr",
+  description: "Winnr - Predict Like A Winnr.",
 };
 
 export default function RootLayout({
