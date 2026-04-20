@@ -15,3 +15,20 @@ export enum OrderType {
   ImmediateOrCancel = "immediate_or_cancel",
   FillOrKill = "fill_or_kill",
 }
+
+type ResolverAddress = {
+  Address: string;
+};
+type ResolverPyth = {
+  Pyth: {
+    feed_id: number[];
+    lower_bound?: number;
+    upper_bound?: number;
+  };
+};
+type ResolverOptimistic = { Optimistic: {} };
+export type Resolver = ResolverAddress | ResolverPyth | ResolverOptimistic;
+
+type AddressResolutionData = { outcome: Outcome };
+type PythResolutionData = { publishTime: number };
+export type ResolutionData = AddressResolutionData | PythResolutionData;
