@@ -73,18 +73,18 @@ export default function Home() {
     return (
       <div className="container mx-auto p-6 md:p-8 flex flex-col gap-10 max-w-[1400px]">
         {/* Loading Skeletons */}
-        <Skeleton className="w-full h-[400px] rounded-2xl bg-surface-container" />
+        <Skeleton className="w-full h-[400px] rounded-none bg-surface-container" />
         <div className="flex gap-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="w-24 h-10 rounded-md bg-surface-container" />
+            <Skeleton key={i} className="w-24 h-10 rounded-none bg-surface-container" />
           ))}
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           <div className="xl:col-span-2 flex flex-col gap-10">
-            <Skeleton className="w-full h-64 rounded-xl bg-surface-container" />
-            <Skeleton className="w-full h-48 rounded-xl bg-surface-container" />
+            <Skeleton className="w-full h-64 rounded-none bg-surface-container" />
+            <Skeleton className="w-full h-48 rounded-none bg-surface-container" />
           </div>
-          <Skeleton className="w-full h-[500px] rounded-xl bg-surface-container" />
+          <Skeleton className="w-full h-[500px] rounded-none bg-surface-container" />
         </div>
       </div>
     );
@@ -110,18 +110,17 @@ export default function Home() {
     <div className="container mx-auto p-6 md:p-8 flex flex-col gap-16 max-w-[1400px]">
       {/* Featured Market Hero */}
       <Link href={`/markets/${featuredMarket.id}`} className="block">
-        <Card className="bg-surface-container border-0 rounded-sm overflow-hidden relative shadow-none p-0 group">
+        <Card className="bg-surface-container border-0 rounded-none overflow-hidden relative shadow-none p-0 group">
           {/* Faux Background for Hero */}
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-linear-to-r from-background via-surface/80 to-transparent z-10 w-2/3"></div>
-            {/* This simulates the crystal background from the image */}
-            <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-linear-to-tr from-primary/5 to-primary/20 opacity-30 skew-x-12 blur-3xl"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-linear-to-tr from-white/5 to-white/10 opacity-30 skew-x-12 blur-3xl"></div>
           </div>
 
           <div className="relative z-10 p-10 lg:p-16 flex flex-col justify-center max-w-3xl">
             <div className="flex items-center gap-3 mb-8">
-              <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_rgba(172,234,211,0.8)]"></div>
-              <span className="text-[10px] font-sans font-bold text-primary uppercase tracking-[0.2em]">
+              <div className="size-2 rounded-none bg-emerald-500"></div>
+              <span className="text-[10px] font-sans font-bold text-white uppercase tracking-[0.2em]">
                 {featuredMarket.tag || "FEATURED HIGH-VOLUME MARKET"}
               </span>
             </div>
@@ -155,14 +154,14 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <Button
                 size="lg"
-                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-sm bg-primary text-black hover:bg-primary/90 flex items-center gap-2"
+                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-none bg-white text-black hover:bg-white/90 flex items-center gap-2"
               >
                 PREDICT NOW <ArrowUp className="size-4 rotate-45" />
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-sm bg-white/5 border-0 hover:bg-white/10 text-white"
+                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-none bg-transparent border border-border hover:bg-surface-bright text-white"
               >
                 ANALYSIS
               </Button>
@@ -207,9 +206,9 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {trendingMarkets.map((market) => (
             <Link key={market.id} href={`/markets/${market.id}`} className="block">
-              <Card className="bg-surface-container-low border border-white/[0.02] hover:bg-surface-container transition-colors p-6 flex flex-col gap-6 h-full rounded-sm shadow-none">
+              <Card className="bg-surface-container-low border border-border hover:bg-surface-container transition-colors p-6 flex flex-col gap-6 h-full rounded-none shadow-none">
                 <div className="flex justify-between items-center">
-                  <span className="px-2 py-1 bg-surface-container-highest text-primary font-sans font-bold text-[9px] uppercase tracking-widest rounded-sm">
+                  <span className="px-2 py-1 bg-surface-container-highest text-white font-sans font-bold text-[9px] uppercase tracking-widest rounded-none">
                     {market.category}
                   </span>
                   <span className="text-[10px] text-muted-foreground font-sans">Ends Dec 12</span>
@@ -225,9 +224,9 @@ export default function Home() {
                     <span>YES {market.chance}</span>
                     <span>NO 62%</span>
                   </div>
-                  <div className="w-full h-[3px] flex bg-[#362727] rounded-none">
-                    <div className="h-full bg-primary" style={{ width: market.chance }}></div>
-                    <div className="h-full bg-[#f4fffa]/20" style={{ width: "2px" }}></div>
+                  <div className="w-full h-[3px] flex bg-surface-bright rounded-none">
+                    <div className="h-full bg-emerald-500" style={{ width: market.chance }}></div>
+                    <div className="h-full bg-transparent" style={{ width: "2px" }}></div>
                   </div>
                 </div>
 
@@ -244,9 +243,9 @@ export default function Home() {
           ))}
 
           {/* Propose a Market Card */}
-          <Card className="bg-surface-container border border-surface-bright shadow-[inset_0px_50px_100px_rgba(172,234,211,0.05)] p-8 flex flex-col justify-center items-center text-center gap-4 h-full rounded-sm min-h-[300px]">
-            <div className="size-12 rounded-lg bg-surface-bright flex items-center justify-center mb-2">
-              <Plus className="size-6 text-primary" />
+          <Card className="bg-surface-container border border-border p-8 flex flex-col justify-center items-center text-center gap-4 h-full rounded-none min-h-[300px]">
+            <div className="size-12 rounded-none bg-surface-bright flex items-center justify-center mb-2">
+              <Plus className="size-6 text-white" />
             </div>
 
             <div>
@@ -258,7 +257,7 @@ export default function Home() {
               </p>
             </div>
 
-            <Button className="w-full bg-primary hover:bg-primary/90 text-black border-0 h-12 rounded-sm font-sans font-bold text-[10px] tracking-widest uppercase mt-4">
+            <Button className="w-full bg-white hover:bg-white/90 text-black border-0 h-12 rounded-none font-sans font-bold text-[10px] tracking-widest uppercase mt-4">
               SUBMIT PROPOSAL
             </Button>
           </Card>

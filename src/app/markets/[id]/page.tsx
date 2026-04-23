@@ -72,6 +72,7 @@ export default function MarketPage() {
     return {
       time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       price: d.price / 100,
+      volume: Math.random() * 100 + 20, // Mock volume for visual bars
     };
   });
 
@@ -83,42 +84,56 @@ export default function MarketPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
-    formattedChartData.push({ time: terminalTime, price: terminalPrice });
+    formattedChartData.push({ time: terminalTime, price: terminalPrice, volume: 50 });
   }
 
   return (
-    <div className="container mx-auto p-6 flex flex-col gap-8 max-w-[1400px]">
-      {/* Header Section */}
-      <MarketDetailHeader
-        category={market.category}
-        subcategory={market.subcategory}
-        titlePrefix={market.titlePrefix}
-        titleHighlight={market.titleHighlight}
-        titleSuffix={market.titleSuffix}
-        liveProbability={liveProbability}
-        isFullyResolved={isFullyResolved}
-        isAwaitingResolution={isAwaitingResolution}
-        resolvedOutcome={resolvedOutcome}
-      />
+    <div className="container mx-auto p-6 max-w-8xl">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Middle Column: Main Content */}
+        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+          <MarketDetailHeader
+            category={market.category}
+            subcategory={market.subcategory}
+            titlePrefix={market.titlePrefix}
+            titleHighlight={market.titleHighlight}
+            titleSuffix={market.titleSuffix}
+            liveProbability={liveProbability}
+            isFullyResolved={isFullyResolved}
+            isAwaitingResolution={isAwaitingResolution}
+            resolvedOutcome={resolvedOutcome}
+            resolutionDate={market.resolutionDate}
+          />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left/Main Column: Chart & Info */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          {/* Main Chart Card */}
           <MarketPriceChart
             chartData={formattedChartData}
             resolution={resolution}
             onResolutionChange={setResolution}
             isConnected={isConnected}
-            volume={market.volume}
-            liquidity={market.liquidity}
-            resolutionDate={market.resolutionDate}
           />
-          <OpenOrdersList marketId={marketId} />
+
+          {/* Rules & Resolution Card */}
+          <div className="border border-border bg-surface-container-low p-6 flex flex-col gap-4 mt-2">
+            <div className="text-[10px] uppercase font-sans font-bold text-muted-foreground tracking-widest">
+              RULES & RESOLUTION
+            </div>
+            <div className="text-sm text-white font-sans leading-relaxed">
+              This market will resolve to "Yes" if the price of Bitcoin (BTC) reaches or exceeds
+              $100,000.00 USD according to the specified data source at any point between the
+              market's creation and December 31, 2024, 11:59:59 PM ET.
+            </div>
+            <div className="text-sm text-muted-foreground font-sans">
+              Resolution source: Binance BTC/USDT spot market.
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <RecentActivity yesPrice={market.yesPrice} noPrice={market.noPrice} />
+          </div>
         </div>
 
-        {/* Right Column: Take Position Panel & Order Book */}
-        <div className="flex flex-col gap-6">
+        {/* Right Column: Trade Panel & Order Book */}
+        <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
           <TradePanel
             marketId={marketId}
             buyYesPrice={buyYesPrice}
@@ -129,32 +144,26 @@ export default function MarketPage() {
             isFullyResolved={isFullyResolved}
             isAwaitingResolution={isAwaitingResolution}
           />
-          <OrderBook bids={bids} asks={asks} />
 
-          {/* Static Vault Integration Card from Design */}
-          <div className="bg-surface-container border-0 rounded-sm p-6 relative overflow-hidden flex flex-col items-center text-center mt-2 group cursor-pointer">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(172,234,211,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="size-32 rounded-full border border-primary/20 bg-primary/5 flex items-center justify-center mb-6 relative">
-              <div className="absolute inset-0 border border-primary/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
-              <div className="absolute inset-2 border border-primary/20 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
-              <div className="size-2 bg-primary rounded-full shadow-[0_0_15px_rgba(172,234,211,0.8)]"></div>
+          {/* Stats Panel moved from Chart */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="border border-border p-4 flex flex-col gap-1">
+              <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-widest">
+                24H VOLUME
+              </span>
+              <span className="text-xl font-heading font-bold text-white">{market.volume}</span>
             </div>
-            <h4 className="text-lg font-heading font-bold text-white mb-2 relative z-10">
-              Vault Integration
-            </h4>
-            <p className="text-xs text-muted-foreground font-sans mb-4 relative z-10 leading-relaxed">
-              Auto-hedge your positions through our managed liquidity vaults.
-            </p>
-            <span className="text-[9px] font-sans font-bold text-primary tracking-widest uppercase relative z-10">
-              Explore Vaults →
-            </span>
+            <div className="border border-border p-4 flex flex-col gap-1">
+              <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-widest">
+                LIQUIDITY
+              </span>
+              <span className="text-xl font-heading font-bold text-white">{market.liquidity}</span>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Full Width Recent Activity Row */}
-      <div className="mt-8">
-        <RecentActivity yesPrice={market.yesPrice} noPrice={market.noPrice} />
+          <OrderBook bids={bids} asks={asks} />
+          <OpenOrdersList marketId={marketId} />
+        </div>
       </div>
     </div>
   );

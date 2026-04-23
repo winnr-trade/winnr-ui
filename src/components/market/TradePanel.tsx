@@ -1,15 +1,11 @@
-"use client";
-
-import { Hourglass, Loader2, Lock } from "lucide-react";
+import { Hourglass, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useGetShares } from "@/api/market";
 import { usePlaceOrder } from "@/api/orderbook/placeOrder";
 import { useGetBalance } from "@/api/wallet/useGetBalance";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Heading } from "@/components/ui/typography";
 import { tokens } from "@/config/constants";
 import { useUserWallet } from "@/hooks/useUserWallet";
 import { OrderType, Outcome, Side } from "@/lib/rollup/types";
@@ -37,9 +33,9 @@ export function TradePanel({
   isAwaitingResolution,
 }: TradePanelProps) {
   const [tradeSide, setTradeSide] = useState<"BUY" | "SELL">("BUY");
-  const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO">("YES");
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Market);
-  const [amount, setAmount] = useState<string>("");
+  const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO">("YES");
+  const [amount, setAmount] = useState<string>("100");
   const [limitPrice, setLimitPrice] = useState<string>("");
 
   const placeOrder = usePlaceOrder();
@@ -50,18 +46,15 @@ export function TradePanel({
 
   const parsedAmount = Number(amount) || 0;
 
-  // Determine which price to show based on Side and Outcome
   const displayYesPrice = tradeSide === "BUY" ? buyYesPrice : sellYesPrice;
   const displayNoPrice = tradeSide === "BUY" ? buyNoPrice : sellNoPrice;
 
   const currentPrice = selectedOutcome === "YES" ? displayYesPrice : displayNoPrice;
   const effectivePrice = orderType === OrderType.Market ? currentPrice : Number(limitPrice) || 0;
 
-  // For Sell orders, if they are entering USD, we still calculate shares to sell.
-  // In a real app, selling might involve entering shares directly.
-  const shares = effectivePrice > 0 ? Math.floor(parsedAmount / (effectivePrice / 100)) : 0;
+  const shares = effectivePrice > 0 ? parsedAmount / (effectivePrice / 100) : 0;
   const maxPayout = shares;
-  const potentialReturn = parsedAmount > 0 ? ((maxPayout - parsedAmount) / parsedAmount) * 100 : 0;
+  const potentialReturn = maxPayout - parsedAmount;
 
   const handleConfirmPosition = async () => {
     if (!signer) {
@@ -94,182 +87,186 @@ export function TradePanel({
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="bg-surface-container border-0 p-6 sm:p-8 rounded-sm shadow-none flex flex-col gap-6 text-[#f4fffa]">
-        {/* Header Row: Title & Action Toggles */}
-        <div className="flex justify-between items-center mb-2">
+    <div className="flex flex-col w-full">
+      <div className="border border-border p-6 rounded-none flex flex-col gap-6 bg-transparent">
+        {/* Header */}
+        <div className="flex justify-between items-center">
           <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
-            POSITION ENTRY
+            EXECUTE ORDER
           </span>
-          <div className="flex gap-4">
-            <div className="flex gap-2 text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground">
-              <Button
-                variant="tab"
-                size="tab"
-                disabled={isFrozen}
-                onClick={() => setTradeSide("BUY")}
-                data-active={tradeSide === "BUY"}
-              >
-                BUY
-              </Button>
-              <Button
-                variant="tab"
-                size="tab"
-                disabled={isFrozen}
-                onClick={() => setTradeSide("SELL")}
-                data-active={tradeSide === "SELL"}
-              >
-                SELL
-              </Button>
+          <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
+            Balance: ${formatNumber(userBalance)}
+          </span>
+        </div>
+
+        {/* Action Toggles: BUY/SELL & MARKET/LIMIT */}
+        <div className="flex justify-between items-center">
+          <div className="flex border border-border rounded-none">
+            <Button
+              variant="ghost"
+              className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+                tradeSide === "BUY" ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+              }`}
+              onClick={() => setTradeSide("BUY")}
+              disabled={isFrozen}
+            >
+              BUY
+            </Button>
+            <Button
+              variant="ghost"
+              className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+                tradeSide === "SELL" ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+              }`}
+              onClick={() => setTradeSide("SELL")}
+              disabled={isFrozen}
+            >
+              SELL
+            </Button>
+          </div>
+          <div className="flex border border-border rounded-none">
+            <Button
+              variant="ghost"
+              className={`h-8 px-3 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+                orderType === OrderType.Market ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+              }`}
+              onClick={() => setOrderType(OrderType.Market)}
+              disabled={isFrozen}
+            >
+              MARKET
+            </Button>
+            <Button
+              variant="ghost"
+              className={`h-8 px-3 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+                orderType === OrderType.Limit ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+              }`}
+              onClick={() => setOrderType(OrderType.Limit)}
+              disabled={isFrozen}
+            >
+              LIMIT
+            </Button>
+          </div>
+        </div>
+
+        {/* YES / NO Toggles */}
+        <div className="flex gap-4">
+          <div
+            className={`flex-1 border p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+              selectedOutcome === "YES"
+                ? "border-emerald-500 bg-emerald-500/5"
+                : "border-border hover:border-emerald-500/50"
+            }`}
+            onClick={() => !isFrozen && setSelectedOutcome("YES")}
+          >
+            <div className={`text-[11px] font-sans font-bold uppercase tracking-widest ${selectedOutcome === "YES" ? "text-emerald-500" : "text-emerald-500/70"}`}>
+              {tradeSide} YES
             </div>
-            <div className="flex gap-2 text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground border-l border-white/10 pl-4">
-              <Button
-                variant="tabWhite"
-                size="tab"
-                disabled={isFrozen}
-                onClick={() => setOrderType(OrderType.Market)}
-                data-active={orderType === OrderType.Market}
-              >
-                MARKET
-              </Button>
-              <Button
-                variant="tabWhite"
-                size="tab"
-                disabled={isFrozen}
-                onClick={() => setOrderType(OrderType.Limit)}
-                data-active={orderType === OrderType.Limit}
-              >
-                LIMIT
-              </Button>
+            <div className="text-xl font-heading font-bold text-white mt-1">
+              {Math.round(displayYesPrice)}%
+            </div>
+          </div>
+          
+          <div
+            className={`flex-1 border p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+              selectedOutcome === "NO"
+                ? "border-destructive bg-destructive/5"
+                : "border-border hover:border-destructive/50"
+            }`}
+            onClick={() => !isFrozen && setSelectedOutcome("NO")}
+          >
+            <div className={`text-[11px] font-sans font-bold uppercase tracking-widest ${selectedOutcome === "NO" ? "text-destructive" : "text-destructive/70"}`}>
+              {tradeSide} NO
+            </div>
+            <div className="text-xl font-heading font-bold text-white mt-1">
+              {Math.round(displayNoPrice)}%
             </div>
           </div>
         </div>
 
-        {/* YES / NO Toggle Block  */}
-        <div className="flex w-full h-12 bg-[#0a110f] rounded-sm p-1 border border-white/[0.02]">
-          <Button
-            variant="outcome"
-            size="outcome"
-            disabled={isFrozen}
-            onClick={() => setSelectedOutcome("YES")}
-            data-active={selectedOutcome === "YES"}
-          >
-            YES
-          </Button>
-          <Button
-            variant="outcome"
-            size="outcome"
-            disabled={isFrozen}
-            onClick={() => setSelectedOutcome("NO")}
-            data-active={selectedOutcome === "NO"}
-          >
-            NO
-          </Button>
-        </div>
-
+        {/* Limit Price Input */}
         {orderType === OrderType.Limit && (
-          <div className="flex flex-col gap-3">
-            <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              LIMIT PRICE (¢)
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
+              LIMIT PRICE (%)
             </span>
-            <div className="relative">
+            <div className="relative flex items-center">
               <Input
                 type="number"
                 disabled={isFrozen}
                 value={limitPrice}
                 onChange={(e) => setLimitPrice(e.target.value)}
-                className="w-full h-14 bg-[#0a110f] border border-white/[0.02] text-xl font-heading font-bold rounded-sm px-4 focus-visible:border-primary/50 text-[#f4fffa]"
                 placeholder="0"
+                className="w-full h-12 bg-transparent border border-border text-base font-sans rounded-none px-4 focus-visible:border-white text-white shadow-none"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-sans text-muted-foreground">
-                ¢
-              </span>
+              <span className="absolute right-4 text-muted-foreground font-sans font-bold">%</span>
             </div>
           </div>
         )}
 
         {/* Amount Input */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              {tradeSide === "BUY" ? "AMOUNT TO BET (USDC)" : "SHARES TO SELL"}
+            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
+              {tradeSide === "BUY" ? "AMOUNT" : "SHARES"}
             </span>
-            <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
-              BAL: {formatNumber(userBalance)}
+            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
+              {tradeSide === "BUY" ? `SHARES: ~${shares.toFixed(1)}` : `VALUE: $${(parsedAmount * effectivePrice / 100).toFixed(2)}`}
             </span>
           </div>
           <div className="relative flex items-center">
+            {tradeSide === "BUY" && <span className="absolute left-4 text-white font-sans font-bold">$</span>}
             <Input
               type="number"
               disabled={isFrozen}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full h-14 bg-[#0a110f] border border-white/[0.02] text-xl font-heading font-bold rounded-sm pl-4 pr-[120px] focus-visible:border-primary/50 text-[#f4fffa]"
+              className={`w-full h-12 bg-transparent border border-border text-base font-sans rounded-none focus-visible:border-white text-white shadow-none ${tradeSide === "BUY" ? "pl-8" : "px-4"}`}
             />
-            <div className="absolute right-2 flex gap-1">
-              <Button
-                variant="tech"
-                size="xs"
-                className="shadow-none"
-                onClick={() => setAmount(((userBalance * 25) / 100).toFixed(2))}
-              >
-                25%
-              </Button>
-              <Button
-                variant="tech"
-                size="xs"
-                className="shadow-none"
-                onClick={() => setAmount(userBalance.toString())}
-              >
-                MAX
-              </Button>
-            </div>
           </div>
         </div>
 
         {/* Stats List */}
-        <div className="flex flex-col gap-3 mt-2">
-          <div className="flex justify-between items-center border-b border-white/[0.05] pb-3">
-            <span className="text-[11px] font-sans text-muted-foreground">
-              {tradeSide === "BUY" ? "Potential Payout" : "Total Proceeds"}
-            </span>
-            <span
-              className={`text-[13px] font-heading font-bold ${tradeSide === "BUY" ? "text-primary" : "text-[#f4fffa]"}`}
-            >
-              ${formatNumber(maxPayout)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center border-b border-white/[0.05] pb-3">
-            <span className="text-[11px] font-sans text-muted-foreground">Price per share</span>
-            <span className="text-[13px] font-heading font-bold text-[#f4fffa]">
-              ${(effectivePrice / 100).toFixed(3)}
-            </span>
-          </div>
+        <div className="flex flex-col gap-3 mt-4">
           <div className="flex justify-between items-center">
-            <span className="text-[11px] font-sans text-muted-foreground">Slippage</span>
-            <span className="text-[13px] font-heading font-bold text-[#f4fffa]">0.05%</span>
+            <span className="text-xs font-sans text-muted-foreground">
+              {tradeSide === "BUY" ? "Potential Return" : "Total Proceeds"}
+            </span>
+            <span className={`text-xs font-sans font-bold ${tradeSide === "BUY" ? "text-emerald-500" : "text-white"}`}>
+              {tradeSide === "BUY" && potentialReturn > 0 ? "+" : ""}{tradeSide === "BUY" && potentialReturn > 0 ? "$" : ""}{tradeSide === "BUY" ? potentialReturn.toFixed(2) : `$${(parsedAmount * effectivePrice / 100).toFixed(2)}`}
+            </span>
           </div>
+          {tradeSide === "BUY" && (
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-sans text-muted-foreground">
+                Total Payout
+              </span>
+              <span className="text-xs font-sans font-bold text-white">
+                ${maxPayout.toFixed(2)}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Submit Button */}
         <Button
           onClick={handleConfirmPosition}
           disabled={isFrozen || placeOrder.isPending || !signer || parsedAmount <= 0}
-          className="w-full h-14 bg-primary hover:bg-primary/90 text-black border-0 rounded-sm mt-4 tracking-[0.3em] font-sans font-bold text-[11px] uppercase transition-all shadow-none"
+          className={`w-full h-12 hover:opacity-90 text-black border-0 rounded-none mt-2 tracking-[0.2em] font-sans font-bold text-[11px] uppercase transition-all shadow-none ${
+            tradeSide === "BUY" ? "bg-white" : "bg-destructive text-white"
+          }`}
         >
           {placeOrder.isPending ? (
             <Loader2 className="size-4 animate-spin" />
           ) : isFullyResolved ? (
-            "R E S O L V E D"
+            "RESOLVED"
           ) : isAwaitingResolution ? (
-            "A W A I T I N G"
+            "AWAITING"
           ) : isFrozen ? (
-            "H A L T E D"
+            "HALTED"
           ) : tradeSide === "BUY" ? (
-            "C O N F I R M  P O S I T I O N"
+            "PLACE ORDER"
           ) : (
-            "S E L L  P O S I T I O N"
+            "SELL POSITION"
           )}
         </Button>
       </div>

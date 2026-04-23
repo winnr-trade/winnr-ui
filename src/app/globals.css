@@ -9,8 +9,9 @@
   --color-foreground: var(--foreground);
 
   /* Fonts mapped to our specific fonts */
-  --font-sans: var(--font-space-grotesk);
+  --font-sans: var(--font-manrope);
   --font-display: var(--font-space-grotesk);
+  --font-heading: var(--font-space-grotesk);
   --font-body: var(--font-manrope);
 
   --color-surface: var(--surface);
@@ -41,34 +42,34 @@
   --color-card: var(--card);
 
   --radius-sm: var(--radius);
-  --radius-md: calc(var(--radius) * 2);
-  --radius-lg: calc(var(--radius) * 3);
-  --radius-xl: calc(var(--radius) * 4);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
 }
 
 :root {
-  /* VERIDIAN FROST */
-  --surface: #07100e;
-  --surface-container-lowest: #040908;
-  --surface-container-low: #0b1513;
-  --surface-container: #0f1d1a;
-  --surface-container-high: #152622;
-  --surface-container-highest: #1b2825;
-  --surface-bright: #212f2c;
+  /* WINNR CORE */
+  --surface: #000000;
+  --surface-container-lowest: #000000;
+  --surface-container-low: #0a0a0a;
+  --surface-container: #0a0a0a;
+  --surface-container-high: #1a1a1a;
+  --surface-container-highest: #1a1a1a;
+  --surface-bright: #262626;
 
   /* Brand Colors from True Design Spec */
-  --primary: #acead3;
-  --primary-container: #70ac97;
-  --on-primary-container: #07100e;
+  --primary: #ffffff;
+  --primary-container: #e2e2e2;
+  --on-primary-container: #000000;
   
-  --secondary: #3d7b6b;
-  --secondary-container: #1b2825;
+  --secondary: #c8c6c5;
+  --secondary-container: #474746;
   
-  --outline-variant: rgba(172, 234, 211, 0.15); /* 15% opacity as per spec */
+  --outline-variant: #262626;
 
   /* Standard Application Colors */
   --background: var(--surface);
-  --foreground: #f4fffa;
+  --foreground: #ffffff;
   
   --card: var(--surface-container-low);
   --card-foreground: var(--foreground);
@@ -79,18 +80,18 @@
   --primary-foreground: var(--on-primary-container);
   
   --muted: var(--surface-container-low);
-  --muted-foreground: #70ac97;
+  --muted-foreground: #8e9192;
 
   --accent: var(--surface-bright);
   --accent-foreground: var(--primary);
 
-  --destructive: #d7383b;
+  --destructive: #F43F5E;
 
-  --border: transparent; /* No-line rule */
+  --border: #262626;
   --input: var(--surface-container-high);
   --ring: var(--primary);
 
-  --radius: 0.125rem; /* Sharp, professional edge */
+  --radius: 0rem;
 }
 
 @layer base {

@@ -4,7 +4,8 @@ export function Logo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 100"
       className={className}
-      fill="currentColor"
+      // fill="currentColor"
+      fill="#00BB7E"
     >
       <title>Winnr</title>
       <path d="m26.6 29.9c0.2 1.1 1.1 1.7 2 1.2 3.4-1.7 9.1-3.9 15-4.6 3.3-0.4 6.4-0.4 6.6-0.4s3 0 6.4 0.4c5.9 0.7 11.1 2.5 14.7 4.3 0.9 0.5 1.6 0.4 2-0.5 0.4-1.5 4.8-20.2 4.8-20.9 0.1-1-0.9-2-2-1.5l-15.2 7.7c-0.6 0.3-1.2 0.1-1.5-0.5l-8.4-14.5c-0.5-0.9-1.8-0.8-2.3 0.1l-8.2 14.5c-0.3 0.6-0.9 0.7-1.5 0.4l-15.3-7.7c-1.1-0.6-2.5 0.3-2.2 1.7l5.1 20.3z" />

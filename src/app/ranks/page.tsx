@@ -9,7 +9,7 @@ export default function HallOfFame() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-4">
         <div>
-          <div className="uppercase tracking-widest text-xs text-primary font-bold font-sans mb-3 drop-shadow-[0_0_8px_rgba(159,251,6,0.3)]">
+          <div className="uppercase tracking-widest text-xs text-white font-bold font-sans mb-3">
             SEASONAL GLOBAL RANKINGS
           </div>
           <Display className="text-6xl md:text-8xl">
@@ -17,7 +17,7 @@ export default function HallOfFame() {
           </Display>
         </div>
 
-        <div className="bg-surface-container-high border-l-4 border-l-primary p-4 rounded-r-lg min-w-[200px] shadow-[0_0_30px_rgba(159,251,6,0.05)]">
+        <div className="bg-surface-container border border-border p-4 rounded-none min-w-[200px] shadow-none">
           <div className="uppercase tracking-widest text-[10px] text-muted-foreground font-bold font-sans mb-1">
             PRIZE POOL
           </div>
@@ -33,59 +33,59 @@ export default function HallOfFame() {
           {/* Podium */}
           <div className="grid grid-cols-3 gap-4 items-end h-[340px]">
             {/* #2 */}
-            <div className="bg-surface-container-low rounded-t-2xl p-6 flex flex-col items-center justify-between h-[260px] relative border-t border-surface-container-high">
+            <div className="bg-surface-container-low rounded-none p-6 flex flex-col items-center justify-between h-[260px] relative border border-border">
               <div className="text-4xl font-heading font-bold text-surface-container-highest absolute top-4 left-6 italic">
                 #2
               </div>
               <div className="mt-8 flex flex-col items-center">
-                <div className="size-16 rounded-xl bg-blue-100 overflow-hidden border-2 border-surface-container-high shadow-lg">
+                <div className="size-16 rounded-none bg-blue-100 overflow-hidden border border-border shadow-none">
                   {/* Avatar placeholder */}
                   <div className="size-full bg-slate-300"></div>
                 </div>
                 <div className="font-heading font-bold text-lg mt-4 text-foreground">
                   OxKinetik
                 </div>
-                <div className="text-primary font-bold font-sans text-sm mt-1 drop-shadow-[0_0_5px_rgba(159,251,6,0.4)]">
+                <div className="text-emerald-500 font-bold font-sans text-sm mt-1">
                   14.2K WINNR
                 </div>
               </div>
             </div>
 
             {/* #1 */}
-            <div className="bg-surface-container-high rounded-t-2xl flex flex-col items-center justify-between h-[340px] relative border-2 border-primary shadow-[0_[-15px]_40px_-15px_rgba(159,251,6,0.3)] z-10">
-              <div className="text-5xl font-heading font-bold text-primary opacity-30 absolute top-4 left-6 italic drop-shadow-[0_0_10px_rgba(159,251,6,0.8)]">
+            <div className="bg-surface-container rounded-none flex flex-col items-center justify-between h-[340px] relative border border-border shadow-none z-10">
+              <div className="text-5xl font-heading font-bold text-emerald-500 opacity-30 absolute top-4 left-6 italic">
                 #1
               </div>
               <div className="mt-16 flex flex-col items-center flex-1 w-full relative">
-                <div className="size-24 rounded-2xl bg-green-100 overflow-hidden border-4 border-primary shadow-[0_0_20px_rgba(159,251,6,0.5)]">
+                <div className="size-24 rounded-none bg-green-100 overflow-hidden border border-border shadow-none">
                   {/* Avatar placeholder */}
                   <div className="size-full bg-[#1b3819]"></div>
                 </div>
-                <div className="absolute top-[84px] bg-primary text-primary-foreground font-bold font-sans text-[10px] px-3 py-1 rounded-full border-2 border-surface-container-high uppercase tracking-wider shadow-lg">
+                <div className="absolute top-[84px] bg-white text-black font-bold font-sans text-[10px] px-3 py-1 rounded-none border border-border uppercase tracking-wider shadow-none">
                   GOD TIER
                 </div>
-                <div className="font-heading font-bold text-2xl mt-8 text-foreground drop-shadow-md">
+                <div className="font-heading font-bold text-2xl mt-8 text-foreground">
                   NeonProphet
                 </div>
-                <div className="text-primary font-bold font-sans text-lg mt-1 drop-shadow-[0_0_8px_rgba(159,251,6,0.6)]">
+                <div className="text-emerald-500 font-bold font-sans text-lg mt-1">
                   28.9K WINNR
                 </div>
               </div>
             </div>
 
             {/* #3 */}
-            <div className="bg-surface-container-lowest rounded-t-2xl p-6 flex flex-col items-center justify-between h-[230px] relative border-t border-surface-container-high">
+            <div className="bg-surface-container-lowest rounded-none p-6 flex flex-col items-center justify-between h-[230px] relative border border-border">
               <div className="text-4xl font-heading font-bold text-surface-container-high absolute top-4 right-6 italic">
                 #3
               </div>
               <div className="mt-6 flex flex-col items-center">
-                <div className="size-14 rounded-xl bg-purple-100 flex items-center justify-center border-2 border-surface-container shadow-sm overflow-hidden text-center text-primary/50 text-2xl font-bold font-heading">
+                <div className="size-14 rounded-none bg-purple-100 flex items-center justify-center border border-border shadow-none overflow-hidden text-center text-primary/50 text-2xl font-bold font-heading">
                   3
                 </div>
                 <div className="font-heading font-bold text-base mt-4 text-foreground">
                   VortexBet
                 </div>
-                <div className="text-primary font-bold font-sans text-xs mt-1 drop-shadow-[0_0_5px_rgba(159,251,6,0.3)]">
+                <div className="text-emerald-500 font-bold font-sans text-xs mt-1">
                   12.1K WINNR
                 </div>
               </div>
@@ -123,7 +123,7 @@ export default function HallOfFame() {
             ].map((user) => (
               <Card
                 key={user.name}
-                className={`p-4 flex items-center justify-between border-0 shadow-none transition-colors ${user.active ? "bg-surface-container-high" : "bg-surface-container-low hover:bg-surface-container"}`}
+                className={`p-4 flex items-center justify-between border border-border shadow-none rounded-none transition-colors ${user.active ? "bg-surface-container" : "bg-surface-container-low hover:bg-surface-container"}`}
               >
                 <div className="flex items-center gap-6">
                   <div className="text-2xl font-heading font-bold text-surface-container-highest whitespace-nowrap w-10">
@@ -131,7 +131,7 @@ export default function HallOfFame() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div
-                      className={`size-10 rounded-lg ${user.avatar} ${user.active ? "opacity-100" : "opacity-70"}`}
+                      className={`size-10 rounded-none ${user.avatar} ${user.active ? "opacity-100" : "opacity-70"}`}
                     ></div>
                     <div>
                       <div className="font-heading font-bold">{user.name}</div>
@@ -152,7 +152,7 @@ export default function HallOfFame() {
                   </div>
                   <Button
                     variant={user.active ? "secondary" : "default"}
-                    className={`w-28 text-xs tracking-wider h-10 ${!user.active ? "shadow-[0_0_10px_rgba(159,251,6,0.3)]" : ""}`}
+                    className={`w-28 text-xs tracking-wider h-10 shadow-none`}
                   >
                     {user.status}
                   </Button>
@@ -169,7 +169,7 @@ export default function HallOfFame() {
               LIVE <span className="text-primary">BETS</span>
             </Heading>
             <div className="flex items-center gap-1.5 ml-auto">
-              <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_rgba(159,251,6,0.8)] animate-pulse"></div>
+              <div className="size-2 rounded-none bg-emerald-500 animate-pulse"></div>
               <span className="text-[10px] uppercase font-sans font-bold text-primary tracking-widest">
                 REAL-TIME
               </span>
@@ -178,11 +178,11 @@ export default function HallOfFame() {
 
           <div className="flex-1 flex flex-col gap-4">
             {/* Live Bet 1 */}
-            <Card className="bg-surface-container-low border-0 shadow-none p-5 relative overflow-hidden group hover:bg-surface-container transition-colors">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(159,251,6,1)]"></div>
+            <Card className="bg-surface-container-low border border-border rounded-none shadow-none p-5 relative overflow-hidden group hover:bg-surface-container transition-colors">
+              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-none"></div>
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="size-8 rounded-full bg-orange-100"></div>
+                  <div className="size-8 rounded-none bg-orange-100"></div>
                   <div className="text-sm font-sans text-muted-foreground">
                     <span className="font-bold text-primary mr-1">
                       DegenKing
@@ -208,10 +208,10 @@ export default function HallOfFame() {
             </Card>
 
             {/* Live Bet 2 (Settled) */}
-            <Card className="bg-surface-container-low border-0 shadow-none p-5 relative overflow-hidden group hover:bg-surface-container transition-colors">
+            <Card className="bg-surface-container-low border border-border rounded-none shadow-none p-5 relative overflow-hidden group hover:bg-surface-container transition-colors">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="size-8 rounded-full bg-pink-200"></div>
+                  <div className="size-8 rounded-none bg-pink-200"></div>
                   <div className="text-sm font-sans text-muted-foreground">
                     <span className="font-bold text-foreground mr-1">
                       CyberMancer
@@ -226,7 +226,7 @@ export default function HallOfFame() {
               <div className="font-heading font-bold text-sm mb-2 text-foreground">
                 Market: Tesla Quarterly Earnings
               </div>
-              <div className="text-primary font-heading transform scale-[1.05] origin-left font-bold text-lg mb-1 drop-shadow-[0_0_8px_rgba(159,251,6,0.3)]">
+              <div className="text-emerald-500 font-heading transform scale-[1.05] origin-left font-bold text-lg mb-1">
                 +$12,450.00{" "}
                 <span className="text-xs inline-block align-middle ml-1">
                   📈
@@ -235,11 +235,11 @@ export default function HallOfFame() {
             </Card>
 
             {/* Live Bet 3 */}
-            <Card className="bg-surface-container-low border-0 shadow-none p-5 relative overflow-hidden group hover:bg-surface-container transition-colors">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(159,251,6,1)]"></div>
+            <Card className="bg-surface-container-low border border-border rounded-none shadow-none p-5 relative overflow-hidden group hover:bg-surface-container transition-colors">
+              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-none"></div>
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="size-8 rounded-full bg-indigo-900 border border-surface-container-high"></div>
+                  <div className="size-8 rounded-none bg-indigo-900 border border-border"></div>
                   <div className="text-sm font-sans text-muted-foreground">
                     <span className="font-bold text-primary mr-1">
                       MoonShot
@@ -265,14 +265,14 @@ export default function HallOfFame() {
             </Card>
           </div>
 
-          <Card className="bg-surface-container-high border-0 shadow-none p-6 mt-auto">
-            <h3 className="font-heading font-bold text-lg mb-2">
+          <Card className="bg-surface-container border border-border rounded-none shadow-none p-6 mt-auto">
+            <h3 className="font-heading font-bold text-lg mb-2 text-white">
               Join the Collective
             </h3>
             <p className="text-muted-foreground font-body text-sm mb-6">
               Connect with 45k+ predictors in the winnr discord.
             </p>
-            <Button className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white flex gap-2 h-12 shadow-[0_4px_14px_rgba(88,101,242,0.4)] transition-all hover:shadow-[0_6px_20px_rgba(88,101,242,0.6)]">
+            <Button className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white flex gap-2 h-12 rounded-none shadow-none transition-all hover:shadow-none">
               <MessageSquare className="size-5 fill-current" />
               JOIN DISCORD
             </Button>

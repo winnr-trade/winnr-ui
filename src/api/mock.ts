@@ -190,7 +190,7 @@ export const MOCK_VAULT_DATA = {
       pnl: "+$3,100",
       pnlColor: "text-primary",
       likelihood: 84,
-      progressColor: "bg-primary drop-shadow-[0_0_8px_rgba(159,251,6,0.6)]",
+      progressColor: "bg-emerald-500",
     },
   ],
   achievements: [

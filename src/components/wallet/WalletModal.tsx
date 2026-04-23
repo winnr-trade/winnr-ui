@@ -34,12 +34,12 @@ export function WalletModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={closeModal}>
-      <DialogContent className="sm:max-w-[425px] bg-surface-container-high border-surface-container-highest">
+      <DialogContent className="sm:max-w-[425px] bg-surface-container border border-border rounded-none">
         <DialogHeader>
-          <DialogTitle className="text-xl font-heading text-center mb-1 text-primary">
+          <DialogTitle className="text-xl font-heading text-center mb-1 text-white">
             CONNECT WALLET
           </DialogTitle>
-          <DialogDescription className="text-center font-sans text-xs uppercase tracking-widest text-muted-foreground pb-4 border-b border-surface-container-highest">
+          <DialogDescription className="text-center font-sans text-xs uppercase tracking-widest text-muted-foreground pb-4 border-b border-border">
             Select a provider from the list below
           </DialogDescription>
         </DialogHeader>
@@ -59,7 +59,7 @@ export function WalletModal() {
                 }}
                 disabled={connecting}
               >
-                <div className="size-8 rounded overflow-hidden relative flex-shrink-0 bg-background flex items-center justify-center p-1">
+                <div className="size-8 rounded-none overflow-hidden relative flex-shrink-0 bg-background flex items-center justify-center p-1">
                   <Image
                     src={wallet.adapter.icon}
                     alt={`${wallet.adapter.name} icon`}
@@ -68,14 +68,14 @@ export function WalletModal() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="font-bold text-lg font-heading tracking-wide text-foreground group-hover:text-primary transition-colors">
+                <span className="font-bold text-lg font-heading tracking-wide text-foreground group-hover:text-white transition-colors">
                   {wallet.adapter.name}
                 </span>
                 {connecting && wallet.readyState === "Installed" && (
-                  <Loader2 className="ml-auto size-5 animate-spin text-primary" />
+                  <Loader2 className="ml-auto size-5 animate-spin text-white" />
                 )}
                 {wallet.readyState === "Installed" && !connecting && (
-                  <span className="ml-auto text-[10px] font-sans uppercase font-bold text-primary tracking-widest bg-primary/10 border border-primary/20 px-2 py-1 rounded">
+                  <span className="ml-auto text-[10px] font-sans uppercase font-bold text-white tracking-widest bg-transparent border border-border px-2 py-1 rounded-none">
                     Detected
                   </span>
                 )}

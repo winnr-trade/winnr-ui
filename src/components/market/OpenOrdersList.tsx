@@ -24,8 +24,8 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
   const openOrders = orders?.filter((o) => o.status === "open") || [];
 
   return (
-    <Card className="bg-surface-container-high border-0 shadow-none p-6 md:p-8 flex flex-col gap-6 rounded-sm">
-      <Heading className="text-xl font-bold tracking-wide text-[#f4fffa]">Open Orders</Heading>
+    <Card className="bg-surface-container-low border border-border shadow-none p-6 md:p-8 flex flex-col gap-6 rounded-none">
+      <Heading className="text-xl font-bold tracking-wide text-white">Open Orders</Heading>
 
       {isLoading ? (
         <div className="text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse">
@@ -38,7 +38,7 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
       ) : (
         <div className="w-full flex flex-col">
           {/* Table Header */}
-          <div className="grid grid-cols-5 text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground pb-3 border-b border-white/[0.05] mb-2 px-4">
+          <div className="grid grid-cols-5 text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground pb-3 border-b border-border mb-2 px-4">
             <div className="col-span-1 text-left">SIDE / OUTCOME</div>
             <div className="col-span-1 text-right">LIMIT PRICE</div>
             <div className="col-span-1 text-right">REMAINING</div>
@@ -76,26 +76,26 @@ function OrderItem({ order }: { order: UserOrder }) {
   };
 
   return (
-    <div className="grid grid-cols-5 items-center px-4 py-3 rounded-sm bg-surface-container-low border border-white/[0.02] hover:bg-surface-container-highest transition-colors group">
+    <div className="grid grid-cols-5 items-center px-4 py-3 rounded-none bg-surface-container border border-border hover:bg-surface-container-highest transition-colors group">
       {/* Side / Outcome */}
       <div className="col-span-1 flex flex-col xl:flex-row xl:items-center gap-2">
         <span
-          className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-[#f4fffa]" : "text-red-400"}`}
+          className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-white" : "text-destructive"}`}
         >
           {actionText}
         </span>
-        <span className="w-fit text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground bg-white/5 border border-white/5 px-2 py-0.5 rounded-sm">
+        <span className="w-fit text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground bg-transparent border border-border px-2 py-0.5 rounded-none">
           {order.order_type}
         </span>
       </div>
 
       {/* Limit Price */}
-      <div className="col-span-1 text-right font-heading font-bold text-sm text-[#f4fffa]">
+      <div className="col-span-1 text-right font-heading font-bold text-sm text-white">
         ${price}
       </div>
 
       {/* Remaining Qty */}
-      <div className="col-span-1 text-right font-sans text-xs tracking-wide text-primary">
+      <div className="col-span-1 text-right font-sans text-xs tracking-wide text-white">
         {remainingQty}
       </div>
 
@@ -109,7 +109,7 @@ function OrderItem({ order }: { order: UserOrder }) {
         <Button
           variant="outline"
           size="xs"
-          className="text-muted-foreground tracking-widest uppercase border-white/10 bg-transparent hover:text-red-400 hover:border-red-400/50 hover:bg-red-400/10 transition-colors shadow-none"
+          className="text-muted-foreground tracking-widest uppercase border-border bg-transparent hover:text-destructive hover:border-destructive hover:bg-destructive/10 transition-colors shadow-none"
           onClick={handleCancelOrder}
           disabled={cancelOrder.isPending}
         >

@@ -41,14 +41,14 @@ export function WalletConnectButton() {
 
     return (
       <div className="flex items-center gap-2 h-10">
-        <div className="h-full px-4 flex items-center bg-surface-container-high rounded-md border border-primary text-primary font-mono text-sm font-bold shadow-[0_0_10px_rgba(159,251,6,0.1)] gap-3">
+        <div className="h-full px-4 flex items-center bg-surface-container rounded-none border border-border text-white font-mono text-sm font-bold shadow-none gap-3">
           <div className="flex items-center gap-2">
-            <div className="size-2 rounded-full bg-primary animate-pulse"></div>
+            <div className="size-2 rounded-none bg-emerald-500 animate-pulse"></div>
             {truncatedKey}
           </div>
-          <div className="w-[1px] h-4 bg-primary/30" />
-          <div className="text-foreground">
-            {formattedBalance} <span className="text-primary text-xs">USDC</span>
+          <div className="w-[1px] h-4 bg-border" />
+          <div className="text-white">
+            {formattedBalance} <span className="text-white text-xs">USDC</span>
           </div>
         </div>
         <Button
@@ -67,7 +67,7 @@ export function WalletConnectButton() {
   return (
     <Button
       onClick={openModal}
-      className="font-bold tracking-wide shadow-[0_0_15px_rgba(159,251,6,0.2)] hover:shadow-[0_0_20px_rgba(159,251,6,0.4)] flex items-center gap-2 h-10"
+      className="font-bold tracking-wide shadow-none hover:shadow-none flex items-center gap-2 h-10"
     >
       <Wallet className="size-4" />
       CONNECT WALLET
