@@ -38,11 +38,12 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
       ) : (
         <div className="w-full flex flex-col">
           {/* Table Header */}
-          <div className="grid grid-cols-5 text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground pb-3 border-b border-border mb-2 px-4">
+          <div className="grid grid-cols-6 text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground pb-3 border-b border-border mb-2 px-4">
             <div className="col-span-1 text-left">SIDE / OUTCOME</div>
             <div className="col-span-1 text-right">LIMIT PRICE</div>
             <div className="col-span-1 text-right">REMAINING</div>
             <div className="col-span-1 text-right">ORIGINAL QTY</div>
+            <div className="col-span-1 text-right">PNL</div>
             <div className="col-span-1 text-right">ACTION</div>
           </div>
 
@@ -76,7 +77,7 @@ function OrderItem({ order }: { order: UserOrder }) {
   };
 
   return (
-    <div className="grid grid-cols-5 items-center px-4 py-3 rounded-none bg-surface-container border border-border hover:bg-surface-container-highest transition-colors group">
+    <div className="grid grid-cols-6 items-center px-4 py-3 rounded-none bg-surface-container border border-border hover:bg-surface-container-highest transition-colors group">
       {/* Side / Outcome */}
       <div className="col-span-1 flex flex-col xl:flex-row xl:items-center gap-2">
         <span
@@ -102,6 +103,11 @@ function OrderItem({ order }: { order: UserOrder }) {
       {/* Original Qty */}
       <div className="col-span-1 text-right font-sans text-xs tracking-wide text-muted-foreground">
         {originalQty}
+      </div>
+
+      {/* PnL */}
+      <div className="col-span-1 text-right font-sans font-bold text-xs tracking-wide text-muted-foreground">
+        --
       </div>
 
       {/* Cancel Action */}

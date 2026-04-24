@@ -1,11 +1,7 @@
 import { Area, AreaChart, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-} from "@/components/ui/chart";
+import { type ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart";
 
 const chartConfig = {
   price: {
@@ -78,19 +74,35 @@ export function MarketPriceChart({
           config={chartConfig}
           className="absolute inset-0 size-full z-0 h-full w-full"
         >
-          <AreaChart
-            data={chartData}
-            margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
-          >
+          <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 10 }}>
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
                 <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="time" hide />
-            <YAxis yAxisId="price" domain={[0, 100]} hide />
-            
+            <XAxis
+              dataKey="time"
+              stroke="#555555"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={20}
+              minTickGap={30}
+              padding={{ right: 20 }}
+            />
+            <YAxis
+              yAxisId="price"
+              domain={[0, 100]}
+              stroke="#555555"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={20}
+              tickFormatter={(value) => `${value}%`}
+              width={40}
+            />
+
             <ChartTooltip
               cursor={{ stroke: "#ffffff", strokeWidth: 1, strokeDasharray: "4 4", opacity: 0.3 }}
               content={({ active, payload }) => {
@@ -99,12 +111,20 @@ export function MarketPriceChart({
                   return (
                     <div className="bg-surface-container border border-border p-3 flex flex-col gap-1 rounded-none shadow-xl">
                       <div className="flex justify-between gap-6">
-                        <span className="text-[10px] font-sans font-bold text-muted-foreground tracking-widest uppercase">PROB</span>
-                        <span className="text-[14px] font-heading font-bold text-white">{data.price.toFixed(2)}%</span>
+                        <span className="text-[10px] font-sans font-bold text-muted-foreground tracking-widest uppercase">
+                          PROB
+                        </span>
+                        <span className="text-[14px] font-heading font-bold text-white">
+                          {data.price.toFixed(2)}%
+                        </span>
                       </div>
                       <div className="flex justify-between gap-6">
-                        <span className="text-[10px] font-sans font-bold text-muted-foreground tracking-widest uppercase">TIME</span>
-                        <span className="text-[10px] font-sans text-muted-foreground">{data.time}</span>
+                        <span className="text-[10px] font-sans font-bold text-muted-foreground tracking-widest uppercase">
+                          TIME
+                        </span>
+                        <span className="text-[10px] font-sans text-muted-foreground">
+                          {data.time}
+                        </span>
                       </div>
                     </div>
                   );
@@ -112,7 +132,7 @@ export function MarketPriceChart({
                 return null;
               }}
             />
-            
+
             <Area
               yAxisId="price"
               type="monotone"
@@ -124,7 +144,27 @@ export function MarketPriceChart({
               dot={(props: any) => {
                 const { cx, cy, index } = props;
                 if (index === chartData.length - 1) {
-                  return <circle key="dot" cx={cx} cy={cy} r={4} fill="#10B981" stroke="none" />;
+                  return (
+                    <g key="dot">
+                      <circle cx={cx} cy={cy} r={4} fill="#10B981" stroke="none">
+                        <animate
+                          attributeName="r"
+                          from="4"
+                          to="16"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          from="0.6"
+                          to="0"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                      <circle cx={cx} cy={cy} r={4} fill="#10B981" stroke="none" />
+                    </g>
+                  );
                 }
                 return null;
               }}

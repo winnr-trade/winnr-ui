@@ -1,8 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
 import { Logo } from "@/components/ui/logo";
 
 export function TopNav() {
+  const pathname = usePathname();
+
+  const getLinkClasses = (path: string) => {
+    // Exact match for root, or startsWith for other paths (like /portfolio or /stake)
+    const isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
+    
+    if (isActive) {
+      return "text-xs font-sans font-bold text-foreground border-b-2 border-primary h-full flex items-center tracking-widest uppercase transition-all";
+    }
+    
+    return "text-xs font-sans font-bold text-muted-foreground hover:text-foreground h-full flex items-center border-b-2 border-transparent tracking-widest uppercase transition-all";
+  };
+
   return (
     <nav className="flex items-center justify-between px-6 bg-background pt-4 border-b border-border">
       <div className="flex items-center gap-12 h-10">
@@ -15,27 +31,21 @@ export function TopNav() {
         <div className="hidden md:flex items-center gap-8 h-full">
           <Link
             href="/"
-            className="text-xs font-sans font-bold text-foreground border-b-2 border-primary h-full flex items-center tracking-widest uppercase transition-all"
+            className={getLinkClasses("/")}
           >
             Markets
           </Link>
           <Link
-            href="/vault"
-            className="text-xs font-sans font-bold text-muted-foreground hover:text-foreground h-full flex items-center border-b-2 border-transparent tracking-widest uppercase transition-all"
+            href="/portfolio"
+            className={getLinkClasses("/portfolio")}
           >
-            Vault
+            Portfolio
           </Link>
           <Link
-            href="/ranks"
-            className="text-xs font-sans font-bold text-muted-foreground hover:text-foreground h-full flex items-center border-b-2 border-transparent tracking-widest uppercase transition-all"
+            href="/stake"
+            className={getLinkClasses("/stake")}
           >
-            Ranks
-          </Link>
-          <Link
-            href="/feed"
-            className="text-xs font-sans font-bold text-muted-foreground hover:text-foreground h-full flex items-center border-b-2 border-transparent tracking-widest uppercase transition-all"
-          >
-            Feed
+            Stake
           </Link>
         </div>
       </div>

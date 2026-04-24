@@ -105,7 +105,7 @@ export function TradePanel({
             <Button
               variant="ghost"
               className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
-                tradeSide === "BUY" ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+                tradeSide === "BUY" ? "bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 hover:text-emerald-500" : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setTradeSide("BUY")}
               disabled={isFrozen}
@@ -115,7 +115,7 @@ export function TradePanel({
             <Button
               variant="ghost"
               className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
-                tradeSide === "SELL" ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+                tradeSide === "SELL" ? "bg-destructive/20 text-destructive hover:bg-destructive/20 hover:text-destructive" : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setTradeSide("SELL")}
               disabled={isFrozen}
@@ -126,7 +126,7 @@ export function TradePanel({
           <div className="flex border border-border rounded-none">
             <Button
               variant="ghost"
-              className={`h-8 px-3 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+              className={`h-8 w-20 rounded-none text-[10px] font-sans font-bold tracking-widest ${
                 orderType === OrderType.Market ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setOrderType(OrderType.Market)}
@@ -136,7 +136,7 @@ export function TradePanel({
             </Button>
             <Button
               variant="ghost"
-              className={`h-8 px-3 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+              className={`h-8 w-20 rounded-none text-[10px] font-sans font-bold tracking-widest ${
                 orderType === OrderType.Limit ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setOrderType(OrderType.Limit)}
@@ -152,7 +152,7 @@ export function TradePanel({
           <div
             className={`flex-1 border p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
               selectedOutcome === "YES"
-                ? "border-emerald-500 bg-emerald-500/5"
+                ? "border-emerald-500 bg-emerald-500/20"
                 : "border-border hover:border-emerald-500/50"
             }`}
             onClick={() => !isFrozen && setSelectedOutcome("YES")}
@@ -161,14 +161,14 @@ export function TradePanel({
               {tradeSide} YES
             </div>
             <div className="text-xl font-heading font-bold text-white mt-1">
-              {Math.round(displayYesPrice)}%
+              {Math.round(displayYesPrice)}¢
             </div>
           </div>
           
           <div
             className={`flex-1 border p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
               selectedOutcome === "NO"
-                ? "border-destructive bg-destructive/5"
+                ? "border-destructive bg-destructive/20"
                 : "border-border hover:border-destructive/50"
             }`}
             onClick={() => !isFrozen && setSelectedOutcome("NO")}
@@ -177,7 +177,7 @@ export function TradePanel({
               {tradeSide} NO
             </div>
             <div className="text-xl font-heading font-bold text-white mt-1">
-              {Math.round(displayNoPrice)}%
+              {Math.round(displayNoPrice)}¢
             </div>
           </div>
         </div>
@@ -251,8 +251,8 @@ export function TradePanel({
         <Button
           onClick={handleConfirmPosition}
           disabled={isFrozen || placeOrder.isPending || !signer || parsedAmount <= 0}
-          className={`w-full h-12 hover:opacity-90 text-black border-0 rounded-none mt-2 tracking-[0.2em] font-sans font-bold text-[11px] uppercase transition-all shadow-none ${
-            tradeSide === "BUY" ? "bg-white" : "bg-destructive text-white"
+          className={`w-full h-12 text-white border-0 rounded-none mt-2 tracking-[0.2em] font-sans font-bold text-[11px] uppercase transition-all shadow-none ${
+            tradeSide === "BUY" ? "bg-emerald-500 hover:bg-emerald-400" : "bg-destructive hover:bg-red-500"
           }`}
         >
           {placeOrder.isPending ? (

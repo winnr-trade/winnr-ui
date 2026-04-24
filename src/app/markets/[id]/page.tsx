@@ -112,6 +112,8 @@ export default function MarketPage() {
             isConnected={isConnected}
           />
 
+          <OpenOrdersList marketId={marketId} />
+
           {/* Rules & Resolution Card */}
           <div className="border border-border bg-surface-container-low p-6 flex flex-col gap-4 mt-2">
             <div className="text-[10px] uppercase font-sans font-bold text-muted-foreground tracking-widest">
@@ -162,7 +164,6 @@ export default function MarketPage() {
           </div>
 
           <OrderBook bids={bids} asks={asks} />
-          <OpenOrdersList marketId={marketId} />
         </div>
       </div>
     </div>
