@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 
 import {
   Activity,
@@ -25,7 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heading } from "@/components/ui/typography";
-import { useUserWallet } from "@/hooks/useUserWallet";
+import { useMainWallet } from "@/hooks/useMainWallet";
+import { formatDate } from "@/utils";
 
 // Helper to map icon names to actual Lucide components
 const getIconByName = (name: string) => {
@@ -47,6 +49,14 @@ const getIconByName = (name: string) => {
 
 export default function Home() {
   const { data: categories, isLoading: isLoadingCat, error: errCat } = useGetCategories();
+  const [activeCategory, setActiveCategory] = useState("");
+
+  // Set the first category as active by default once loaded
+  useEffect(() => {
+    if (categories && categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0].name);
+    }
+  }, [categories, activeCategory]);
   const {
     data: trendingMarkets,
     isLoading: isLoadingTrend,
@@ -57,7 +67,7 @@ export default function Home() {
   const { data: marketStats, isLoading: isLoadingStats, error: errStats } = useGetMarketStats();
   const { data: featuredMarket, isLoading: isLoadingFeat, error: errFeat } = useGetFeaturedMarket();
 
-  useUserWallet();
+  useMainWallet();
 
   const isLoading =
     isLoadingCat ||
@@ -110,43 +120,68 @@ export default function Home() {
     <div className="container mx-auto p-6 md:p-8 flex flex-col gap-16 max-w-[1400px]">
       {/* Featured Market Hero */}
       <Link href={`/markets/${featuredMarket.id}`} className="block">
-        <Card className="bg-surface-container border-0 rounded-none overflow-hidden relative shadow-none p-0 group">
-          {/* Faux Background for Hero */}
+        <Card className="bg-surface-container border-0 rounded-none overflow-hidden relative shadow-none p-0 group min-h-[300px] lg:min-h-[420px]">
+          {/* Advanced CSS Background */}
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-linear-to-r from-background via-surface/80 to-transparent z-10 w-2/3"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-linear-to-tr from-white/5 to-white/10 opacity-30 skew-x-12 blur-3xl"></div>
+            <div
+              className="absolute inset-0 opacity-[0.15]"
+              style={{
+                backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+                backgroundSize: "32px 32px",
+              }}
+            ></div>
+            <div className="absolute inset-0 bg-linear-to-r from-background via-background/90 to-transparent z-10 w-full lg:w-2/3"></div>
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/20 to-background z-10"></div>
+
+            {/* Animated Glows */}
+            <div className="absolute -top-24 -right-24 size-96 bg-primary/20 blur-[120px] rounded-full"></div>
+            <div className="absolute top-1/2 -right-12 size-64 bg-emerald-500/10 blur-[100px] rounded-full"></div>
           </div>
 
-          <div className="relative z-10 p-10 lg:p-16 flex flex-col justify-center max-w-3xl">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="size-2 rounded-none bg-emerald-500"></div>
-              <span className="text-[10px] font-sans font-bold text-white uppercase tracking-[0.2em]">
-                {featuredMarket.tag || "FEATURED HIGH-VOLUME MARKET"}
-              </span>
-            </div>
-
-            <h1 className="text-5xl lg:text-[5.5rem] font-heading font-extrabold leading-[0.95] mb-12 tracking-tight text-[#f4fffa]">
-              {featuredMarket.titlePrefix}{" "}
-              <span className="text-primary">{featuredMarket.titleHighlight}</span>{" "}
-              {featuredMarket.titleSuffix}
-            </h1>
-
-            <div className="flex items-center gap-16 mb-12">
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
-                  YES PROBABILITY
-                </span>
-                <span className="text-4xl font-heading font-bold text-primary">
-                  {featuredMarket.probability}
+          <div className="relative z-10 p-8 lg:p-12 lg:py-16 flex flex-col justify-center max-w-4xl">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-2">
+                <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-[10px] font-sans font-bold text-emerald-500 uppercase tracking-[0.25em]">
+                  {featuredMarket.tag || "FEATURED MARKET"}
                 </span>
               </div>
-              <div className="w-px h-12 bg-white/10"></div>
+            </div>
+
+            <h1 className="text-4xl lg:text-6xl font-heading font-extrabold leading-[1.1] mb-8 tracking-tight text-[#f4fffa] max-w-2xl">
+              {featuredMarket.titlePrefix}
+            </h1>
+
+            <div className="flex items-center gap-10 lg:gap-20 mb-10">
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
+                <span className="text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
+                  YES PROBABILITY
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl lg:text-5xl font-heading font-bold text-primary">
+                    {featuredMarket.probability}
+                  </span>
+                  <span className="text-xs font-sans font-bold text-emerald-500/60 flex items-center gap-0.5">
+                    <ArrowUp className="size-3" /> 0.0%
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
                   TOTAL VOLUME
                 </span>
-                <span className="text-4xl font-heading font-bold text-[#f4fffa]">
+                <span className="text-4xl lg:text-5xl font-heading font-bold text-[#f4fffa]">
                   {featuredMarket.volume}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
+                  ENDS IN
+                </span>
+                <span className="text-4xl lg:text-5xl font-heading font-bold text-[#f4fffa]">
+                  {featuredMarket.endsIn || "—"}
                 </span>
               </div>
             </div>
@@ -154,16 +189,9 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <Button
                 size="lg"
-                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-none bg-white text-black hover:bg-white/90 flex items-center gap-2"
+                className="h-12 px-10 text-[10px] font-sans font-bold tracking-[0.2em] uppercase rounded-none bg-primary text-black hover:bg-primary/90 flex items-center gap-2 border-0 shadow-xl shadow-primary/20"
               >
-                PREDICT NOW <ArrowUp className="size-4 rotate-45" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-14 px-8 text-sm font-sans font-bold tracking-widest uppercase rounded-none bg-transparent border border-border hover:bg-surface-bright text-white"
-              >
-                ANALYSIS
+                PREDICT NOW <ArrowRight className="size-3" />
               </Button>
             </div>
           </div>
@@ -174,11 +202,12 @@ export default function Home() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-8 py-4 px-1">
         <div className="flex items-center gap-3 overflow-x-auto pb-4 lg:pb-0 scrollbar-none justify-center w-full">
           {categories.map((cat) => (
-            <Button
-              key={cat.name}
-              variant="pill"
-              size="pill"
-              data-active={cat.active}
+            <Button 
+              key={cat.name} 
+              variant="pill" 
+              size="pill" 
+              data-active={activeCategory === cat.name}
+              onClick={() => setActiveCategory(cat.name)}
             >
               {cat.name}
             </Button>
@@ -211,7 +240,9 @@ export default function Home() {
                   <span className="px-2 py-1 bg-surface-container-highest text-white font-sans font-bold text-[9px] uppercase tracking-widest rounded-none">
                     {market.category}
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-sans">Ends Dec 12</span>
+                  <span className="text-[10px] text-muted-foreground font-sans">
+                    {formatDate(market.resolutionTime)}
+                  </span>
                 </div>
 
                 <h3 className="font-heading font-bold text-lg leading-snug flex-1 text-[#f4fffa]">
@@ -221,20 +252,32 @@ export default function Home() {
                 {/* Probabilities Bar */}
                 <div className="flex flex-col gap-2 mt-2">
                   <div className="flex justify-between text-[9px] font-sans font-bold uppercase tracking-widest text-[#f4fffa]/40">
-                    <span>YES {market.chance}</span>
-                    <span>NO 62%</span>
+                    <span className="text-emerald-500">YES {market.chanceNum}%</span>
+                    <span className="text-destructive">NO {100 - market.chanceNum}%</span>
                   </div>
-                  <div className="w-full h-[3px] flex bg-surface-bright rounded-none">
-                    <div className="h-full bg-emerald-500" style={{ width: market.chance }}></div>
-                    <div className="h-full bg-transparent" style={{ width: "2px" }}></div>
+                  <div className="w-full h-[3px] flex bg-surface-bright rounded-none overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-500"
+                      style={{ width: `${market.chanceNum}%` }}
+                    ></div>
+                    <div
+                      className="h-full bg-destructive transition-all duration-500"
+                      style={{ width: `${100 - market.chanceNum}%` }}
+                    ></div>
                   </div>
                 </div>
 
                 <div className="flex gap-3 mt-1">
-                  <Button variant="tech" size="outcome" className="flex-1 h-10">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-11 bg-emerald-500/10 text-emerald-500 border-emerald-500/50 hover:bg-emerald-500/20 hover:border-emerald-500 transition-all rounded-none font-sans font-bold text-[10px] tracking-widest uppercase"
+                  >
                     PREDICT YES
                   </Button>
-                  <Button variant="tech" size="outcome" className="flex-1 h-10">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-11 bg-destructive/10 text-destructive border-destructive/50 hover:bg-destructive/20 hover:border-destructive transition-all rounded-none font-sans font-bold text-[10px] tracking-widest uppercase"
+                  >
                     PREDICT NO
                   </Button>
                 </div>

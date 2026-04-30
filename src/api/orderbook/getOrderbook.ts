@@ -7,7 +7,8 @@ export type OrderbookData = {
   asks: OrderbookItem[];
 };
 
-export function useOrderbook(marketId: number) {
+export function useOrderbook(params: { marketId: number }) {
+  const { marketId } = params;
   const [orderbook, setOrderbook] = useState<OrderbookData>({ bids: [], asks: [] });
   const [isConnected, setIsConnected] = useState(false);
 
@@ -31,6 +32,8 @@ export function useOrderbook(marketId: number) {
 
       try {
         const data = JSON.parse(event.data);
+        // console.log("Orderbook message", data);
+
         if (data.yes_bids && data.yes_asks) {
           setOrderbook({
             bids: data.yes_bids.map((bid: [number, number]) => [bid[0] / 100, bid[1]]),

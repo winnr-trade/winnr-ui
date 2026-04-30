@@ -25,14 +25,19 @@ export const useGetTrendingMarkets = () => {
 
       // biome-ignore lint/suspicious/noExplicitAny: indexer response
       return json.data
-        .map((m: any) => ({
-          id: m.id.toString(),
-          title: m.question,
-          category: "Miscellaneous",
-          chance: midPriceToChance(m.latest_mid_price),
-          volume: formatVolume(Number(m.volume ?? 0)),
-          iconName: "activity",
-        }))
+        .map((m: any) => {
+          const chanceNum = m.latest_mid_price != null ? Math.round(m.latest_mid_price / 100) : 50;
+          return {
+            id: m.id.toString(),
+            title: m.question,
+            category: "Miscellaneous",
+            chance: `${chanceNum}%`,
+            chanceNum,
+            volume: formatVolume(Number(m.volume ?? 0)),
+            resolutionTime: m.resolution_time,
+            iconName: "activity",
+          };
+        })
         .reverse();
     },
   });

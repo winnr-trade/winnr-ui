@@ -12,7 +12,8 @@ export type ChartResponse = {
   data: ChartDataPoint[];
 };
 
-export const useMarketChart = (marketId: number, resolution: string) => {
+export const useMarketChart = (params: { marketId: number; resolution: string }) => {
+  const { marketId, resolution } = params;
   return useQuery({
     queryKey: ["marketChart", marketId, resolution],
     queryFn: async (): Promise<ChartResponse> => {

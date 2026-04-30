@@ -74,7 +74,7 @@ export function MarketPriceChart({
           config={chartConfig}
           className="absolute inset-0 size-full z-0 h-full w-full"
         >
-          <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 10 }}>
+          <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
@@ -87,7 +87,7 @@ export function MarketPriceChart({
               fontSize={10}
               tickLine={false}
               axisLine={false}
-              tickMargin={20}
+              tickMargin={8}
               minTickGap={30}
               padding={{ right: 20 }}
             />
@@ -98,7 +98,7 @@ export function MarketPriceChart({
               fontSize={10}
               tickLine={false}
               axisLine={false}
-              tickMargin={20}
+              tickMargin={8}
               tickFormatter={(value) => `${value}%`}
               width={40}
             />
@@ -123,7 +123,7 @@ export function MarketPriceChart({
                           TIME
                         </span>
                         <span className="text-[10px] font-sans text-muted-foreground">
-                          {data.time}
+                          {data.fullTime || data.time}
                         </span>
                       </div>
                     </div>
@@ -135,7 +135,7 @@ export function MarketPriceChart({
 
             <Area
               yAxisId="price"
-              type="monotone"
+              type="linear"
               dataKey="price"
               stroke="#10B981"
               fillOpacity={1}

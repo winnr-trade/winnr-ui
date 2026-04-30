@@ -1,12 +1,12 @@
 "use client";
 
 import { toast } from "sonner";
-import { useCancelOrder } from "@/api/orderbook/useCancelOrder";
-import { type UserOrder, useGetUserOrders } from "@/api/orderbook/useGetUserOrders";
+import { useCancelOrder } from "@/api/orderbook/cancelOrder";
+import { type UserOrder, useGetUserOrders } from "@/api/orderbook/getUserOrders";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/typography";
-import { useUserWallet } from "@/hooks/useUserWallet";
+import { useMainWallet } from "@/hooks/useMainWallet";
 import { formatNumber } from "@/utils";
 
 interface OpenOrdersListProps {
@@ -14,8 +14,8 @@ interface OpenOrdersListProps {
 }
 
 export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
-  const { address } = useUserWallet();
-  const { data: orders, isLoading } = useGetUserOrders(address, marketId);
+  const { address } = useMainWallet();
+  const { data: orders, isLoading } = useGetUserOrders({ userAddress: address, marketId });
 
   if (!address) {
     return null;
@@ -64,7 +64,7 @@ function OrderItem({ order }: { order: UserOrder }) {
   const isBuy = order.side === "bid";
   const outcomeText = order.outcome.toUpperCase();
   const actionText = `${isBuy ? "BUY" : "SELL"} ${outcomeText}`;
-  const price = (order.canonical_price / 100).toFixed(3);
+  const price = Math.round(order.canonical_price);
   const remainingQty = formatNumber(order.remaining_quantity, 0, 0);
   const originalQty = formatNumber(order.original_quantity, 0, 0);
 
@@ -81,7 +81,7 @@ function OrderItem({ order }: { order: UserOrder }) {
       {/* Side / Outcome */}
       <div className="col-span-1 flex flex-col xl:flex-row xl:items-center gap-2">
         <span
-          className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-white" : "text-destructive"}`}
+          className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-emerald-500" : "text-destructive"}`}
         >
           {actionText}
         </span>
@@ -92,7 +92,7 @@ function OrderItem({ order }: { order: UserOrder }) {
 
       {/* Limit Price */}
       <div className="col-span-1 text-right font-heading font-bold text-sm text-white">
-        ${price}
+        {price}¢
       </div>
 
       {/* Remaining Qty */}

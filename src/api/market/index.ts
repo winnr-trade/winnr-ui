@@ -7,3 +7,4 @@ export * from "./getNewestMarkets";
 export * from "./getTrendingMarkets";
 export * from "./getShares";
 export * from "./getMarketChart";
+export * from "./getRecentTrades";

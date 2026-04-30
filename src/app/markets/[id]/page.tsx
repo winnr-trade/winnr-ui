@@ -5,25 +5,30 @@ import { useState } from "react";
 import { useMarketChart, useMarketDetail } from "@/api/market";
 import { useOrderbook } from "@/api/orderbook";
 import {
+  MarketDepthChart,
   MarketDetailHeader,
   MarketDetailSkeleton,
   MarketPriceChart,
   OrderBook,
   RecentActivity,
+  RulesAndResolution,
   TradePanel,
+  YourPosition,
 } from "@/components/market";
 import { OpenOrdersList } from "@/components/market/OpenOrdersList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function MarketPage() {
   const params = useParams();
   const id = Array.isArray(params?.id) ? params?.id[0] : params?.id || "unknown";
 
   const marketId = typeof id === "string" ? Number(id) : Number(id[0] || 0);
-  const { data: market, isLoading, error } = useMarketDetail(marketId);
-  const { bids, asks, isConnected } = useOrderbook(marketId);
+  const { data: market, isLoading, error } = useMarketDetail({ id: marketId });
+  const { bids, asks, isConnected } = useOrderbook({ marketId });
   const [resolution, setResolution] = useState<"1m" | "15m" | "1h" | "1d" | "1w" | "all">("all");
-  const { data: chartDataResponse } = useMarketChart(marketId, resolution);
+  const { data: chartDataResponse } = useMarketChart({ marketId, resolution });
   const chartData = chartDataResponse?.data || [];
+  const [activeTab, setActiveTab] = useState<"chart" | "orderbook">("chart");
 
   if (isLoading) {
     return <MarketDetailSkeleton />;
@@ -66,25 +71,44 @@ export default function MarketPage() {
   const buyNoPrice = highestBid !== null ? 100 - highestBid : parseFloat(market.noPrice);
   const sellNoPrice = lowestAsk !== null ? 100 - lowestAsk : parseFloat(market.noPrice);
 
-  // Format chart data
-  const formattedChartData = chartData.map((d) => {
-    const date = new Date(Number(d.time));
-    return {
-      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      price: d.price / 100,
-      volume: Math.random() * 100 + 20, // Mock volume for visual bars
-    };
-  });
+  // Format chart data with resolution-aware labels
+  const formattedChartData = [...chartData]
+    .sort((a, b) => Number(a.time) - Number(b.time))
+    .map((d) => {
+      const date = new Date(Number(d.time));
 
-  // If market is resolved, append terminal data point at 0 or 100
+      // Determine format based on resolution
+      let timeLabel: string;
+      if (resolution === "all" || resolution === "1w" || resolution === "1d") {
+        timeLabel = date.toLocaleDateString([], { month: "short", day: "numeric" });
+      } else {
+        timeLabel = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+
+      return {
+        time: timeLabel,
+        fullTime: date.toLocaleString(), // for tooltip
+        price: d.price / 100,
+        volume: Math.random() * 100 + 20,
+      };
+    });
+
+  // If market is resolved, append terminal data point
   if (isFullyResolved && formattedChartData.length > 0) {
     const terminalPrice = resolvedOutcome === "yes" ? 100 : 0;
     const resolutionMs = new Date(market.resolutionTime).getTime();
-    const terminalTime = new Date(resolutionMs).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+    const date = new Date(resolutionMs);
+    const terminalTime =
+      resolution === "all" || resolution === "1w" || resolution === "1d"
+        ? date.toLocaleDateString([], { month: "short", day: "numeric" })
+        : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    formattedChartData.push({
+      time: terminalTime,
+      fullTime: date.toLocaleString(),
+      price: terminalPrice,
+      volume: 50,
     });
-    formattedChartData.push({ time: terminalTime, price: terminalPrice, volume: 50 });
   }
 
   return (
@@ -103,39 +127,59 @@ export default function MarketPage() {
             isAwaitingResolution={isAwaitingResolution}
             resolvedOutcome={resolvedOutcome}
             resolutionDate={market.resolutionDate}
+            volume={market.volume}
+            liquidity={market.liquidity}
           />
 
-          <MarketPriceChart
-            chartData={formattedChartData}
-            resolution={resolution}
-            onResolutionChange={setResolution}
-            isConnected={isConnected}
-          />
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as "chart" | "orderbook")}
+            className="w-full"
+          >
+            <TabsList
+              variant="line"
+              className="w-full justify-start border-b border-border/50 rounded-none h-auto p-0 flex gap-4"
+            >
+              <TabsTrigger
+                value="chart"
+                className="pb-4 px-2 text-[10px] font-sans font-bold uppercase tracking-[0.2em] rounded-none after:bottom-0 data-active:after:bg-emerald-500 data-active:text-white"
+              >
+                Price Chart
+              </TabsTrigger>
+              <TabsTrigger
+                value="orderbook"
+                className="pb-4 px-2 text-[10px] font-sans font-bold uppercase tracking-[0.2em] rounded-none after:bottom-0 data-active:after:bg-emerald-500 data-active:text-white"
+              >
+                Orderbook
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="chart" className="pt-6">
+              <MarketPriceChart
+                chartData={formattedChartData}
+                resolution={resolution}
+                onResolutionChange={setResolution}
+                isConnected={isConnected}
+              />
+            </TabsContent>
+            <TabsContent value="orderbook" className="pt-6 flex flex-col gap-6">
+              <MarketDepthChart bids={bids} asks={asks} />
+              <OrderBook bids={bids} asks={asks} />
+            </TabsContent>
+          </Tabs>
 
           <OpenOrdersList marketId={marketId} />
 
-          {/* Rules & Resolution Card */}
-          <div className="border border-border bg-surface-container-low p-6 flex flex-col gap-4 mt-2">
-            <div className="text-[10px] uppercase font-sans font-bold text-muted-foreground tracking-widest">
-              RULES & RESOLUTION
-            </div>
-            <div className="text-sm text-white font-sans leading-relaxed">
-              This market will resolve to "Yes" if the price of Bitcoin (BTC) reaches or exceeds
-              $100,000.00 USD according to the specified data source at any point between the
-              market's creation and December 31, 2024, 11:59:59 PM ET.
-            </div>
-            <div className="text-sm text-muted-foreground font-sans">
-              Resolution source: Binance BTC/USDT spot market.
-            </div>
-          </div>
+          <RulesAndResolution resolver={market.resolver} resolutionTime={market.resolutionTime} />
 
           <div className="mt-8">
-            <RecentActivity yesPrice={market.yesPrice} noPrice={market.noPrice} />
+            <RecentActivity marketId={marketId} />
           </div>
         </div>
 
-        {/* Right Column: Trade Panel & Order Book */}
+        {/* Right Column: Trade Panel */}
         <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+          <YourPosition marketId={marketId} yesPrice={buyYesPrice} noPrice={buyNoPrice} />
+
           <TradePanel
             marketId={marketId}
             buyYesPrice={buyYesPrice}
@@ -146,24 +190,6 @@ export default function MarketPage() {
             isFullyResolved={isFullyResolved}
             isAwaitingResolution={isAwaitingResolution}
           />
-
-          {/* Stats Panel moved from Chart */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="border border-border p-4 flex flex-col gap-1">
-              <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-widest">
-                24H VOLUME
-              </span>
-              <span className="text-xl font-heading font-bold text-white">{market.volume}</span>
-            </div>
-            <div className="border border-border p-4 flex flex-col gap-1">
-              <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-widest">
-                LIQUIDITY
-              </span>
-              <span className="text-xl font-heading font-bold text-white">{market.liquidity}</span>
-            </div>
-          </div>
-
-          <OrderBook bids={bids} asks={asks} />
         </div>
       </div>
     </div>

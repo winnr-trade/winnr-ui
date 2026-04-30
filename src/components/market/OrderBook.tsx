@@ -57,7 +57,7 @@ export function OrderBook({ bids, asks }: OrderBookProps) {
           )}
           {yesAsks.map(([price, size], i) => (
             <div key={`yes-${i}`} className="flex justify-between items-center text-[11px] font-sans">
-              <span className="text-white font-bold">{price.toFixed(1)}%</span>
+              <span className="text-white font-bold">{price.toFixed(1)}¢</span>
               <span className="text-muted-foreground">{formatSize(size)}</span>
             </div>
           ))}
@@ -73,7 +73,7 @@ export function OrderBook({ bids, asks }: OrderBookProps) {
           )}
           {noAsks.map(([price, size], i) => (
             <div key={`no-${i}`} className="flex justify-between items-center text-[11px] font-sans">
-              <span className="text-white font-bold">{price.toFixed(1)}%</span>
+              <span className="text-white font-bold">{price.toFixed(1)}¢</span>
               <span className="text-muted-foreground">{formatSize(size)}</span>
             </div>
           ))}

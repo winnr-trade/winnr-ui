@@ -4,9 +4,9 @@ import { indexerApiBaseUrl } from "@/config/env";
 /** Format a raw integer volume (in micro-units, 6 decimals) to a human-readable string */
 function formatVolume(raw: number): string {
   const dollars = raw / 1_000_000;
-  if (dollars >= 1_000_000) return `~$${(dollars / 1_000_000).toFixed(1)}M Volume`;
-  if (dollars >= 1_000) return `~$${(dollars / 1_000).toFixed(1)}K Volume`;
-  return `~$${dollars.toFixed(0)} Volume`;
+  if (dollars >= 1_000_000) return `$${(dollars / 1_000_000).toFixed(1)}M`;
+  if (dollars >= 1_000) return `$${(dollars / 1_000).toFixed(1)}K`;
+  return `$${dollars.toFixed(0)}`;
 }
 
 /** Convert a mid_price in basis points (0-10000) to a probability number (0-100) */

@@ -16,7 +16,8 @@ export interface UserOrder {
   status: "open" | "filled" | "cancelled";
 }
 
-export function useGetUserOrders(userAddress: string | undefined, marketId?: number) {
+export function useGetUserOrders(params: { userAddress: string | undefined; marketId?: number }) {
+  const { userAddress, marketId } = params;
   return useQuery<UserOrder[]>({
     queryKey: ["userOrders", userAddress, marketId],
     queryFn: async () => {

@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { rollup } from "@/api/utils";
 
-export const useMarketDetail = (id: number) => {
+export const useMarketDetail = (params: { id: number }) => {
+  const { id } = params;
   return useQuery({
     queryKey: ["marketDetail", id],
     queryFn: async () => {
@@ -31,6 +32,8 @@ export const useMarketDetail = (id: number) => {
         outcome: m.outcome ?? null, // "yes" | "no" | null
         yesPrice: `${prob.toFixed(1)}¢`,
         noPrice: `${(100 - prob).toFixed(1)}¢`,
+        resolver: m.resolver,
+        question: m.question,
       };
     },
   });

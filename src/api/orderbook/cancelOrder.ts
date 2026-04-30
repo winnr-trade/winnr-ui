@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { rollup } from "@/api/utils";
-import { useUserWallet } from "@/hooks/useUserWallet";
+import { useAgentWallet } from "@/hooks/useAgentWallet";
 
 export function useCancelOrder() {
-  const { signer } = useUserWallet();
+  const { signer, isActive } = useAgentWallet();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (params: { orderId: number }) => {
-      if (!signer) {
-        throw new Error("Wallet not connected");
+      if (!isActive || !signer) {
+        throw new Error("Trading session not active. Please enable trading.");
       }
       return await rollup.orderbook.cancelOrder(params, signer);
     },

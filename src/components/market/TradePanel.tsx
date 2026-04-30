@@ -3,11 +3,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useGetShares } from "@/api/market";
 import { usePlaceOrder } from "@/api/orderbook/placeOrder";
-import { useGetBalance } from "@/api/wallet/useGetBalance";
+import { useGetBalance } from "@/api/wallet/getBalance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tokens } from "@/config/constants";
-import { useUserWallet } from "@/hooks/useUserWallet";
+import { useAgentWallet } from "@/hooks/useAgentWallet";
+import { useMainWallet } from "@/hooks/useMainWallet";
 import { OrderType, Outcome, Side } from "@/lib/rollup/types";
 import { formatNumber } from "@/utils";
 
@@ -35,16 +36,17 @@ export function TradePanel({
   const [tradeSide, setTradeSide] = useState<"BUY" | "SELL">("BUY");
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Market);
   const [selectedOutcome, setSelectedOutcome] = useState<"YES" | "NO">("YES");
-  const [amount, setAmount] = useState<string>("100");
+  const [shares, setShares] = useState<string>("1000");
   const [limitPrice, setLimitPrice] = useState<string>("");
 
   const placeOrder = usePlaceOrder();
-  const { address, signer } = useUserWallet();
-  const { data: sharesData } = useGetShares(marketId, address);
-  const { data: balanceData } = useGetBalance(address);
+  const { address } = useMainWallet();
+  const { isActive: isAgentActive, enableTrading, isRegistering } = useAgentWallet();
+  const { data: sharesData } = useGetShares({ marketId, address });
+  const { data: balanceData } = useGetBalance({ address });
   const userBalance = balanceData ? Number(balanceData) / 10 ** tokens.usdc.decimals : 0;
 
-  const parsedAmount = Number(amount) || 0;
+  const parsedShares = Number(shares) || 0;
 
   const displayYesPrice = tradeSide === "BUY" ? buyYesPrice : sellYesPrice;
   const displayNoPrice = tradeSide === "BUY" ? buyNoPrice : sellNoPrice;
@@ -52,21 +54,23 @@ export function TradePanel({
   const currentPrice = selectedOutcome === "YES" ? displayYesPrice : displayNoPrice;
   const effectivePrice = orderType === OrderType.Market ? currentPrice : Number(limitPrice) || 0;
 
-  const shares = effectivePrice > 0 ? parsedAmount / (effectivePrice / 100) : 0;
-  const maxPayout = shares;
-  const potentialReturn = maxPayout - parsedAmount;
+  const totalCost = (parsedShares * effectivePrice) / 100;
+  const maxPayout = parsedShares;
+  const potentialReturn = maxPayout - totalCost;
 
   const handleConfirmPosition = async () => {
-    if (!signer) {
+    if (!address) {
       toast.error("Please connect your wallet first");
       return;
     }
-    if (parsedAmount <= 0) {
-      toast.error("Please enter a valid amount");
+
+    if (!isAgentActive) {
+      await enableTrading();
       return;
     }
-    if (shares <= 0) {
-      toast.error("Invalid shares calculated");
+
+    if (parsedShares <= 0) {
+      toast.error("Please enter a valid number of shares");
       return;
     }
 
@@ -75,13 +79,13 @@ export function TradePanel({
       outcome: selectedOutcome === "YES" ? Outcome.Yes : Outcome.No,
       side: tradeSide === "BUY" ? Side.Bid : Side.Ask,
       price: effectivePrice,
-      quantity: Math.floor(shares),
+      quantity: Math.floor(parsedShares),
       orderType: orderType,
     });
 
     toast.promise(orderPromise, {
       loading: "Placing order...",
-      success: `Successfully ${tradeSide === "BUY" ? "bought" : "sold"} ${formatNumber(shares, 0, 0)} shares!`,
+      success: `Successfully ${tradeSide === "BUY" ? "placed buy order" : "placed sell order"} for ${formatNumber(parsedShares, 0, 0)} shares!`,
       error: (err) => `Order failed: ${err.message || "Unknown error"}`,
     });
   };
@@ -105,7 +109,9 @@ export function TradePanel({
             <Button
               variant="ghost"
               className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
-                tradeSide === "BUY" ? "bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 hover:text-emerald-500" : "text-muted-foreground hover:text-white hover:bg-transparent"
+                tradeSide === "BUY"
+                  ? "bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 hover:text-emerald-500"
+                  : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setTradeSide("BUY")}
               disabled={isFrozen}
@@ -115,7 +121,9 @@ export function TradePanel({
             <Button
               variant="ghost"
               className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
-                tradeSide === "SELL" ? "bg-destructive/20 text-destructive hover:bg-destructive/20 hover:text-destructive" : "text-muted-foreground hover:text-white hover:bg-transparent"
+                tradeSide === "SELL"
+                  ? "bg-destructive/20 text-destructive hover:bg-destructive/20 hover:text-destructive"
+                  : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setTradeSide("SELL")}
               disabled={isFrozen}
@@ -127,7 +135,9 @@ export function TradePanel({
             <Button
               variant="ghost"
               className={`h-8 w-20 rounded-none text-[10px] font-sans font-bold tracking-widest ${
-                orderType === OrderType.Market ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+                orderType === OrderType.Market
+                  ? "bg-white text-black hover:bg-white hover:text-black"
+                  : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setOrderType(OrderType.Market)}
               disabled={isFrozen}
@@ -137,7 +147,9 @@ export function TradePanel({
             <Button
               variant="ghost"
               className={`h-8 w-20 rounded-none text-[10px] font-sans font-bold tracking-widest ${
-                orderType === OrderType.Limit ? "bg-white text-black hover:bg-white hover:text-black" : "text-muted-foreground hover:text-white hover:bg-transparent"
+                orderType === OrderType.Limit
+                  ? "bg-white text-black hover:bg-white hover:text-black"
+                  : "text-muted-foreground hover:text-white hover:bg-transparent"
               }`}
               onClick={() => setOrderType(OrderType.Limit)}
               disabled={isFrozen}
@@ -157,14 +169,16 @@ export function TradePanel({
             }`}
             onClick={() => !isFrozen && setSelectedOutcome("YES")}
           >
-            <div className={`text-[11px] font-sans font-bold uppercase tracking-widest ${selectedOutcome === "YES" ? "text-emerald-500" : "text-emerald-500/70"}`}>
+            <div
+              className={`text-[11px] font-sans font-bold uppercase tracking-widest ${selectedOutcome === "YES" ? "text-emerald-500" : "text-emerald-500/70"}`}
+            >
               {tradeSide} YES
             </div>
             <div className="text-xl font-heading font-bold text-white mt-1">
               {Math.round(displayYesPrice)}¢
             </div>
           </div>
-          
+
           <div
             className={`flex-1 border p-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
               selectedOutcome === "NO"
@@ -173,7 +187,9 @@ export function TradePanel({
             }`}
             onClick={() => !isFrozen && setSelectedOutcome("NO")}
           >
-            <div className={`text-[11px] font-sans font-bold uppercase tracking-widest ${selectedOutcome === "NO" ? "text-destructive" : "text-destructive/70"}`}>
+            <div
+              className={`text-[11px] font-sans font-bold uppercase tracking-widest ${selectedOutcome === "NO" ? "text-destructive" : "text-destructive/70"}`}
+            >
               {tradeSide} NO
             </div>
             <div className="text-xl font-heading font-bold text-white mt-1">
@@ -186,7 +202,7 @@ export function TradePanel({
         {orderType === OrderType.Limit && (
           <div className="flex flex-col gap-2">
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
-              LIMIT PRICE (%)
+              LIMIT PRICE (¢)
             </span>
             <div className="relative flex items-center">
               <Input
@@ -202,25 +218,24 @@ export function TradePanel({
           </div>
         )}
 
-        {/* Amount Input */}
+        {/* Shares Input */}
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
-              {tradeSide === "BUY" ? "AMOUNT" : "SHARES"}
+              SHARES TO {tradeSide}
             </span>
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
-              {tradeSide === "BUY" ? `SHARES: ~${shares.toFixed(1)}` : `VALUE: $${(parsedAmount * effectivePrice / 100).toFixed(2)}`}
+              COST: ${formatNumber(totalCost)}
             </span>
           </div>
           <div className="relative flex items-center">
-            {tradeSide === "BUY" && <span className="absolute left-4 text-white font-sans font-bold">$</span>}
             <Input
               type="number"
               disabled={isFrozen}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-              className={`w-full h-12 bg-transparent border border-border text-base font-sans rounded-none focus-visible:border-white text-white shadow-none ${tradeSide === "BUY" ? "pl-8" : "px-4"}`}
+              value={shares}
+              onChange={(e) => setShares(e.target.value)}
+              placeholder="0"
+              className="w-full h-12 bg-transparent border border-border text-base font-sans rounded-none px-4 focus-visible:border-white text-white shadow-none"
             />
           </div>
         </div>
@@ -231,15 +246,17 @@ export function TradePanel({
             <span className="text-xs font-sans text-muted-foreground">
               {tradeSide === "BUY" ? "Potential Return" : "Total Proceeds"}
             </span>
-            <span className={`text-xs font-sans font-bold ${tradeSide === "BUY" ? "text-emerald-500" : "text-white"}`}>
-              {tradeSide === "BUY" && potentialReturn > 0 ? "+" : ""}{tradeSide === "BUY" && potentialReturn > 0 ? "$" : ""}{tradeSide === "BUY" ? potentialReturn.toFixed(2) : `$${(parsedAmount * effectivePrice / 100).toFixed(2)}`}
+            <span
+              className={`text-xs font-sans font-bold ${tradeSide === "BUY" ? "text-emerald-500" : "text-white"}`}
+            >
+              {tradeSide === "BUY" && potentialReturn > 0 ? "+" : ""}
+              {tradeSide === "BUY" && potentialReturn > 0 ? "$" : ""}
+              {tradeSide === "BUY" ? potentialReturn.toFixed(2) : `$${totalCost.toFixed(2)}`}
             </span>
           </div>
           {tradeSide === "BUY" && (
             <div className="flex justify-between items-center">
-              <span className="text-xs font-sans text-muted-foreground">
-                Total Payout
-              </span>
+              <span className="text-xs font-sans text-muted-foreground">Total Payout</span>
               <span className="text-xs font-sans font-bold text-white">
                 ${maxPayout.toFixed(2)}
               </span>
@@ -250,13 +267,22 @@ export function TradePanel({
         {/* Submit Button */}
         <Button
           onClick={handleConfirmPosition}
-          disabled={isFrozen || placeOrder.isPending || !signer || parsedAmount <= 0}
+          disabled={
+            isFrozen ||
+            placeOrder.isPending ||
+            isRegistering ||
+            (isAgentActive && parsedShares <= 0)
+          }
           className={`w-full h-12 text-white border-0 rounded-none mt-2 tracking-[0.2em] font-sans font-bold text-[11px] uppercase transition-all shadow-none ${
-            tradeSide === "BUY" ? "bg-emerald-500 hover:bg-emerald-400" : "bg-destructive hover:bg-red-500"
+            tradeSide === "BUY"
+              ? "bg-emerald-500 hover:bg-emerald-400"
+              : "bg-destructive hover:bg-red-500"
           }`}
         >
-          {placeOrder.isPending ? (
+          {placeOrder.isPending || isRegistering ? (
             <Loader2 className="size-4 animate-spin" />
+          ) : !isAgentActive ? (
+            "ENABLE TRADING"
           ) : isFullyResolved ? (
             "RESOLVED"
           ) : isAwaitingResolution ? (

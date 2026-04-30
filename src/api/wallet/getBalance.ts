@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { rollup } from "@/api/utils";
 import { tokens } from "@/config/constants";
 
-export const useGetBalance = (address?: string, tokenId?: string) => {
+export const useGetBalance = (params: { address?: string; tokenId?: string }) => {
+  let { address, tokenId } = params;
   const usdcTokenId = tokens.usdc.id;
   tokenId = tokenId || usdcTokenId;
   return useQuery({

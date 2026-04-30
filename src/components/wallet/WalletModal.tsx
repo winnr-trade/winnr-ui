@@ -1,6 +1,5 @@
 "use client";
 
-import { useWallet } from "@solana/wallet-adapter-react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -12,10 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useMainWallet } from "@/hooks/useMainWallet";
 import { useWalletUIStore } from "@/store/useWalletUIStore";
 
 export function WalletModal() {
-  const { wallets, select, connected, connecting } = useWallet();
+  const { wallets, select, connected, connecting } = useMainWallet();
   const { isModalOpen, closeModal } = useWalletUIStore();
   const [hasMounted, setHasMounted] = useState(false);
 

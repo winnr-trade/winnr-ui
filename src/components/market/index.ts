@@ -4,3 +4,6 @@ export { MarketPriceChart } from "./MarketPriceChart";
 export { OrderBook } from "./OrderBook";
 export { RecentActivity } from "./RecentActivity";
 export { TradePanel } from "./TradePanel";
+export { YourPosition } from "./YourPosition";
+export { MarketDepthChart } from "./MarketDepthChart";
+export { RulesAndResolution } from "./RulesAndResolution";

@@ -127,8 +127,8 @@ export class Market {
   }
 
   // Fetch a list of markets, with optional from_id and limit
-  async list(from_id: number = 0, limit: number = 10) {
-    const query = { from_id, limit };
+  async list(params: { page: number; limit?: number }) {
+    const query = { page: params.page, limit: params.limit };
     return this.rollup.http.get(`${this.prefix}/list`, { query });
   }
 
@@ -137,8 +137,10 @@ export class Market {
     return this.rollup.http.get(`${this.prefix}/${marketId}`);
   }
 
-  async getShares(marketId: number, address: string) {
-    return this.rollup.http.get(`${this.prefix}/${marketId}/shares/${address}`);
+  async getShares(params: { marketId: number; userAddress: string }) {
+    return this.rollup.http.get(`${this.prefix}/shares`, {
+      query: { market_id: params.marketId, user_address: params.userAddress },
+    });
   }
 
   // Fetch market module status
