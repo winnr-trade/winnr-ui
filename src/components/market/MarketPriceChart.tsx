@@ -17,6 +17,8 @@ interface MarketPriceChartProps {
   resolution: Resolution;
   onResolutionChange: (resolution: Resolution) => void;
   isConnected: boolean;
+  isLoading?: boolean;
+  isEnded?: boolean;
 }
 
 const RESOLUTION_OPTIONS: { label: string; val: Resolution }[] = [
@@ -31,21 +33,36 @@ export function MarketPriceChart({
   resolution,
   onResolutionChange,
   isConnected,
+  isLoading = false,
+  isEnded = false,
 }: MarketPriceChartProps) {
+  const getStatus = () => {
+    if (isLoading) return "CONNECTING...";
+    if (isEnded) return "ENDED";
+    return "LIVE";
+  };
+
+  const status = getStatus();
+
   return (
     <Card className="bg-surface-container-low border border-border rounded-none shadow-none flex flex-col relative h-[400px]">
       {/* Chart Header */}
       <div className="p-6 flex justify-between items-center z-10 border-b border-border/50">
         <div className="flex items-center gap-4">
-          <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
-            PROBABILITY
-          </span>
           <div className="flex items-center gap-2">
             <div
-              className={`size-2 rounded-none ${isConnected ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground"}`}
+              className={`size-2 rounded-full ${
+                status === "LIVE"
+                  ? "bg-emerald-500 animate-breathe"
+                  : "bg-muted-foreground"
+              }`}
             ></div>
-            <span className="text-[10px] text-muted-foreground font-sans uppercase tracking-widest">
-              {isConnected ? "LIVE" : "CONNECTING..."}
+            <span
+              className={`text-[10px] font-sans uppercase tracking-widest ${
+                status === "LIVE" ? "text-emerald-500" : "text-muted-foreground"
+              }`}
+            >
+              {status}
             </span>
           </div>
         </div>

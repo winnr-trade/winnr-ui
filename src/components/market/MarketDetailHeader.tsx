@@ -118,6 +118,9 @@ export function MarketDetailHeader({
 
         {/* Probability Display (Right Aligned) */}
         <div className="flex flex-col items-end">
+          <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em] mb-1">
+            PROBABILITY
+          </span>
           <div className={`text-7xl font-heading font-bold tracking-tighter leading-none ${isHighChance ? "text-emerald-500" : "text-destructive"}`}>
             {liveProbability}
           </div>

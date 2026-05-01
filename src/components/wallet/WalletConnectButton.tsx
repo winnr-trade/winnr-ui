@@ -62,7 +62,7 @@ export function WalletConnectButton() {
             <div className="flex items-center h-10 cursor-pointer group">
               <div className="h-full px-4 flex items-center bg-surface-container rounded-none border border-border text-white font-mono text-sm font-bold shadow-none gap-3 group-hover:bg-surface-container-highest transition-colors">
                 <div className="flex items-center gap-2">
-                  <div className="size-2 rounded-none bg-emerald-500 animate-pulse"></div>
+                  <div className="size-2 rounded-full bg-emerald-500 animate-breathe"></div>
                   {truncatedKey}
                 </div>
                 <div className="w-[1px] h-4 bg-border" />

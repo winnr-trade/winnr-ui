@@ -26,7 +26,10 @@ export default function MarketPage() {
   const { data: market, isLoading, error } = useMarketDetail({ id: marketId });
   const { bids, asks, isConnected } = useOrderbook({ marketId });
   const [resolution, setResolution] = useState<"1m" | "15m" | "1h" | "1d" | "1w" | "all">("all");
-  const { data: chartDataResponse } = useMarketChart({ marketId, resolution });
+  const { data: chartDataResponse, isLoading: isChartLoading } = useMarketChart({
+    marketId,
+    resolution,
+  });
   const chartData = chartDataResponse?.data || [];
   const [activeTab, setActiveTab] = useState<"chart" | "orderbook">("chart");
 
@@ -159,6 +162,8 @@ export default function MarketPage() {
                 resolution={resolution}
                 onResolutionChange={setResolution}
                 isConnected={isConnected}
+                isLoading={isChartLoading}
+                isEnded={isPastResolution}
               />
             </TabsContent>
             <TabsContent value="orderbook" className="pt-6 flex flex-col gap-6">

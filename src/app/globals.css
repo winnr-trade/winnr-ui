@@ -104,4 +104,19 @@
   button, [role="button"] {
     @apply cursor-pointer;
   }
+
+  @keyframes breathe {
+    0%, 100% {
+      opacity: 1;
+      filter: brightness(1);
+    }
+    50% {
+      opacity: 0.5;
+      filter: brightness(1.5);
+    }
+  }
+
+  .animate-breathe {
+    animation: breathe 2s infinite ease-in-out;
+  }
 }

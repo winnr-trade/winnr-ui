@@ -30,6 +30,7 @@ export function transformTradeToActivity(trade: Trade): ActivityRow[] {
 
   switch (settlementKind) {
     case "mint_pair":
+      // In a mint, both parties are effectively 'buying' their respective sides from the contract
       rows.push({ marketId, user: buyer, outcome: "yes", side: "buy", price, quantity, timestamp, txHash });
       rows.push({ marketId, user: seller, outcome: "no", side: "buy", price: 10000 - price, quantity, timestamp, txHash });
       break;
@@ -38,10 +39,11 @@ export function transformTradeToActivity(trade: Trade): ActivityRow[] {
       rows.push({ marketId, user: seller, outcome: "yes", side: "sell", price, quantity, timestamp, txHash });
       break;
     case "transfer_no":
-      rows.push({ marketId, user: buyer, outcome: "no", side: "sell", price: 10000 - price, quantity, timestamp, txHash });
-      rows.push({ marketId, user: seller, outcome: "no", side: "buy", price: 10000 - price, quantity, timestamp, txHash });
+      rows.push({ marketId, user: buyer, outcome: "no", side: "buy", price: 10000 - price, quantity, timestamp, txHash });
+      rows.push({ marketId, user: seller, outcome: "no", side: "sell", price: 10000 - price, quantity, timestamp, txHash });
       break;
     case "merge_pair":
+      // In a merge, both parties are 'selling' (burning) their shares back to the contract
       rows.push({ marketId, user: buyer, outcome: "no", side: "sell", price: 10000 - price, quantity, timestamp, txHash });
       rows.push({ marketId, user: seller, outcome: "yes", side: "sell", price, quantity, timestamp, txHash });
       break;
@@ -108,20 +110,24 @@ export function RecentActivity({ marketId }: RecentActivityProps) {
                   </TableCell>
                   <TableCell className="py-3">
                     <div className="flex items-center gap-2">
-                      <div className={`size-4 rounded-none flex items-center justify-center ${
-                        row.side === "buy" ? "bg-emerald-500/10" : "bg-destructive/10"
-                      }`}>
-                        {row.side === "buy" ? (
-                          <ArrowUp className="size-2.5 text-emerald-500" />
-                        ) : (
-                          <ArrowDown className="size-2.5 text-destructive" />
-                        )}
-                      </div>
-                      <span className={`text-[10px] font-bold uppercase tracking-tighter ${
-                        row.side === "buy" ? "text-emerald-500" : "text-destructive"
-                      }`}>
-                        {row.side} {row.outcome}
-                      </span>
+                      {/* Logic: Buy YES or Sell NO increases probability -> Green. Sell YES or Buy NO decreases probability -> Red. */}
+                      {(() => {
+                        const isUp = (row.side === "buy" && row.outcome === "yes") || (row.side === "sell" && row.outcome === "no");
+                        const colorClass = isUp ? "text-emerald-500" : "text-destructive";
+                        const bgClass = isUp ? "bg-emerald-500/10" : "bg-destructive/10";
+                        const Icon = isUp ? ArrowUp : ArrowDown;
+                        
+                        return (
+                          <>
+                            <div className={`size-4 rounded-none flex items-center justify-center ${bgClass}`}>
+                              <Icon className={`size-2.5 ${colorClass}`} />
+                            </div>
+                            <span className={`text-[10px] font-bold uppercase tracking-tighter ${colorClass}`}>
+                              {row.side} {row.outcome}
+                            </span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </TableCell>
                   <TableCell className="py-3 text-right font-mono text-[11px] text-white">
