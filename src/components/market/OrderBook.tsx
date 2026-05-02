@@ -1,32 +1,23 @@
-import { Card } from "@/components/ui/card";
-import { useOrderbook } from "@/api/orderbook";
 import { useMarketDetail } from "@/api/market";
+import { useOrderbook } from "@/api/orderbook";
+import { Card } from "@/components/ui/card";
+import { formatCents, formatSize, parseUsd } from "@/utils";
 
 interface OrderBookProps {
   marketId: number;
 }
 
-function formatSize(size: number) {
-  return size >= 1000 ? (size / 1000).toFixed(1) + "k" : size.toString();
-}
-
 export function OrderBook({ marketId }: OrderBookProps) {
   const { bids, asks } = useOrderbook({ marketId });
   const { data: market } = useMarketDetail({ id: marketId });
-  
-  // YES ASKS (selling YES)
-  const yesAsks = [...asks].sort((a, b) => a[0] - b[0]).slice(0, 5);
-  
-  // NO ASKS (selling NO = buying YES)
-  // Convert YES bids to NO asks (100 - price)
-  const noAsks = [...bids]
-    .map(([price, size]) => [100 - price, size] as [number, number])
-    .sort((a, b) => a[0] - b[0])
-    .slice(0, 5);
 
-  const lowestAsk = asks.length > 0 ? Math.min(...asks.map(a => a[0])) : (market?.bestAsk ?? 50);
-  const highestBid = bids.length > 0 ? Math.max(...bids.map(b => b[0])) : (market?.bestBid ?? 50);
-  const probability = Math.round((lowestAsk + highestBid) / 2);
+  const probability = market?.probability || 50;
+
+  // YES ASKS (selling YES) - lowest to highest
+  const yesAsks = [...asks].sort((a, b) => (a[0] < b[0] ? -1 : 1)).slice(0, 5);
+
+  // YES BIDS (buying YES) - highest to lowest
+  const yesBids = [...bids].sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, 5);
 
   const yesPercent = probability;
   const noPercent = 100 - probability;
@@ -49,35 +40,41 @@ export function OrderBook({ marketId }: OrderBookProps) {
         </div>
       </div>
 
-      {/* Two columns */}
+      {/* Two columns: BIDS | ASKS */}
       <div className="grid grid-cols-2 gap-8 mt-2">
-        {/* TOP YES ASKS */}
+        {/* YES BIDS */}
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-[9px] text-muted-foreground font-sans font-bold uppercase tracking-widest mb-2 border-b border-border pb-2">
-            <span>TOP YES ASKS</span>
+            <span>YES BIDS</span>
           </div>
-          {yesAsks.length === 0 && (
-            <div className="text-[11px] text-muted-foreground font-sans">No asks</div>
+          {yesBids.length === 0 && (
+            <div className="text-[11px] text-muted-foreground font-sans">No bids</div>
           )}
-          {yesAsks.map(([price, size], i) => (
-            <div key={`yes-${i}`} className="flex justify-between items-center text-[11px] font-sans">
-              <span className="text-white font-bold">{price.toFixed(1)}¢</span>
+          {yesBids.map(([price, size]) => (
+            <div
+              key={`bid-${price.toString()}`}
+              className="flex justify-between items-center text-[11px] font-sans"
+            >
+              <span className="text-emerald-500 font-bold">{formatCents(price)}¢</span>
               <span className="text-muted-foreground">{formatSize(size)}</span>
             </div>
           ))}
         </div>
 
-        {/* TOP NO ASKS */}
+        {/* YES ASKS */}
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-[9px] text-muted-foreground font-sans font-bold uppercase tracking-widest mb-2 border-b border-border pb-2">
-            <span>TOP NO ASKS</span>
+            <span>YES ASKS</span>
           </div>
-          {noAsks.length === 0 && (
+          {yesAsks.length === 0 && (
             <div className="text-[11px] text-muted-foreground font-sans">No asks</div>
           )}
-          {noAsks.map(([price, size], i) => (
-            <div key={`no-${i}`} className="flex justify-between items-center text-[11px] font-sans">
-              <span className="text-white font-bold">{price.toFixed(1)}¢</span>
+          {yesAsks.map(([price, size]) => (
+            <div
+              key={`ask-${price.toString()}`}
+              className="flex justify-between items-center text-[11px] font-sans"
+            >
+              <span className="text-destructive font-bold">{formatCents(price)}¢</span>
               <span className="text-muted-foreground">{formatSize(size)}</span>
             </div>
           ))}

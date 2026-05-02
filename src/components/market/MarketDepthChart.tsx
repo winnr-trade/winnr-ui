@@ -11,21 +11,28 @@ interface MarketDepthChartProps {
 
 export function MarketDepthChart({ marketId }: MarketDepthChartProps) {
   const { bids, asks } = useOrderbook({ marketId });
+
   // Process bids: highest to lowest for cumulative, then sort by price for chart
-  const sortedBids = [...bids].sort((a, b) => b[0] - a[0]);
+  const sortedBids = [...bids].sort((a, b) => (a[0] < b[0] ? 1 : -1));
   let cumulativeBids = 0;
-  const bidData = sortedBids.map(([price, size]) => {
-    cumulativeBids += size;
-    return { price, volume: cumulativeBids };
-  }).sort((a, b) => a.price - b.price);
+  const bidData = sortedBids
+    .map(([price, size]) => {
+      cumulativeBids += size;
+      const priceCents = Number(price / BigInt(10000)); // Simple conversion to cents for the chart axis
+      return { price: priceCents, volume: cumulativeBids };
+    })
+    .sort((a, b) => a.price - b.price);
 
   // Process asks: lowest to highest for cumulative, then sort by price for chart
-  const sortedAsks = [...asks].sort((a, b) => a[0] - b[0]);
+  const sortedAsks = [...asks].sort((a, b) => (a[0] > b[0] ? 1 : -1));
   let cumulativeAsks = 0;
-  const askData = sortedAsks.map(([price, size]) => {
-    cumulativeAsks += size;
-    return { price, volume: cumulativeAsks };
-  }).sort((a, b) => a.price - b.price);
+  const askData = sortedAsks
+    .map(([price, size]) => {
+      cumulativeAsks += size;
+      const priceCents = Number(price / BigInt(10000));
+      return { price: priceCents, volume: cumulativeAsks };
+    })
+    .sort((a, b) => a.price - b.price);
 
   return (
     <Card className="bg-surface-container-low border border-border rounded-none shadow-none flex flex-col relative h-[300px] p-6">

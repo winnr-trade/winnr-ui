@@ -35,6 +35,11 @@ export const parseUsd = (value: number | string | bigint) => {
   return parseUnits(value.toString(), 6);
 };
 
+/** Converts a cent value to raw 6-decimal base units (e.g. 50 -> 500000) */
+export const parseCents = (value: number | string | bigint) => {
+  return parseUnits((Number(value) / 100).toString(), 6);
+};
+
 /**
  * Divides an integer unit value by 10^decimals to get its string decimal representation.
  */
@@ -66,4 +71,15 @@ export function formatCents(value: number | string | bigint): string {
 export function priceToUnits(price: number | string | bigint, decimals: number): bigint {
   const multiplier = BigInt(10) ** BigInt(Math.max(0, decimals - 4));
   return BigInt(price) * multiplier;
+}
+
+/** Converts base units of a given decimal back to 4-digit price units (e.g. 475300, 6 -> 4753) */
+export function unitsToPrice(units: number | string | bigint, decimals: number): number {
+  const divisor = BigInt(10) ** BigInt(Math.max(0, decimals - 4));
+  return Number(BigInt(units) / divisor);
+}
+
+/** Formats a numeric size for display, adding 'k' suffix for values >= 1000 */
+export function formatSize(size: number) {
+  return size >= 1000 ? (size / 1000).toFixed(1) + "k" : size.toString();
 }

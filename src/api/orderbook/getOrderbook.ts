@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
+import { priceToUnits } from "@/utils";
 
-export type OrderbookItem = [number, number]; // [price, size]
+export type OrderbookItem = [bigint, number]; // [price, size]
 export type OrderbookData = {
   bids: OrderbookItem[];
   asks: OrderbookItem[];
@@ -28,16 +29,13 @@ export function useOrderbook(params: { marketId: number }) {
     });
 
     ws.addEventListener("message", (event) => {
-      // console.log("Message received", event);
-
       try {
         const data = JSON.parse(event.data);
-        // console.log("Orderbook message", data);
 
         if (data.yes_bids && data.yes_asks) {
           setOrderbook({
-            bids: data.yes_bids.map((bid: [number, number]) => [bid[0] / 100, bid[1]]),
-            asks: data.yes_asks.map((ask: [number, number]) => [ask[0] / 100, ask[1]]),
+            bids: data.yes_bids.map((bid: [number, number]) => [priceToUnits(bid[0], 6), bid[1]]),
+            asks: data.yes_asks.map((ask: [number, number]) => [priceToUnits(ask[0], 6), ask[1]]),
           });
         }
       } catch (err) {

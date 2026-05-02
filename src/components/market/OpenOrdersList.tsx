@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/typography";
 import { useMainWallet } from "@/hooks/useMainWallet";
-import { formatNumber } from "@/utils";
+import { formatCents, formatNumber } from "@/utils";
 
 interface OpenOrdersListProps {
   marketId: number;
@@ -67,9 +67,9 @@ function OrderItem({ order }: { order: UserOrder }) {
   const isBuy = order.side === "bid";
   const outcomeText = order.outcome.toUpperCase();
   const actionText = `${isBuy ? "BUY" : "SELL"} ${outcomeText}`;
-  const price = Math.round(order.canonical_price);
-  const remainingQty = formatNumber(order.remaining_quantity, 0, 0);
-  const originalQty = formatNumber(order.original_quantity, 0, 0);
+  const price = formatCents(order.canonicalPrice);
+  const remainingQty = formatNumber(order.remainingQuantity, 0, 0);
+  const originalQty = formatNumber(order.originalQuantity, 0, 0);
 
   const handleCancelOrder = () => {
     toast.promise(cancelOrder.mutateAsync({ orderId: order.id }), {
@@ -89,7 +89,7 @@ function OrderItem({ order }: { order: UserOrder }) {
           {actionText}
         </span>
         <span className="w-fit text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground bg-transparent border border-border px-2 py-0.5 rounded-none">
-          {order.order_type}
+          {order.orderType}
         </span>
       </div>
 

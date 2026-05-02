@@ -1,18 +1,27 @@
-import { bytesToHex } from "@sovereign-sdk/utils";
+import type { Signer } from "@sovereign-sdk/signers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import b58 from "bs58";
 import { rollup } from "@/api/utils";
 import { useAgentWallet } from "@/hooks/useAgentWallet";
 import type { OrderType, Outcome, Side } from "@/lib/rollup/types";
+import { unitsToPrice } from "@/utils";
 
 export interface PlaceOrderParams {
   marketId: number;
   outcome: Outcome;
   side: Side;
-  price: number;
+  price: bigint;
   quantity: number;
   orderType: OrderType;
 }
+
+export const placeOrder = async (params: PlaceOrderParams, signer: Signer) => {
+  console.log("params", params);
+
+  const orderReq = { ...params, price: unitsToPrice(params.price, 6) };
+  console.log("order", orderReq);
+
+  return await rollup.orderbook.placeOrder(orderReq, signer);
+};
 
 export const usePlaceOrder = () => {
   const { signer, isActive } = useAgentWallet();
@@ -24,11 +33,7 @@ export const usePlaceOrder = () => {
         throw new Error("Trading session not active. Please enable trading.");
       }
 
-      const addr = await signer.publicKey();
-
-      console.log("signer:", b58.encode(addr));
-
-      return await rollup.orderbook.placeOrder(params, signer);
+      return placeOrder(params, signer);
     },
     onSuccess: () => {
       // Invalidate relevant queries so the UI updates immediately after a trade
