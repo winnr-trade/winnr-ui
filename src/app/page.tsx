@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
 
 import {
   Activity,
@@ -14,6 +13,7 @@ import {
   Trophy,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   useGetCategories,
   useGetClosingSoon,
@@ -202,10 +202,10 @@ export default function Home() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-center gap-8 py-4 px-1">
         <div className="flex items-center gap-3 overflow-x-auto pb-4 lg:pb-0 scrollbar-none justify-center w-full">
           {categories.map((cat) => (
-            <Button 
-              key={cat.name} 
-              variant="pill" 
-              size="pill" 
+            <Button
+              key={cat.name}
+              variant="pill"
+              size="pill"
               data-active={activeCategory === cat.name}
               onClick={() => setActiveCategory(cat.name)}
             >

@@ -1,35 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { indexerApiBaseUrl } from "@/config/env";
+import { keysToCamelCase } from "@/utils";
+import { http } from "@/api/utils";
+import { Trade } from "@/types";
 
-export type Trade = {
-  id: number;
-  marketId: number;
-  makerOrderId: number;
-  takerOrderId: number;
-  price: number;
-  quantity: number;
-  buyer: string;
-  seller: string;
-  settlementKind: "mint_pair" | "transfer_yes" | "transfer_no" | "merge_pair";
-  timestamp: number;
-  txHash: string;
+export const getRecentTrades = async (marketId: number, limit: number = 20): Promise<Trade[]> => {
+  const res = await http.get(`/markets/${marketId}/trades`, { params: { limit } });
+  const data = keysToCamelCase(res.data.data || []);
+  return data;
 };
 
 export const useGetRecentTrades = (params: { marketId: number; limit?: number }) => {
-  const { marketId, limit = 50 } = params;
+  const { marketId, limit = 20 } = params;
 
-  return useQuery({
+  return useQuery<Trade[]>({
     queryKey: ["recentTrades", marketId, limit],
-    queryFn: async (): Promise<Trade[]> => {
-      const res = await fetch(
-        `${indexerApiBaseUrl}/api/v1/markets/${marketId}/trades?limit=${limit}`,
-      );
-      if (!res.ok) {
-        throw new Error("Failed to fetch recent trades");
-      }
-      const json = await res.json();
-      return json.data || [];
-    },
+    queryFn: () => getRecentTrades(marketId, limit),
     enabled: Number.isFinite(marketId),
     refetchInterval: 5000, // Refetch every 5 seconds for live updates
   });

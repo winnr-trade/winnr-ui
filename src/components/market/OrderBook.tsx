@@ -1,15 +1,19 @@
 import { Card } from "@/components/ui/card";
+import { useOrderbook } from "@/api/orderbook";
+import { useMarketDetail } from "@/api/market";
 
 interface OrderBookProps {
-  bids: [number, number][];
-  asks: [number, number][];
+  marketId: number;
 }
 
 function formatSize(size: number) {
   return size >= 1000 ? (size / 1000).toFixed(1) + "k" : size.toString();
 }
 
-export function OrderBook({ bids, asks }: OrderBookProps) {
+export function OrderBook({ marketId }: OrderBookProps) {
+  const { bids, asks } = useOrderbook({ marketId });
+  const { data: market } = useMarketDetail({ id: marketId });
+  
   // YES ASKS (selling YES)
   const yesAsks = [...asks].sort((a, b) => a[0] - b[0]).slice(0, 5);
   
@@ -20,8 +24,8 @@ export function OrderBook({ bids, asks }: OrderBookProps) {
     .sort((a, b) => a[0] - b[0])
     .slice(0, 5);
 
-  const lowestAsk = asks.length > 0 ? Math.min(...asks.map(a => a[0])) : 50;
-  const highestBid = bids.length > 0 ? Math.max(...bids.map(b => b[0])) : 50;
+  const lowestAsk = asks.length > 0 ? Math.min(...asks.map(a => a[0])) : (market?.bestAsk ?? 50);
+  const highestBid = bids.length > 0 ? Math.max(...bids.map(b => b[0])) : (market?.bestBid ?? 50);
   const probability = Math.round((lowestAsk + highestBid) / 2);
 
   const yesPercent = probability;

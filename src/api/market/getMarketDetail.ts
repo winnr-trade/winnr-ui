@@ -1,40 +1,47 @@
 import { useQuery } from "@tanstack/react-query";
-import { rollup } from "@/api/utils";
+import { http } from "@/api/utils";
+import type { Market, Resolver } from "@/types";
+import { calculateProbability, keysToCamelCase, priceToUnits } from "@/utils";
+
+export const getMarketDetail = async (id: number): Promise<Market> => {
+  const m = await http.get(`/markets/${id}`).then((res) => keysToCamelCase(res.data.data));
+
+  let resolver: Resolver;
+  if (m.resolverType === "address") {
+    resolver = { type: "address", config: m.resolverConfig };
+  } else if (m.resolverType === "pyth") {
+    resolver = { type: "pyth", config: m.resolverConfig };
+  } else if (m.resolverType === "optimistic") {
+    resolver = { type: "optimistic", config: {} };
+  } else {
+    resolver = { type: "unknown", config: {} };
+  }
+
+  const bestBid = m.bestBid ? priceToUnits(m.bestBid, 6) : null;
+  const bestAsk = m.bestAsk ? priceToUnits(m.bestAsk, 6) : null;
+
+  const probability = calculateProbability(bestBid, bestAsk);
+
+  return {
+    id: m.id.toString(),
+    category: "General",
+    subcategory: "MARKET",
+    question: m.question,
+    probability: probability,
+    totalVolume: BigInt(m.totalVolume ?? 0),
+    totalShares: BigInt(m.totalShares ?? 0),
+    resolutionTime: Number(m.resolutionTime),
+    outcome: m.outcome ?? null,
+    resolver,
+    bestBid,
+    bestAsk,
+  };
+};
 
 export const useMarketDetail = (params: { id: number }) => {
   const { id } = params;
-  return useQuery({
+  return useQuery<Market>({
     queryKey: ["marketDetail", id],
-    queryFn: async () => {
-      // biome-ignore lint/suspicious/noExplicitAny: API type missing
-      const m = (await rollup.market.get(id)) as any;
-
-      const totalShares = m.total_yes_shares + m.total_no_shares;
-      const prob = totalShares === 0 ? 50 : Math.round((m.total_yes_shares / totalShares) * 100);
-      
-      const resolutionDate = new Date(m.resolution_time).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-
-      return {
-        category: "General",
-        subcategory: "MARKET",
-        titlePrefix: m.question,
-        titleHighlight: "",
-        titleSuffix: "",
-        probability: `${prob}%`,
-        volume: `$${m.volume ?? 0}`,
-        liquidity: "$0", // Pending actual liquidity calculation
-        resolutionDate,
-        resolutionTime: m.resolution_time, // raw timestamp for comparison
-        outcome: m.outcome ?? null, // "yes" | "no" | null
-        yesPrice: `${prob.toFixed(1)}¢`,
-        noPrice: `${(100 - prob).toFixed(1)}¢`,
-        resolver: m.resolver,
-        question: m.question,
-      };
-    },
+    queryFn: () => getMarketDetail(id),
   });
 };

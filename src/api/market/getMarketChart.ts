@@ -1,30 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { indexerApiBaseUrl } from "@/config/env";
+import { http } from "@/api/utils";
+import { ChartResponse } from "@/types";
 
-export type ChartDataPoint = {
-  time: string; // The backend returns it as a stringified timestamp, e.g., "1775692800000"
-  price: number; // e.g. 4753 basis points
-};
-
-export type ChartResponse = {
-  success: boolean;
-  resolution: string;
-  data: ChartDataPoint[];
+export const getMarketChart = async (marketId: number, resolution: string): Promise<ChartResponse> => {
+  const res = await http.get(`/markets/${marketId}/chart`, {
+    params: { resolution },
+  });
+  return res.data;
 };
 
 export const useMarketChart = (params: { marketId: number; resolution: string }) => {
   const { marketId, resolution } = params;
   return useQuery({
     queryKey: ["marketChart", marketId, resolution],
-    queryFn: async (): Promise<ChartResponse> => {
-      const res = await fetch(
-        `${indexerApiBaseUrl}/api/v1/markets/${marketId}/chart?resolution=${resolution}`,
-      );
-      if (!res.ok) {
-        throw new Error("Failed to fetch market chart data");
-      }
-      return res.json();
-    },
+    queryFn: () => getMarketChart(marketId, resolution),
     enabled: Number.isFinite(marketId) && !!resolution,
     refetchInterval: 60000, // optionally refetch every minute
   });

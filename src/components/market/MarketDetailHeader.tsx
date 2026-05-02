@@ -1,38 +1,44 @@
 import { Calendar, Share2 } from "lucide-react";
-import { Display } from "@/components/ui/typography";
 import { toast } from "sonner";
+import { useMarketDetail } from "@/api/market";
+import { IconButton } from "@/components/ui/icon-button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Display } from "@/components/ui/typography";
+import { deriveMarketState, formatFullDate, formatNumber, formatUnits } from "@/utils";
 
 interface MarketDetailHeaderProps {
-  category: string;
-  subcategory: string;
-  titlePrefix: string;
-  titleHighlight: string;
-  titleSuffix: string;
-  liveProbability: string;
-  isFullyResolved: boolean;
-  isAwaitingResolution: boolean;
-  resolvedOutcome: "yes" | "no" | null;
-  resolutionDate?: string;
-  volume?: string;
-  liquidity?: string;
+  marketId: number;
 }
 
-export function MarketDetailHeader({
-  category,
-  subcategory,
-  titlePrefix,
-  titleHighlight,
-  titleSuffix,
-  liveProbability,
-  isFullyResolved,
-  isAwaitingResolution,
-  resolvedOutcome,
-  resolutionDate = "DEC 31, 2024",
-  volume = "$0",
-  liquidity = "$0",
-}: MarketDetailHeaderProps) {
-  const probValue = parseInt(liveProbability);
-  const isHighChance = probValue >= 50;
+export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
+  const { data: market, isLoading: isMarketLoading } = useMarketDetail({ id: marketId });
+  // const { bids, asks } = useOrderbook({ marketId });
+
+  if (isMarketLoading) {
+    return (
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-4">
+        <div className="max-w-3xl w-full">
+          <Skeleton className="w-32 h-6 mb-4 bg-surface-container" />
+          <Skeleton className="w-full h-16 bg-surface-container mb-2" />
+          <Skeleton className="w-3/4 h-16 bg-surface-container" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!market) return null;
+
+  const { isFullyResolved, isAwaitingResolution, resolvedOutcome } = deriveMarketState(market);
+
+  console.log("marekt", market);
+
+  const { category, question, resolutionTime, totalShares, probability } = market;
+
+  const resolutionDate = formatFullDate(resolutionTime);
+  const isHighChance = probability >= 50;
+  const displayProbability = `${probability}%`;
+  const displayVolume = `$${formatNumber(formatUnits(market.totalVolume || 0, 6), 0, 0)}`;
+  const displayOI = `$${formatNumber(totalShares, 0, 0)}`;
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -52,23 +58,12 @@ export function MarketDetailHeader({
             {resolutionDate}
           </div>
         </div>
-        <button 
-          onClick={handleShare}
-          className="text-muted-foreground hover:text-white transition-colors p-2 -mr-2"
-        >
-          <Share2 className="size-5" />
-        </button>
+        <IconButton onClick={handleShare} icon={Share2} variant="ghost" className="-mr-2" />
       </div>
 
       {/* Main Question */}
       <Display className="text-4xl md:text-5xl leading-tight text-white max-w-4xl">
-        {titlePrefix}
-        {titleHighlight && (
-          <span className="text-white border-b-4 border-white pb-1 ml-2 mr-2">
-            {titleHighlight}
-          </span>
-        )}
-        {titleSuffix}
+        {question}
       </Display>
 
       {/* Bottom Row: Resolution Info or Probability & Stats */}
@@ -76,21 +71,21 @@ export function MarketDetailHeader({
         <div className="flex items-center gap-10">
           {/* Stats Section (Left Aligned) */}
           <div className="flex items-center gap-10">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2.5">
               <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em]">
                 VOLUME
               </span>
-              <span className="text-[20px] font-heading font-bold text-white leading-none">
-                {volume}
+              <span className="text-2xl font-heading font-bold text-white leading-none">
+                {displayVolume}
               </span>
             </div>
             <div className="h-8 w-px bg-border/60" />
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2.5">
               <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em]">
-                LIQUIDITY
+                OPEN INTEREST
               </span>
-              <span className="text-[20px] font-heading font-bold text-white leading-none">
-                {liquidity}
+              <span className="text-2xl font-heading font-bold text-white leading-none">
+                {displayOI}
               </span>
             </div>
           </div>
@@ -100,9 +95,7 @@ export function MarketDetailHeader({
               <div className="text-xl font-heading font-bold uppercase">
                 <span className="text-muted-foreground mr-2">Resolved:</span>
                 <span
-                  className={
-                    resolvedOutcome === "yes" ? "text-emerald-500" : "text-destructive"
-                  }
+                  className={resolvedOutcome === "yes" ? "text-emerald-500" : "text-destructive"}
                 >
                   {resolvedOutcome === "yes" ? "YES" : "NO"}
                 </span>
@@ -121,8 +114,10 @@ export function MarketDetailHeader({
           <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em] mb-1">
             PROBABILITY
           </span>
-          <div className={`text-7xl font-heading font-bold tracking-tighter leading-none ${isHighChance ? "text-emerald-500" : "text-destructive"}`}>
-            {liveProbability}
+          <div
+            className={`text-7xl font-heading font-bold tracking-tighter leading-none ${isHighChance ? "text-emerald-500" : "text-destructive"}`}
+          >
+            {displayProbability}
           </div>
         </div>
       </div>

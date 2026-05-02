@@ -3,12 +3,14 @@
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card } from "@/components/ui/card";
 
+import { useOrderbook } from "@/api/orderbook";
+
 interface MarketDepthChartProps {
-  bids: [number, number][];
-  asks: [number, number][];
+  marketId: number;
 }
 
-export function MarketDepthChart({ bids, asks }: MarketDepthChartProps) {
+export function MarketDepthChart({ marketId }: MarketDepthChartProps) {
+  const { bids, asks } = useOrderbook({ marketId });
   // Process bids: highest to lowest for cumulative, then sort by price for chart
   const sortedBids = [...bids].sort((a, b) => b[0] - a[0]);
   let cumulativeBids = 0;

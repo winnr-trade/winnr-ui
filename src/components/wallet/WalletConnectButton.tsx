@@ -21,7 +21,7 @@ import { formatBalance, truncateAddress } from "@/utils";
 export function WalletConnectButton() {
   const { address, connected, publicKey, disconnect } = useMainWallet();
   const { openModal } = useWalletUIStore();
-  const { data: balance } = useGetBalance({ address });
+  const { data: balance } = useGetBalance({ address: address ?? undefined });
   const { isActive: isAgentActive, enableTrading, isRegistering } = useAgentWallet();
   const [mounted, setMounted] = useState(false);
 

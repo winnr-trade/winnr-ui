@@ -1,27 +1,33 @@
 "use client";
 
+import { useMarketDetail } from "@/api/market";
 import { useGetShares } from "@/api/market/getShares";
 import { Card } from "@/components/ui/card";
 import { useMainWallet } from "@/hooks/useMainWallet";
-import { formatNumber } from "@/utils";
+import { formatNumber, formatUsd } from "@/utils";
+import { deriveMarketState } from "@/utils/market";
 
 interface YourPositionProps {
   marketId: number;
-  yesPrice: number; // in cents
-  noPrice: number; // in cents
 }
 
-export function YourPosition({ marketId, yesPrice, noPrice }: YourPositionProps) {
+export function YourPosition({ marketId }: YourPositionProps) {
   const { address } = useMainWallet();
-  const { data: shares, isLoading } = useGetShares({ marketId, address });
+  const { data: market } = useMarketDetail({ id: marketId });
+  const { data: shares } = useGetShares({
+    marketId,
+    address,
+  });
 
-  if (!address) {
+  if (!address || !shares) {
     return null;
   }
 
-  const hasPosition = shares && (shares.yes > 0 || shares.no > 0);
-  const yesValue = shares ? (shares.yes * yesPrice) / 100 : 0;
-  const noValue = shares ? (shares.no * noPrice) / 100 : 0;
+  const { buyYesPrice: yesPrice, buyNoPrice: noPrice } = deriveMarketState(market);
+
+  const yesValue = BigInt(shares.yes) * yesPrice;
+  const noValue = BigInt(shares.no) * noPrice;
+  const hasPosition = shares.yes > 0 || shares.no > 0;
   const totalValue = yesValue + noValue;
 
   return (
@@ -32,7 +38,7 @@ export function YourPosition({ marketId, yesPrice, noPrice }: YourPositionProps)
         </span>
         {hasPosition && (
           <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
-            Value: ${formatNumber(totalValue)}
+            Value: {formatUsd(totalValue)}
           </span>
         )}
       </div>
@@ -54,7 +60,7 @@ export function YourPosition({ marketId, yesPrice, noPrice }: YourPositionProps)
                 {formatNumber(shares.yes, 0, 0)}
               </span>
               <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
-                ${formatNumber(yesValue)}
+                ${formatUsd(yesValue)}
               </span>
             </div>
           )}
@@ -68,7 +74,7 @@ export function YourPosition({ marketId, yesPrice, noPrice }: YourPositionProps)
                 {formatNumber(shares.no, 0, 0)}
               </span>
               <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
-                ${formatNumber(noValue)}
+                ${formatUsd(noValue)}
               </span>
             </div>
           )}

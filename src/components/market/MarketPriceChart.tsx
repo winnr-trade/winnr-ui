@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Area, AreaChart, XAxis, YAxis } from "recharts";
+import { useMarketChart, useMarketDetail } from "@/api/market";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { type ChartConfig, ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { deriveMarketState } from "@/utils/market";
 
 const chartConfig = {
   price: {
@@ -13,12 +16,7 @@ const chartConfig = {
 type Resolution = "1m" | "15m" | "1h" | "1d" | "1w" | "all";
 
 interface MarketPriceChartProps {
-  chartData: { time: string; price: number }[];
-  resolution: Resolution;
-  onResolutionChange: (resolution: Resolution) => void;
-  isConnected: boolean;
-  isLoading?: boolean;
-  isEnded?: boolean;
+  marketId: number;
 }
 
 const RESOLUTION_OPTIONS: { label: string; val: Resolution }[] = [
@@ -28,14 +26,56 @@ const RESOLUTION_OPTIONS: { label: string; val: Resolution }[] = [
   { label: "ALL", val: "all" },
 ];
 
-export function MarketPriceChart({
-  chartData,
-  resolution,
-  onResolutionChange,
-  isConnected,
-  isLoading = false,
-  isEnded = false,
-}: MarketPriceChartProps) {
+export function MarketPriceChart({ marketId }: MarketPriceChartProps) {
+  const [resolution, setResolution] = useState<Resolution>("all");
+  const { data: market, isLoading: isMarketLoading } = useMarketDetail({ id: marketId });
+  const { data: chartDataResponse, isLoading: isChartLoading } = useMarketChart({
+    marketId,
+    resolution,
+  });
+
+  const chartData = chartDataResponse?.data || [];
+  const { isPastResolution, resolvedOutcome } = deriveMarketState(market);
+  const isLoading = isMarketLoading || isChartLoading;
+  const isEnded = isPastResolution;
+
+  // Format chart data with resolution-aware labels
+  const formattedChartData = [...chartData]
+    .sort((a, b) => Number(a.time) - Number(b.time))
+    .map((d) => {
+      const date = new Date(Number(d.time));
+      let timeLabel: string;
+      if (resolution === "all" || resolution === "1w" || resolution === "1d") {
+        timeLabel = date.toLocaleDateString([], { month: "short", day: "numeric" });
+      } else {
+        timeLabel = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+      return {
+        time: timeLabel,
+        fullTime: date.toLocaleString(), // for tooltip
+        price: d.price / 100,
+        volume: Math.random() * 100 + 20,
+      };
+    });
+
+  // If market is resolved, append terminal data point
+  if (market && isEnded && resolvedOutcome !== null && formattedChartData.length > 0) {
+    const terminalPrice = resolvedOutcome === "yes" ? 100 : 0;
+    const resolutionMs = new Date(market.resolutionTime).getTime();
+    const date = new Date(resolutionMs);
+    const terminalTime =
+      resolution === "all" || resolution === "1w" || resolution === "1d"
+        ? date.toLocaleDateString([], { month: "short", day: "numeric" })
+        : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    formattedChartData.push({
+      time: terminalTime,
+      fullTime: date.toLocaleString(),
+      price: terminalPrice,
+      volume: 50,
+    });
+  }
+
   const getStatus = () => {
     if (isLoading) return "CONNECTING...";
     if (isEnded) return "ENDED";
@@ -77,7 +117,7 @@ export function MarketPriceChart({
                   ? "bg-surface-container text-white border-b-2 border-white"
                   : "text-muted-foreground"
               }`}
-              onClick={() => onResolutionChange(res.val)}
+              onClick={() => setResolution(res.val)}
             >
               {res.label}
             </Button>
@@ -91,7 +131,7 @@ export function MarketPriceChart({
           config={chartConfig}
           className="absolute inset-0 size-full z-0 h-full w-full"
         >
-          <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+          <AreaChart data={formattedChartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
@@ -160,7 +200,7 @@ export function MarketPriceChart({
               strokeWidth={2}
               dot={(props: any) => {
                 const { cx, cy, index } = props;
-                if (index === chartData.length - 1) {
+                if (index === formattedChartData.length - 1) {
                   return (
                     <g key="dot">
                       <circle cx={cx} cy={cy} r={4} fill="#10B981" stroke="none">

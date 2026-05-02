@@ -1,54 +1,48 @@
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
+
+export function now(): number {
+  return dayjs().valueOf();
+}
+
 /**
- * Formats a timestamp (ms or s) into a human readable date string like "Ends Dec 12"
+ * Formats a timestamp (ms) into a human readable date string like "Ends Dec 12"
  */
-export function formatDate(timestamp: number | string | undefined): string {
-  if (!timestamp) return "No date";
-  
-  let ts = typeof timestamp === "string" ? Number(timestamp) : timestamp;
-  if (isNaN(ts)) return "Invalid Date";
-
-  // Heuristic: if timestamp is before 2000, it's likely in seconds (approx 9.4e8)
-  // If it's less than 10^12, it's likely seconds.
-  if (ts < 1000000000000) {
-    ts *= 1000;
-  }
-
-  const date = new Date(ts);
-  if (isNaN(date.getTime())) return "Invalid Date";
-  
-  const now = new Date();
-  
-  // If date is in the future, prefix with "Ends"
-  const prefix = date > now ? "Ends " : "Ended ";
-  
-  const options: Intl.DateTimeFormatOptions = { 
-    month: 'short', 
-    day: 'numeric' 
-  };
-  
-  return `${prefix}${date.toLocaleDateString(undefined, options)}`;
+export function formatDate(timestampMs: number): string {
+  const date = dayjs(timestampMs);
+  const prefix = date.isAfter(dayjs()) ? "Ends " : "Ended ";
+  return `${prefix}${date.format("MMM D")}`;
 }
 
 /**
  * Returns a short relative time string like "2m ago"
  */
-export function formatTimeAgo(timestamp: number | string | undefined): string {
-  if (!timestamp) return "just now";
+export function formatTimeAgo(timestampMs: number): string {
+  return dayjs(timestampMs).fromNow();
+}
 
-  let ts = typeof timestamp === "string" ? Number(timestamp) : timestamp;
-  if (isNaN(ts)) return "unknown";
+/**
+ * Formats a timestamp into a full date string like "Dec 12, 2024"
+ */
+export function formatFullDate(timestampMs: number): string {
+  return dayjs(timestampMs).format("MMM D, YYYY");
+}
 
-  if (ts < 1000000000000) {
-    ts *= 1000;
-  }
+/**
+ * Formats time until a future date like "2d : 5h"
+ */
+export function formatTimeUntil(timestampMs: number): string {
+  const now = dayjs();
+  const target = dayjs(timestampMs);
+  const diffMs = target.diff(now);
 
-  const seconds = Math.floor((Date.now() - ts) / 1000);
-  if (seconds < 0) return "just now";
-  if (seconds < 60) return `${seconds}s ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  if (diffMs <= 0) return "Ended";
+
+  const days = target.diff(now, "day");
+  const hours = target.diff(now.add(days, "day"), "hour");
+
+  if (days > 0) return `${days}d : ${hours}h`;
+  return `${hours}h`;
 }

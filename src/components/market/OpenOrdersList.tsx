@@ -15,7 +15,10 @@ interface OpenOrdersListProps {
 
 export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
   const { address } = useMainWallet();
-  const { data: orders, isLoading } = useGetUserOrders({ userAddress: address, marketId });
+  const { data: orders, isLoading } = useGetUserOrders({
+    userAddress: address ?? undefined,
+    marketId,
+  });
 
   if (!address) {
     return null;
