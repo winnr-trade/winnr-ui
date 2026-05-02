@@ -4,17 +4,19 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useMarketDetail } from "@/api/market";
 import {
-  MarketDepthChart,
   MarketDetailHeader,
   MarketDetailSkeleton,
   MarketPriceChart,
-  OrderBook,
   RecentActivity,
   RulesAndResolution,
+} from "@/components/market";
+import {
+  MarketDepthChart,
+  OpenOrdersList,
+  OrderBook,
   TradePanel,
   YourPosition,
-} from "@/components/market";
-import { OpenOrdersList } from "@/components/market/OpenOrdersList";
+} from "@/components/orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function MarketPage() {
