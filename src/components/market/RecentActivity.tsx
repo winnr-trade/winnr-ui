@@ -1,7 +1,6 @@
 import { ArrowDown, ArrowUp, History, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { useGetRecentTrades } from "@/api/market";
-import { Trade } from "@/types";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -12,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Heading } from "@/components/ui/typography";
-import { formatNumber, truncateAddress, formatTimeAgo } from "@/utils";
+import type { Trade } from "@/types";
+import { formatNumber, formatTimeAgo, truncateAddress } from "@/utils";
 
 interface ActivityRow {
   marketId: number;
@@ -136,8 +136,6 @@ export function RecentActivity({ marketId }: RecentActivityProps) {
     if (!trades) return [];
     return trades.flatMap(transformTradeToActivity).sort((a, b) => b.timestamp - a.timestamp);
   }, [trades]);
-
-
 
   return (
     <Card className="bg-surface-container-low border border-border rounded-none shadow-none p-5 h-full">

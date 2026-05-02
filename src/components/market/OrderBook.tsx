@@ -1,7 +1,7 @@
 import { useMarketDetail } from "@/api/market";
 import { useOrderbook } from "@/api/orderbook";
 import { Card } from "@/components/ui/card";
-import { formatCents, formatSize, parseUsd } from "@/utils";
+import { formatCents, formatSize } from "@/utils";
 
 interface OrderBookProps {
   marketId: number;
