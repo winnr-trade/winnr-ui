@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { http, rollup } from "@/api/utils";
 import { tokens } from "@/config/constants";
 import { useMainWallet } from "@/hooks/useMainWallet";
+import type { PortfolioActivity, PortfolioData, PortfolioPosition } from "@/types";
 import { formatFullDate } from "@/utils";
-import { PortfolioActivity, PortfolioData, PortfolioPosition } from "@/types";
 
 export const getPortfolioData = async (address: string): Promise<PortfolioData> => {
   // 1. Fetch Balance
