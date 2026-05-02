@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { keysToCamelCase } from "@/utils";
 import { http } from "@/api/utils";
-import { Trade } from "@/types";
+import type { Trade } from "@/types";
+import { keysToCamelCase } from "@/utils";
 
 export const getRecentTrades = async (marketId: number, limit: number = 20): Promise<Trade[]> => {
   const res = await http.get(`/markets/${marketId}/trades`, { params: { limit } });

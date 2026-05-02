@@ -7,7 +7,7 @@ import { useMemo } from "react";
 export default function SolanaProvider({ children }: { children: React.ReactNode }) {
   // Use 'devnet' by default as requested
   const network = "devnet";
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = useMemo(() => clusterApiUrl(network), []);
 
   // Modern wallets implementing the Wallet Standard (like Phantom)
   // are automatically detected by the WalletProvider without needing custom adapters.

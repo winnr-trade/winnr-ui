@@ -1,7 +1,7 @@
+import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils";
-import { type VariantProps } from "class-variance-authority";
 
 export interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -12,7 +12,10 @@ export interface IconButtonProps
 }
 
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ className, variant = "ghost", size = "default", icon: Icon, iconClassName, ...props }, ref) => {
+  (
+    { className, variant = "ghost", size = "default", icon: Icon, iconClassName, ...props },
+    ref,
+  ) => {
     const sizeMap = {
       default: "size-10",
       sm: "size-8",
@@ -37,7 +40,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         <Icon className={cn(iconSizeMap[size], iconClassName)} />
       </Button>
     );
-  }
+  },
 );
 
 IconButton.displayName = "IconButton";

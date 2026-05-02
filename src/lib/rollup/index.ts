@@ -11,10 +11,10 @@ import {
   standardTypeBuilder,
   type TypeBuilder,
 } from "@sovereign-sdk/web3";
+import { AgentWallet } from "./agentWallet";
 import { ChainState } from "./chainState";
 import { Market } from "./market";
 import { Orderbook } from "./orderbook";
-import { AgentWallet } from "./agentWallet";
 
 export class RollupClient {
   rollup!: Rollup<any, any>;

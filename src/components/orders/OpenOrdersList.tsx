@@ -75,7 +75,7 @@ function OrderItem({ order }: { order: UserOrder }) {
     toast.promise(cancelOrder.mutateAsync({ orderId: order.id }), {
       loading: "Canceling order...",
       success: "Order canceled successfully",
-      error: (err: any) => `Failed to cancel order: ${err.message}`,
+      error: (err: Error) => `Failed to cancel order: ${err.message}`,
     });
   };
 

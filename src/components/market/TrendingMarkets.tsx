@@ -101,9 +101,7 @@ export function TrendingMarkets() {
           </div>
 
           <div>
-            <h3 className="font-heading font-bold text-xl text-[#f4fffa] mb-2">
-              Propose a Market
-            </h3>
+            <h3 className="font-heading font-bold text-xl text-[#f4fffa] mb-2">Propose a Market</h3>
             <p className="text-muted-foreground font-sans text-sm leading-relaxed max-w-[80%] mx-auto mb-2">
               Staked users can submit new market ideas for community governance.
             </p>

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { keysToCamelCase } from "@/utils";
 import { http } from "@/api/utils";
+import { keysToCamelCase } from "@/utils";
 
 export const getMarketStats = async () => {
   const res = await http.get("/markets", { params: { limit: 100 } });

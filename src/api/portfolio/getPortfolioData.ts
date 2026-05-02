@@ -24,7 +24,7 @@ export const getPortfolioData = async (address: string): Promise<PortfolioData> 
   const activePositions: PortfolioPosition[] = openOrders.map((o: any) => {
     const market = marketMap.get(o.market_id);
     const question = market?.question || `Market #${o.market_id}`;
-    const trimmedQuestion = question.length > 50 ? question.substring(0, 47) + "..." : question;
+    const trimmedQuestion = question.length > 50 ? `${question.substring(0, 47)}...` : question;
 
     const price = o.canonical_price / 100;
     const currentMidPrice = market?.latest_mid_price ? market.latest_mid_price / 100 : price;
@@ -50,7 +50,7 @@ export const getPortfolioData = async (address: string): Promise<PortfolioData> 
   const recentActivity: PortfolioActivity[] = (orders || []).slice(0, 5).map((o: any) => {
     const market = marketMap.get(o.market_id);
     const question = market?.question || `Market #${o.market_id}`;
-    const trimmedQuestion = question.length > 30 ? question.substring(0, 27) + "..." : question;
+    const trimmedQuestion = question.length > 30 ? `${question.substring(0, 27)}...` : question;
 
     return {
       id: o.id.toString(),

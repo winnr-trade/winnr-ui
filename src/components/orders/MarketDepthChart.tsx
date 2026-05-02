@@ -1,9 +1,8 @@
 "use client";
 
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Card } from "@/components/ui/card";
-
 import { useOrderbook } from "@/api/orderbook";
+import { Card } from "@/components/ui/card";
 
 interface MarketDepthChartProps {
   marketId: number;

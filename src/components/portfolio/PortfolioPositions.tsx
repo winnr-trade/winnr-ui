@@ -13,7 +13,7 @@ export function PortfolioPositions() {
 
   const handleCancel = async (orderId: string) => {
     try {
-      await cancelOrder.mutateAsync({ orderId: parseInt(orderId) });
+      await cancelOrder.mutateAsync({ orderId: parseInt(orderId, 10) });
       toast.success("Order cancelled successfully");
     } catch (err) {
       toast.error("Failed to cancel order");

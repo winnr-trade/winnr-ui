@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { keysToCamelCase, formatTimeUntil } from "@/utils";
 import { http } from "@/api/utils";
+import { formatTimeUntil, keysToCamelCase } from "@/utils";
 
 /** Format a raw integer volume (in micro-units, 6 decimals) to a human-readable string */
 function formatVolume(raw: number): string {
@@ -18,8 +18,6 @@ function midPriceToProb(m: any): number {
   if (m.bestAsk != null) return m.bestAsk;
   return 50;
 }
-
-
 
 export const getFeaturedMarket = async () => {
   const res = await http.get("/markets", { params: { limit: 1 } });

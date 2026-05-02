@@ -37,9 +37,7 @@ export function PortfolioActivity() {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-sans font-bold text-white">{activity.action}</span>
-                <span className="text-xs font-sans text-muted-foreground">
-                  {activity.subtext}
-                </span>
+                <span className="text-xs font-sans text-muted-foreground">{activity.subtext}</span>
               </div>
             </div>
             <div className="flex flex-col items-end gap-1">

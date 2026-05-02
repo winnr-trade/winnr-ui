@@ -81,5 +81,5 @@ export function unitsToPrice(units: number | string | bigint, decimals: number):
 
 /** Formats a numeric size for display, adding 'k' suffix for values >= 1000 */
 export function formatSize(size: number) {
-  return size >= 1000 ? (size / 1000).toFixed(1) + "k" : size.toString();
+  return size >= 1000 ? `${(size / 1000).toFixed(1)}k` : size.toString();
 }

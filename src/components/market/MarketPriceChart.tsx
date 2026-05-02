@@ -92,9 +92,7 @@ export function MarketPriceChart({ marketId }: MarketPriceChartProps) {
           <div className="flex items-center gap-2">
             <div
               className={`size-2 rounded-full ${
-                status === "LIVE"
-                  ? "bg-emerald-500 animate-breathe"
-                  : "bg-muted-foreground"
+                status === "LIVE" ? "bg-emerald-500 animate-breathe" : "bg-muted-foreground"
               }`}
             ></div>
             <span
@@ -131,7 +129,10 @@ export function MarketPriceChart({ marketId }: MarketPriceChartProps) {
           config={chartConfig}
           className="absolute inset-0 size-full z-0 h-full w-full"
         >
-          <AreaChart data={formattedChartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+          <AreaChart
+            data={formattedChartData}
+            margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+          >
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />

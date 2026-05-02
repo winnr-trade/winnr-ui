@@ -27,7 +27,7 @@
   --color-on-primary-container: var(--on-primary-container);
   --color-secondary: var(--secondary);
   --color-secondary-container: var(--secondary-container);
-  
+
   --color-outline-variant: var(--outline-variant);
 
   --color-ring: var(--ring);
@@ -61,31 +61,31 @@
   --primary: #ffffff;
   --primary-container: #e2e2e2;
   --on-primary-container: #000000;
-  
+
   --secondary: #c8c6c5;
   --secondary-container: #474746;
-  
+
   --outline-variant: #262626;
 
   /* Standard Application Colors */
   --background: var(--surface);
   --foreground: #ffffff;
-  
+
   --card: var(--surface-container-low);
   --card-foreground: var(--foreground);
-  
+
   --popover: var(--surface-container-highest);
   --popover-foreground: var(--foreground);
 
   --primary-foreground: var(--on-primary-container);
-  
+
   --muted: var(--surface-container-low);
   --muted-foreground: #8e9192;
 
   --accent: var(--surface-bright);
   --accent-foreground: var(--primary);
 
-  --destructive: #F43F5E;
+  --destructive: #f43f5e;
 
   --border: #262626;
   --input: var(--surface-container-high);
@@ -101,12 +101,14 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
-  button, [role="button"] {
+  button,
+  [role="button"] {
     @apply cursor-pointer;
   }
 
   @keyframes breathe {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
       filter: brightness(1);
     }

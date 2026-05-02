@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { http } from "@/api/utils";
-import { ChartResponse } from "@/types";
+import type { ChartResponse } from "@/types";
 
-export const getMarketChart = async (marketId: number, resolution: string): Promise<ChartResponse> => {
+export const getMarketChart = async (
+  marketId: number,
+  resolution: string,
+): Promise<ChartResponse> => {
   const res = await http.get(`/markets/${marketId}/chart`, {
     params: { resolution },
   });

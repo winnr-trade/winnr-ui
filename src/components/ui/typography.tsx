@@ -30,10 +30,7 @@ export function Heading({ className, ...props }: TypographyProps) {
 export function Body({ className, ...props }: TypographyProps) {
   return (
     <p
-      className={cn(
-        "font-body text-base text-foreground/80 leading-relaxed",
-        className,
-      )}
+      className={cn("font-body text-base text-foreground/80 leading-relaxed", className)}
       {...props}
     />
   );

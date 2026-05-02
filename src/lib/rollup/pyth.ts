@@ -5,8 +5,6 @@ export class Pyth {
   // biome-ignore lint/suspicious/noExplicitAny: types aren't used
   private readonly rollup: Rollup<any, any>;
 
-  private readonly prefix: string = "/modules/pyth";
-
   constructor(rollup: Rollup<any, any>) {
     this.rollup = rollup;
   }
