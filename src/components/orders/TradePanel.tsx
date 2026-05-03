@@ -126,20 +126,17 @@ export function TradePanel({ marketId }: TradePanelProps) {
           <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
             EXECUTE ORDER
           </span>
-          <span className="text-[10px] font-sans text-muted-foreground tracking-widest">
-            Balance: ${formatNumber(userBalance)}
-          </span>
         </div>
 
         {/* Action Toggles: BUY/SELL & MARKET/LIMIT */}
         <div className="flex justify-between items-center">
-          <div className="flex border border-border rounded-none overflow-hidden">
+          <div className={`flex border rounded-none overflow-hidden transition-colors ${side === Side.Bid ? "border-emerald-500" : "border-destructive"}`}>
             <label className="contents">
               <input type="radio" className="hidden" value={Side.Bid} {...register("side")} />
               <Button
                 type="button"
                 variant="ghost"
-                className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+                className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest transition-colors ${
                   side === Side.Bid
                     ? "bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 hover:text-emerald-500"
                     : "text-muted-foreground hover:text-white hover:bg-transparent"
@@ -155,7 +152,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
               <Button
                 type="button"
                 variant="ghost"
-                className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest ${
+                className={`h-8 px-4 rounded-none text-[10px] font-sans font-bold tracking-widest transition-colors ${
                   side === Side.Ask
                     ? "bg-destructive/20 text-destructive hover:bg-destructive/20 hover:text-destructive"
                     : "text-muted-foreground hover:text-white hover:bg-transparent"
@@ -274,7 +271,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
                 className="w-full h-12 bg-transparent border border-border text-base font-sans rounded-none px-4 focus-visible:border-white text-white shadow-none"
                 {...register("limitPrice", { valueAsNumber: true })}
               />
-              <span className="absolute right-4 text-muted-foreground font-sans font-bold">%</span>
+              <span className="absolute right-4 text-muted-foreground font-sans font-bold">¢</span>
             </div>
           </div>
         )}
@@ -286,7 +283,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
               SHARES TO {side === Side.Bid ? "BUY" : "SELL"}
             </span>
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
-              COST: ${formatNumber(totalCost)}
+              Available: ${formatNumber(userBalance)}
             </span>
           </div>
           <div className="relative flex items-center">
@@ -307,6 +304,15 @@ export function TradePanel({ marketId }: TradePanelProps) {
 
         {/* Stats List */}
         <div className="flex flex-col gap-3 mt-4">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-sans text-muted-foreground">
+              {side === Side.Bid ? "Cost to buy" : "Proceeds"}
+            </span>
+            <span className="text-xs font-sans font-bold text-white">
+              ${formatUsd(totalCost)}
+            </span>
+          </div>
+
           <div className="flex justify-between items-center">
             <span className="text-xs font-sans text-muted-foreground">
               {side === Side.Bid ? "Potential Return" : "Total Proceeds"}

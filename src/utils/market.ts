@@ -64,3 +64,4 @@ export function calculateProbability(bestBid: bigint | null, bestAsk: bigint | n
 
   return Math.round(Number(prob) / 10000);
 }
+

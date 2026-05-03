@@ -6,6 +6,7 @@ import { useGetFeaturedMarket } from "@/api/market";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency, formatTimeUntil } from "@/utils";
 
 export function FeaturedMarketHero() {
   const { data: featuredMarket, isLoading, error } = useGetFeaturedMarket();
@@ -15,6 +16,10 @@ export function FeaturedMarketHero() {
   }
 
   if (error || !featuredMarket) return null;
+
+  const prob = featuredMarket.probability;
+  const volume = formatCurrency(featuredMarket.totalVolume, true);
+  const endsIn = formatTimeUntil(featuredMarket.resolutionTime);
 
   return (
     <Link href={`/markets/${featuredMarket.id}`} className="block">
@@ -41,23 +46,23 @@ export function FeaturedMarketHero() {
             <div className="flex items-center gap-2">
               <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
               <span className="text-[10px] font-sans font-bold text-emerald-500 uppercase tracking-[0.25em]">
-                {featuredMarket.tag || "FEATURED MARKET"}
+                {"FEATURED MARKET"}
               </span>
             </div>
           </div>
 
           <h1 className="text-4xl lg:text-6xl font-heading font-extrabold leading-[1.1] mb-8 tracking-tight text-[#f4fffa] max-w-2xl">
-            {featuredMarket.titlePrefix}
+            {featuredMarket.question}
           </h1>
 
           <div className="flex items-center gap-10 lg:gap-20 mb-10">
             <div className="flex flex-col gap-1">
               <span className="text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground">
-                YES PROBABILITY
+                PROBABILITY
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl lg:text-5xl font-heading font-bold text-primary">
-                  {featuredMarket.probability}
+                  {prob}%
                 </span>
                 <span className="text-xs font-sans font-bold text-emerald-500/60 flex items-center gap-0.5">
                   <ArrowUp className="size-3" /> 0.0%
@@ -70,7 +75,7 @@ export function FeaturedMarketHero() {
                 TOTAL VOLUME
               </span>
               <span className="text-4xl lg:text-5xl font-heading font-bold text-[#f4fffa]">
-                {featuredMarket.volume}
+                {volume}
               </span>
             </div>
 
@@ -79,7 +84,7 @@ export function FeaturedMarketHero() {
                 ENDS IN
               </span>
               <span className="text-4xl lg:text-5xl font-heading font-bold text-[#f4fffa]">
-                {featuredMarket.endsIn || "—"}
+                {endsIn}
               </span>
             </div>
           </div>

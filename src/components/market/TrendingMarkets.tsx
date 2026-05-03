@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heading } from "@/components/ui/typography";
-import { formatDate } from "@/utils";
+import { calculateProbability, formatCurrency, formatDate } from "@/utils";
 
 export function TrendingMarkets() {
   const { data: trendingMarkets, isLoading, error } = useGetTrendingMarkets();
@@ -42,57 +42,66 @@ export function TrendingMarkets() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {trendingMarkets.map((market) => (
-          <Link key={market.id} href={`/markets/${market.id}`} className="block">
-            <Card className="bg-surface-container-low border border-border hover:bg-surface-container transition-colors p-6 flex flex-col gap-6 h-full rounded-none shadow-none">
-              <div className="flex justify-between items-center">
-                <span className="px-2 py-1 bg-surface-container-highest text-white font-sans font-bold text-[9px] uppercase tracking-widest rounded-none">
-                  {market.category}
-                </span>
-                <span className="text-[10px] text-muted-foreground font-sans">
-                  {formatDate(market.resolutionTime)}
-                </span>
-              </div>
+        {trendingMarkets.map((market) => {
+          const chanceNum = calculateProbability(market.bestBid, market.bestAsk);
+          const volume = formatCurrency(market.totalVolume, true);
 
-              <h3 className="font-heading font-bold text-lg leading-snug flex-1 text-[#f4fffa]">
-                {market.title}
-              </h3>
-
-              {/* Probabilities Bar */}
-              <div className="flex flex-col gap-2 mt-2">
-                <div className="flex justify-between text-[9px] font-sans font-bold uppercase tracking-widest text-[#f4fffa]/40">
-                  <span className="text-emerald-500">YES {market.chanceNum}%</span>
-                  <span className="text-destructive">NO {100 - market.chanceNum}%</span>
+          return (
+            <Link key={market.id} href={`/markets/${market.id}`} className="block">
+              <Card className="bg-surface-container-low border border-border hover:bg-surface-container transition-colors p-6 flex flex-col gap-6 h-full rounded-none shadow-none">
+                <div className="flex justify-between items-center">
+                  <span className="px-2 py-1 bg-surface-container-highest text-white font-sans font-bold text-[9px] uppercase tracking-widest rounded-none">
+                    {market.category}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-sans">
+                    {formatDate(market.resolutionTime)}
+                  </span>
                 </div>
-                <div className="w-full h-[3px] flex bg-surface-bright rounded-none overflow-hidden">
-                  <div
-                    className="h-full bg-emerald-500 transition-all duration-500"
-                    style={{ width: `${market.chanceNum}%` }}
-                  ></div>
-                  <div
-                    className="h-full bg-destructive transition-all duration-500"
-                    style={{ width: `${100 - market.chanceNum}%` }}
-                  ></div>
-                </div>
-              </div>
 
-              <div className="flex gap-3 mt-1">
-                <Button
-                  variant="outline"
-                  className="flex-1 h-11 bg-emerald-500/10 text-emerald-500 border-emerald-500/50 hover:bg-emerald-500/20 hover:border-emerald-500 transition-all rounded-none font-sans font-bold text-[10px] tracking-widest uppercase"
-                >
-                  PREDICT YES
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 h-11 bg-destructive/10 text-destructive border-destructive/50 hover:bg-destructive/20 hover:border-destructive transition-all rounded-none font-sans font-bold text-[10px] tracking-widest uppercase"
-                >
-                  PREDICT NO
-                </Button>
-              </div>
-            </Card>
-          </Link>
-        ))}
+                <h3 className="font-heading font-bold text-lg leading-snug flex-1 text-[#f4fffa]">
+                  {market.question}
+                </h3>
+
+                {/* Probabilities Bar */}
+                <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex justify-between text-[9px] font-sans font-bold uppercase tracking-widest text-[#f4fffa]/40">
+                    <span className="text-emerald-500">YES {chanceNum}%</span>
+                    <span className="text-destructive">NO {100 - chanceNum}%</span>
+                  </div>
+                  <div className="w-full h-[3px] flex bg-surface-bright rounded-none overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-500"
+                      style={{ width: `${chanceNum}%` }}
+                    ></div>
+                    <div
+                      className="h-full bg-destructive transition-all duration-500"
+                      style={{ width: `${100 - chanceNum}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-1 text-[10px] font-sans font-bold text-muted-foreground uppercase tracking-widest">
+                  <span>Volume: {volume}</span>
+                </div>
+
+                <div className="flex gap-3 mt-1">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-11 bg-emerald-500/10 text-emerald-500 border-emerald-500/50 hover:bg-emerald-500/20 hover:border-emerald-500 transition-all rounded-none font-sans font-bold text-[10px] tracking-widest uppercase"
+                  >
+                    PREDICT YES
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-11 bg-destructive/10 text-destructive border-destructive/50 hover:bg-destructive/20 hover:border-destructive transition-all rounded-none font-sans font-bold text-[10px] tracking-widest uppercase"
+                  >
+                    PREDICT NO
+                  </Button>
+                </div>
+              </Card>
+            </Link>
+          );
+        })}
 
         {/* Propose a Market Card */}
         <Card className="bg-surface-container border border-border p-8 flex flex-col justify-center items-center text-center gap-4 h-full rounded-none min-h-[300px]">

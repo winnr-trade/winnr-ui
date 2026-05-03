@@ -15,10 +15,12 @@ export function formatNumber(
   value: number | string | bigint,
   minDecimals: number = 2,
   maxDecimals: number = 2,
+  compact: boolean = false,
 ): string {
-  return Number(value).toLocaleString(undefined, {
+  return Number(value).toLocaleString("en-US", {
     minimumFractionDigits: minDecimals,
     maximumFractionDigits: maxDecimals,
+    notation: compact ? "compact" : "standard",
   });
 }
 
@@ -60,6 +62,11 @@ export function formatUnits(value: bigint | string | number, decimals: number): 
 
 export function formatUsd(value: number | string | bigint): string {
   return formatUnits(value, 6);
+}
+
+export function formatCurrency(value: number | string | bigint, compact: boolean = false): string {
+  const amount = Number(formatUsd(value));
+  return `$${formatNumber(amount, 0, compact ? 1 : 2, compact)}`;
 }
 
 /** Converts raw 6-decimal base units to a cents string (e.g. 475300 -> "47.53") */
