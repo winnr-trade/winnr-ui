@@ -1,12 +1,65 @@
 "use client";
 
 import { ArrowRight, Plus } from "lucide-react";
+import { useMemo } from "react";
 import { usePortfolioData } from "@/api/portfolio";
+import { useGetBalance } from "@/api/wallet/getBalance";
+import { useMainWallet } from "@/hooks/useMainWallet";
+import { formatNumber } from "@/utils";
 
 export function PortfolioStats() {
-  const { data: portfolio } = usePortfolioData();
+  const { address } = useMainWallet();
+  const { data: balanceData, isLoading: isBalanceLoading } = useGetBalance({ address });
+  const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolioData();
 
-  if (!portfolio) return null;
+  const stats = useMemo(() => {
+    if (!portfolio || balanceData === undefined) return null;
+
+    const availableBalance = Number(balanceData) / 1_000_000;
+    let totalPositionValue = 0;
+    let totalPnl = 0;
+
+    for (const pos of portfolio.activePositions) {
+      const midPriceCents = pos.latestMidPrice ? pos.latestMidPrice / 100 : 50;
+
+      if (pos.yesShares > 0) {
+        const avgPriceCents = pos.avgPriceYes ? pos.avgPriceYes / 100 : 50;
+        const currentPriceCents = midPriceCents;
+        totalPositionValue += (pos.yesShares * currentPriceCents) / 100;
+        totalPnl += ((currentPriceCents - avgPriceCents) * pos.yesShares) / 100;
+      }
+
+      if (pos.noShares > 0) {
+        const avgPriceCents = pos.avgPriceNo ? pos.avgPriceNo / 100 : 50;
+        const currentPriceCents = 100 - midPriceCents;
+        totalPositionValue += (pos.noShares * currentPriceCents) / 100;
+        totalPnl += ((currentPriceCents - avgPriceCents) * pos.noShares) / 100;
+      }
+    }
+
+    const totalValue = availableBalance + totalPositionValue;
+    const pnlPercent = totalValue > 0 ? (totalPnl / (totalValue - totalPnl)) * 100 : 0;
+
+    return {
+      totalValue: `$${formatNumber(totalValue, 2, 2)}`,
+      unrealizedPnl: `${totalPnl >= 0 ? "+" : "-"}$${formatNumber(Math.abs(totalPnl), 2, 2)}`,
+      unrealizedPnlPercent: `${pnlPercent >= 0 ? "+" : "-"}${formatNumber(Math.abs(pnlPercent), 1, 1)}%`,
+      availableBalance: `$${formatNumber(availableBalance, 2, 2)}`,
+      pnlPositive: totalPnl >= 0,
+    };
+  }, [portfolio, balanceData]);
+
+  if (isBalanceLoading || isPortfolioLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-border mb-12 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="p-8 border-r border-border bg-surface-container-low h-32"></div>
+        ))}
+      </div>
+    );
+  }
+
+  if (!stats) return null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-border mb-12">
@@ -15,7 +68,7 @@ export function PortfolioStats() {
           Total Portfolio Value
         </span>
         <span className="text-4xl font-heading font-bold text-white tracking-tight">
-          {portfolio.stats.totalValue}
+          {stats.totalValue}
         </span>
       </div>
       <div className="p-8 border-b md:border-b-0 md:border-r border-border bg-surface-container-low flex flex-col gap-3 justify-center">
@@ -23,11 +76,20 @@ export function PortfolioStats() {
           Unrealized P&L
         </span>
         <div className="flex items-center gap-4">
-          <span className="text-3xl font-heading font-bold text-emerald-500 tracking-tight">
-            {portfolio.stats.unrealizedPnl}
+          <span
+            className={`text-3xl font-heading font-bold tracking-tight ${stats.pnlPositive ? "text-emerald-500" : "text-destructive"}`}
+          >
+            {stats.unrealizedPnl}
           </span>
-          <span className="text-[10px] font-sans font-bold text-emerald-500 border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 flex items-center gap-1 rounded-none">
-            <ArrowRight className="w-3 h-3 -rotate-45" /> {portfolio.stats.unrealizedPnlPercent}
+          <span
+            className={`text-[10px] font-sans font-bold border px-2 py-1 flex items-center gap-1 rounded-none ${
+              stats.pnlPositive
+                ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/10"
+                : "text-destructive border-destructive/20 bg-destructive/10"
+            }`}
+          >
+            <ArrowRight className={`w-3 h-3 ${stats.pnlPositive ? "-rotate-45" : "rotate-45"}`} />{" "}
+            {stats.unrealizedPnlPercent}
           </span>
         </div>
       </div>
@@ -36,7 +98,7 @@ export function PortfolioStats() {
           Available Balance
         </span>
         <span className="text-3xl font-heading font-bold text-white tracking-tight">
-          {portfolio.stats.availableBalance}
+          {stats.availableBalance}
         </span>
         <div className="absolute right-8 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground group-hover:border-white group-hover:text-white transition-colors">
           <Plus className="w-4 h-4" />

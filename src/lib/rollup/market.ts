@@ -143,6 +143,12 @@ export class Market {
     });
   }
 
+  async getActivePositions(params: { userAddress: string }) {
+    return this.rollup.http.get(`${this.prefix}/positions`, {
+      query: { user_address: params.userAddress, page: 0, limit: 100 },
+    });
+  }
+
   // Fetch market module status
   async status() {
     return this.rollup.http.get(`${this.prefix}/status`);

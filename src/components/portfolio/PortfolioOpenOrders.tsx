@@ -4,11 +4,10 @@ import { toast } from "sonner";
 import { useCancelOrder } from "@/api/orderbook/cancelOrder";
 import { type UserOrder, useGetUserOrders } from "@/api/orderbook/getUserOrders";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Heading } from "@/components/ui/typography";
 import { useMainWallet } from "@/hooks/useMainWallet";
 import { formatCents, formatNumber } from "@/utils";
-
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -18,15 +17,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface OpenOrdersListProps {
-  marketId: number;
-}
-
-export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
+export function PortfolioOpenOrders() {
   const { address } = useMainWallet();
   const { data: orders, isLoading } = useGetUserOrders({
     userAddress: address ?? undefined,
-    marketId,
   });
 
   if (!address) {
@@ -36,40 +30,48 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
   const openOrders = orders?.filter((o) => o.status === "open") || [];
 
   return (
-    <Card className="bg-surface-container-low border border-border shadow-none p-6 md:p-8 flex flex-col gap-6 rounded-none">
-      <Heading className="text-xl font-bold tracking-wide text-white">Open Orders</Heading>
+    <div className="flex flex-col mb-12">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-heading font-bold text-white">Open Orders</h2>
+        <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground border border-border px-3 py-1 bg-surface-container-low rounded-none">
+          {openOrders.length} {openOrders.length === 1 ? "Order" : "Orders"}
+        </span>
+      </div>
 
-      <div className="w-full">
+      <div className="border border-border bg-surface-container-low rounded-none">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-border hover:bg-transparent">
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4">
-                SIDE / OUTCOME
+              <TableHead className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground h-12 px-4 w-[20%]">
+                Market
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
-                LIMIT PRICE
+              <TableHead className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground h-12 px-4 text-center">
+                Side / Outcome
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
-                REMAINING
+              <TableHead className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground h-12 px-4 text-center">
+                Limit Price
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
-                ORIGINAL QTY
+              <TableHead className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground h-12 px-4 text-center">
+                Remaining
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
-                ACTION
+              <TableHead className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground h-12 px-4 text-center">
+                Original Qty
+              </TableHead>
+              <TableHead className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground h-12 px-4 text-right">
+                Action
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="p-8 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse">
+                <TableCell colSpan={7} className="p-12 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse">
                   Loading orders...
                 </TableCell>
               </TableRow>
             ) : openOrders.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="p-8 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground">
+                <TableCell colSpan={7} className="p-12 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground">
                   No open orders
                 </TableCell>
               </TableRow>
@@ -81,7 +83,7 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
           </TableBody>
         </Table>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -105,25 +107,33 @@ function OrderItem({ order }: { order: UserOrder }) {
 
   return (
     <TableRow className="border-b border-border/50 hover:bg-surface-container transition-colors group">
-      <TableCell className="px-4 py-4">
-        <div className="flex flex-col xl:flex-row xl:items-center gap-2">
-          <span
-            className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-emerald-500" : "text-destructive"}`}
+      <TableCell className="px-4 py-4 w-[20%]">
+        <div className="flex items-start justify-between gap-3">
+          <Link 
+            href={`/markets/${order.marketId}`}
+            className="group/link text-sm font-sans font-bold text-white hover:text-white transition-colors leading-tight"
           >
-            {actionText}
-          </span>
-          <span className="w-fit text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground bg-transparent border border-border px-2 py-0.5 rounded-none">
+            {order.marketQuestion || `Market #${order.marketId}`}
+          </Link>
+          <span className="shrink-0 text-[9px] uppercase tracking-widest font-sans font-bold text-muted-foreground bg-transparent border border-border px-2 py-0.5 rounded-none mt-0.5">
             {order.orderType}
           </span>
         </div>
       </TableCell>
-      <TableCell className="text-right font-heading font-bold text-sm text-white px-4 py-4">
+      <TableCell className="px-4 py-4 text-center">
+        <span
+          className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-emerald-500" : "text-destructive"}`}
+        >
+          {actionText}
+        </span>
+      </TableCell>
+      <TableCell className="text-center font-heading font-bold text-sm text-white px-4 py-4">
         {price}¢
       </TableCell>
-      <TableCell className="text-right font-sans text-xs tracking-wide text-white px-4 py-4">
+      <TableCell className="text-center font-sans text-sm font-bold tracking-wide text-white px-4 py-4">
         {remainingQty}
       </TableCell>
-      <TableCell className="text-right font-sans text-xs tracking-wide text-muted-foreground px-4 py-4">
+      <TableCell className="text-center font-sans text-sm font-bold tracking-wide text-muted-foreground px-4 py-4">
         {originalQty}
       </TableCell>
 

@@ -1,15 +1,12 @@
 export interface PortfolioPosition {
-  id: string;
   marketId: number;
-  market: string;
-  fullMarket: string;
-  outcome: string;
-  position: string;
-  avgPrice: string;
-  currentPrice: string;
-  unrealizedPnl: string;
-  pnlPositive: boolean;
-  value: number;
+  question: string;
+  outcome?: string;
+  yesShares: number;
+  noShares: number;
+  avgPriceYes?: number;
+  avgPriceNo?: number;
+  latestMidPrice?: number;
 }
 
 export interface PortfolioActivity {
@@ -23,12 +20,5 @@ export interface PortfolioActivity {
 }
 
 export interface PortfolioData {
-  stats: {
-    totalValue: string;
-    unrealizedPnl: string;
-    unrealizedPnlPercent: string;
-    availableBalance: string;
-  };
   activePositions: PortfolioPosition[];
-  recentActivity: PortfolioActivity[];
 }

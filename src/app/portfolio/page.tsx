@@ -6,6 +6,8 @@ import { PortfolioHeader } from "@/components/portfolio/PortfolioHeader";
 import { PortfolioPositions } from "@/components/portfolio/PortfolioPositions";
 import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
 
+import { PortfolioOpenOrders } from "@/components/portfolio/PortfolioOpenOrders";
+
 export default function PortfolioPage() {
   const { data: portfolio, isLoading, error } = usePortfolioData();
 
@@ -30,6 +32,7 @@ export default function PortfolioPage() {
       <PortfolioHeader />
       <PortfolioStats />
       <PortfolioPositions />
+      <PortfolioOpenOrders />
       <PortfolioActivity />
     </div>
   );

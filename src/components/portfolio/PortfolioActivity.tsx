@@ -1,13 +1,22 @@
 "use client";
 
 import { ArrowRight, ArrowRightLeft, Plus, Wallet } from "lucide-react";
-import { usePortfolioData } from "@/api/portfolio";
+import { useUserActivity } from "@/api/portfolio";
 import { Button } from "@/components/ui/button";
 
 export function PortfolioActivity() {
-  const { data: portfolio } = usePortfolioData();
+  const { data: activityList, isLoading } = useUserActivity(10);
 
-  if (!portfolio) return null;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col animate-pulse">
+        <div className="h-8 w-48 bg-surface-container mb-6"></div>
+        <div className="border border-border bg-surface-container-low h-64"></div>
+      </div>
+    );
+  }
+
+  if (!activityList) return null;
 
   return (
     <div className="flex flex-col">
@@ -22,11 +31,11 @@ export function PortfolioActivity() {
       </div>
 
       <div className="border border-border bg-surface-container-low flex flex-col">
-        {portfolio.recentActivity.map((activity, idx) => (
+        {activityList.map((activity, idx) => (
           <div
             key={activity.id}
             className={`flex justify-between items-center p-6 hover:bg-surface-container transition-colors cursor-pointer ${
-              idx !== portfolio.recentActivity.length - 1 ? "border-b border-border/50" : ""
+              idx !== activityList.length - 1 ? "border-b border-border/50" : ""
             }`}
           >
             <div className="flex items-center gap-4">
@@ -54,7 +63,7 @@ export function PortfolioActivity() {
             </div>
           </div>
         ))}
-        {portfolio.recentActivity.length === 0 && (
+        {activityList.length === 0 && (
           <div className="p-12 text-center">
             <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
               No recent activity
