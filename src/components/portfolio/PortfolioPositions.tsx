@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { usePortfolioData } from "@/api/portfolio";
+import { useActivePositions } from "@/api/portfolio";
 import { Button } from "@/components/ui/button";
 import { formatNumber } from "@/utils";
 import {
@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/table";
 
 export function PortfolioPositions() {
-  const { data: portfolio } = usePortfolioData();
+  const { data: positions, isLoading } = useActivePositions();
 
   const flattenedPositions = useMemo(() => {
-    if (!portfolio) return [];
+    if (!positions) return [];
     const rows: any[] = [];
 
-    for (const pos of portfolio.activePositions) {
+    for (const pos of positions) {
       const midPriceCents = pos.latestMidPrice ? pos.latestMidPrice / 100 : 50;
 
       if (pos.yesShares > 0) {
@@ -69,9 +69,9 @@ export function PortfolioPositions() {
       }
     }
     return rows;
-  }, [portfolio]);
+  }, [positions]);
 
-  if (!portfolio) return null;
+  if (isLoading && !positions) return null;
 
   return (
     <div className="flex flex-col mb-12">

@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { http, rollup } from "@/api/utils";
+import { http } from "@/api/utils";
 import { useMainWallet } from "@/hooks/useMainWallet";
-import type { PortfolioData, PortfolioPosition } from "@/types";
+import type { PortfolioPosition } from "@/types";
 
-export const getPortfolioData = async (address: string): Promise<PortfolioData> => {
-  // 1. Fetch Real Active Positions (Share balances) from the Indexer
+export const getActivePositions = async (address: string): Promise<PortfolioPosition[]> => {
+  // Fetch Real Active Positions (Share balances) from the Indexer
   const res = await http.get("/positions", { params: { user_address: address, limit: 100 } });
   const positions: any = res.data.data;
 
@@ -19,19 +19,17 @@ export const getPortfolioData = async (address: string): Promise<PortfolioData> 
     latestMidPrice: pos.latest_mid_price,
   }));
 
-  return {
-    activePositions,
-  };
+  return activePositions;
 };
 
-export const usePortfolioData = () => {
+export const useActivePositions = () => {
   const { address } = useMainWallet();
 
-  return useQuery<PortfolioData | null>({
-    queryKey: ["portfolioData", address],
+  return useQuery<PortfolioPosition[]>({
+    queryKey: ["activePositions", address],
     queryFn: () => {
-      if (!address) return null;
-      return getPortfolioData(address);
+      if (!address) return [];
+      return getActivePositions(address);
     },
     enabled: !!address,
   });

@@ -2,7 +2,7 @@
 
 import { ArrowRight, Plus } from "lucide-react";
 import { useMemo } from "react";
-import { usePortfolioData } from "@/api/portfolio";
+import { useActivePositions } from "@/api/portfolio";
 import { useGetBalance } from "@/api/wallet/getBalance";
 import { useMainWallet } from "@/hooks/useMainWallet";
 import { formatNumber } from "@/utils";
@@ -10,16 +10,18 @@ import { formatNumber } from "@/utils";
 export function PortfolioStats() {
   const { address } = useMainWallet();
   const { data: balanceData, isLoading: isBalanceLoading } = useGetBalance({ address });
-  const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolioData();
+  const { data: positions, isLoading: isPortfolioLoading } = useActivePositions();
+
+  console.log("balanceData", balanceData);
 
   const stats = useMemo(() => {
-    if (!portfolio || balanceData === undefined) return null;
+    if (!positions || balanceData === undefined) return null;
 
     const availableBalance = Number(balanceData) / 1_000_000;
     let totalPositionValue = 0;
     let totalPnl = 0;
 
-    for (const pos of portfolio.activePositions) {
+    for (const pos of positions) {
       const midPriceCents = pos.latestMidPrice ? pos.latestMidPrice / 100 : 50;
 
       if (pos.yesShares > 0) {
@@ -47,7 +49,7 @@ export function PortfolioStats() {
       availableBalance: `$${formatNumber(availableBalance, 2, 2)}`,
       pnlPositive: totalPnl >= 0,
     };
-  }, [portfolio, balanceData]);
+  }, [positions, balanceData]);
 
   if (isBalanceLoading || isPortfolioLoading) {
     return (

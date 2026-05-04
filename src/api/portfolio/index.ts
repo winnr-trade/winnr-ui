@@ -1,2 +1,2 @@
-export * from "./getPortfolioData";
+export * from "./getActivePositions";
 export * from "./getUserActivity";

@@ -1,6 +1,6 @@
 "use client";
 
-import { usePortfolioData } from "@/api/portfolio";
+import { useActivePositions } from "@/api/portfolio";
 import { PortfolioActivity } from "@/components/portfolio/PortfolioActivity";
 import { PortfolioHeader } from "@/components/portfolio/PortfolioHeader";
 import { PortfolioPositions } from "@/components/portfolio/PortfolioPositions";
@@ -9,7 +9,7 @@ import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
 import { PortfolioOpenOrders } from "@/components/portfolio/PortfolioOpenOrders";
 
 export default function PortfolioPage() {
-  const { data: portfolio, isLoading, error } = usePortfolioData();
+  const { data: positions, isLoading, error } = useActivePositions();
 
   if (isLoading) {
     return (
