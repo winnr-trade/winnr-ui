@@ -19,8 +19,15 @@ export interface Market {
   probability: number;
   totalVolume: bigint;
   totalShares: bigint;
+  totalSharesVolume: bigint;
   resolutionTime: number;
   outcome: "yes" | "no" | null;
+  status: string;
+  creator: string;
+  collateralToken: string;
+  createdAt: number;
+  eventNumber: number;
+  txHash: string;
   resolver: Resolver;
   bestBid: bigint | null;
   bestAsk: bigint | null;

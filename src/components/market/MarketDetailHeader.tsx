@@ -1,10 +1,18 @@
+import * as React from "react";
 import { Calendar, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useMarketDetail } from "@/api/market";
 import { IconButton } from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Display } from "@/components/ui/typography";
-import { deriveMarketState, formatFullDate, formatNumber, formatUnits } from "@/utils";
+import {
+  deriveMarketState,
+  formatFullDate,
+  formatNumber,
+  formatTimeUntil,
+  formatUnits,
+} from "@/utils";
+import { ShareModal } from "./ShareModal";
 
 interface MarketDetailHeaderProps {
   marketId: number;
@@ -12,7 +20,7 @@ interface MarketDetailHeaderProps {
 
 export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
   const { data: market, isLoading: isMarketLoading } = useMarketDetail({ id: marketId });
-  // const { bids, asks } = useOrderbook({ marketId });
+  const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
 
   if (isMarketLoading) {
     return (
@@ -30,23 +38,26 @@ export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
 
   const { isFullyResolved, isAwaitingResolution, resolvedOutcome } = deriveMarketState(market);
 
-  console.log("marekt", market);
+  const { category, question, resolutionTime, totalShares, probability, createdAt } = market;
 
-  const { category, question, resolutionTime, totalShares, probability } = market;
-
-  const resolutionDate = formatFullDate(resolutionTime);
+  const creationDate = formatFullDate(createdAt);
   const isHighChance = probability >= 50;
   const displayProbability = `${probability}%`;
   const displayVolume = `$${formatNumber(formatUnits(market.totalVolume || 0, 6), 0, 0)}`;
   const displayOI = `$${formatNumber(totalShares, 0, 0)}`;
+  const displayEndsIn = formatTimeUntil(resolutionTime);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Market link copied to clipboard");
-  };
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
     <div className="flex flex-col gap-3 mb-0">
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        url={currentUrl}
+        title={question}
+      />
+
       {/* Top Bar: Tags & Share */}
       <div className="flex justify-between items-center w-full">
         <div className="flex gap-2 items-center">
@@ -55,10 +66,15 @@ export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
           </div>
           <div className="border border-border text-muted-foreground text-[10px] font-bold font-sans tracking-widest uppercase px-3 py-1 flex items-center gap-2">
             <Calendar className="size-3" />
-            {resolutionDate}
+            {creationDate}
           </div>
         </div>
-        <IconButton onClick={handleShare} icon={Share2} variant="ghost" className="-mr-2" />
+        <IconButton
+          onClick={() => setIsShareModalOpen(true)}
+          icon={Share2}
+          variant="ghost"
+          className="-mr-2"
+        />
       </div>
 
       {/* Main Question */}
@@ -68,9 +84,9 @@ export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
 
       {/* Bottom Row: Resolution Info or Probability & Stats */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="flex items-center gap-10">
+        <div className="flex items-end gap-10 pb-2">
           {/* Stats Section (Left Aligned) */}
-          <div className="flex items-center gap-10">
+          <div className="flex items-end gap-10">
             <div className="flex flex-col gap-2.5">
               <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em]">
                 VOLUME
@@ -79,7 +95,7 @@ export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
                 {displayVolume}
               </span>
             </div>
-            <div className="h-8 w-px bg-border/60" />
+            <div className="h-8 w-px bg-border/60 mb-1" />
             <div className="flex flex-col gap-2.5">
               <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em]">
                 OPEN INTEREST
@@ -88,9 +104,18 @@ export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
                 {displayOI}
               </span>
             </div>
+            <div className="h-8 w-px bg-border/60 mb-1" />
+            <div className="flex flex-col gap-2.5">
+              <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em]">
+                ENDS IN
+              </span>
+              <span className="text-2xl font-heading font-bold text-white leading-none">
+                {displayEndsIn}
+              </span>
+            </div>
           </div>
 
-          <div>
+          <div className="mb-0.5">
             {isFullyResolved && (
               <div className="text-xl font-heading font-bold uppercase">
                 <span className="text-muted-foreground mr-2">Resolved:</span>
@@ -110,8 +135,8 @@ export function MarketDetailHeader({ marketId }: MarketDetailHeaderProps) {
         </div>
 
         {/* Probability Display (Right Aligned) */}
-        <div className="flex flex-col items-end">
-          <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em] mb-1">
+        <div className="flex flex-col items-end gap-2.5">
+          <span className="text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.2em]">
             PROBABILITY
           </span>
           <div

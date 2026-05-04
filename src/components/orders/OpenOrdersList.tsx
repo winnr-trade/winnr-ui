@@ -36,26 +36,35 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
   const openOrders = orders?.filter((o) => o.status === "open") || [];
 
   return (
-    <Card className="bg-surface-container-low border border-border shadow-none p-6 md:p-8 flex flex-col gap-6 rounded-none">
-      <Heading className="text-xl font-bold tracking-wide text-white">Open Orders</Heading>
+    <Card className="bg-surface-container-low border border-border shadow-none rounded-none flex flex-col overflow-hidden">
+      <div className="px-6 md:px-8 py-6 flex justify-between items-center">
+        <Heading className="text-lg font-bold tracking-tight text-white uppercase tracking-[0.05em]">
+          Open Orders
+        </Heading>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-sans font-bold text-muted-foreground uppercase tracking-widest">
+            {openOrders.length} {openOrders.length === 1 ? "Order" : "Orders"}
+          </span>
+        </div>
+      </div>
 
-      <div className="w-full">
+      <div className="w-full overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-border hover:bg-transparent">
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4">
+            <TableRow className="border-b border-border/60 hover:bg-transparent">
+              <TableHead className="text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground h-12 px-6 md:px-8">
                 SIDE / OUTCOME
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
+              <TableHead className="text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground h-12 px-6 md:px-8 text-center">
                 LIMIT PRICE
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
+              <TableHead className="text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground h-12 px-6 md:px-8 text-center">
                 REMAINING
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
+              <TableHead className="text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground h-12 px-6 md:px-8 text-center">
                 ORIGINAL QTY
               </TableHead>
-              <TableHead className="text-[9px] uppercase font-sans font-bold tracking-[0.2em] text-muted-foreground h-10 px-4 text-right">
+              <TableHead className="text-[10px] uppercase font-sans font-bold tracking-widest text-muted-foreground h-12 px-6 md:px-8 text-right">
                 ACTION
               </TableHead>
             </TableRow>
@@ -104,8 +113,8 @@ function OrderItem({ order }: { order: UserOrder }) {
   };
 
   return (
-    <TableRow className="border-b border-border/50 hover:bg-surface-container transition-colors group">
-      <TableCell className="px-4 py-4">
+    <TableRow className="border-b border-border/40 hover:bg-surface-container transition-colors group">
+      <TableCell className="px-6 md:px-8 py-4">
         <div className="flex flex-col xl:flex-row xl:items-center gap-2">
           <span
             className={`font-heading font-bold text-sm tracking-wide ${isBuy ? "text-emerald-500" : "text-destructive"}`}
@@ -117,17 +126,17 @@ function OrderItem({ order }: { order: UserOrder }) {
           </span>
         </div>
       </TableCell>
-      <TableCell className="text-right font-heading font-bold text-sm text-white px-4 py-4">
+      <TableCell className="text-center font-heading font-bold text-sm text-white px-6 md:px-8 py-4">
         {price}¢
       </TableCell>
-      <TableCell className="text-right font-sans text-xs tracking-wide text-white px-4 py-4">
+      <TableCell className="text-center font-sans text-xs tracking-wide text-white px-6 md:px-8 py-4">
         {remainingQty}
       </TableCell>
-      <TableCell className="text-right font-sans text-xs tracking-wide text-muted-foreground px-4 py-4">
+      <TableCell className="text-center font-sans text-xs tracking-wide text-muted-foreground px-6 md:px-8 py-4">
         {originalQty}
       </TableCell>
 
-      <TableCell className="text-right px-4 py-4">
+      <TableCell className="text-right px-6 md:px-8 py-4">
         <Button
           variant="outline"
           size="xs"
