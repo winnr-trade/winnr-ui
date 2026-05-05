@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronDown, Copy, LogOut, ShieldCheck, Wallet } from "lucide-react";
+import { ChevronDown, Coins, Copy, LogOut, ShieldCheck, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGetBalance } from "@/api/wallet/getBalance";
+import { useMintTestFunds } from "@/api/wallet/mintTestFunds";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,6 +24,7 @@ export function WalletConnectButton() {
   const { openModal } = useWalletUIStore();
   const { data: balance } = useGetBalance({ address: address ?? undefined });
   const { isActive: isAgentActive, enableTrading, isRegistering } = useAgentWallet();
+  const mintTestFunds = useMintTestFunds();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -34,6 +36,11 @@ export function WalletConnectButton() {
       navigator.clipboard.writeText(publicKey.toBase58());
       toast.success("Address copied to clipboard");
     }
+  };
+
+  const handleMintTestUSDC = () => {
+    if (!address) return;
+    mintTestFunds.mutate(address);
   };
 
   // Prevent hydration mismatch by doing a skeleton-like render initially
@@ -120,6 +127,23 @@ export function WalletConnectButton() {
               <DropdownMenuSeparator className="bg-border" />
             </>
           )}
+
+          <DropdownMenuItem
+            className="flex items-center gap-3 px-3 py-3 text-[10px] font-sans font-bold uppercase tracking-widest cursor-pointer hover:bg-surface-container focus:bg-surface-container text-white transition-colors rounded-none outline-none"
+            onClick={() => handleMintTestUSDC()}
+            disabled={mintTestFunds.isPending}
+          >
+            <Coins
+              className={`size-4 ${mintTestFunds.isPending ? "animate-pulse" : "text-primary"}`}
+            />
+            <div className="flex flex-col gap-0.5">
+              <span>{mintTestFunds.isPending ? "Minting..." : "Claim 10,000 Test USDC"}</span>
+              <span className="text-[8px] text-muted-foreground normal-case tracking-normal font-normal">
+                {mintTestFunds.isPending ? "Processing transaction..." : "Get test funds for trading"}
+              </span>
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-border" />
 
           <DropdownMenuItem
             className="flex items-center gap-3 px-3 py-3 text-[10px] font-sans font-bold uppercase tracking-widest cursor-pointer hover:bg-destructive hover:text-white focus:bg-destructive focus:text-white transition-colors rounded-none outline-none group"
