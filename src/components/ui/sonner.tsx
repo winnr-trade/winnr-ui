@@ -10,15 +10,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      style={{ "--border-radius": "0px" } as React.CSSProperties}
       toastOptions={{
         classNames: {
           toast:
-            "group toast font-sans rounded-none border border-border bg-surface-container-low text-foreground shadow-2xl",
+            "group toast font-sans rounded-none! border border-border bg-surface-container-low text-foreground shadow-2xl",
           description: "text-muted-foreground text-xs",
           actionButton:
-            "bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[10px]",
+            "bg-primary text-primary-foreground font-bold uppercase tracking-widest text-[10px] rounded-none!",
           cancelButton:
-            "bg-muted text-muted-foreground font-bold uppercase tracking-widest text-[10px]",
+            "bg-muted text-muted-foreground font-bold uppercase tracking-widest text-[10px] rounded-none!",
           success: "border-l-4 border-l-emerald-500 text-emerald-500",
           error: "border-l-4 border-l-destructive text-destructive",
           info: "border-l-4 border-l-blue-500 text-blue-500",
