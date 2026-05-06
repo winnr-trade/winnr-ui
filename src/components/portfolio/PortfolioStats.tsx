@@ -5,49 +5,25 @@ import { useMemo } from "react";
 import { useActivePositions } from "@/api/portfolio";
 import { useGetBalance } from "@/api/wallet/getBalance";
 import { useMainWallet } from "@/hooks/useMainWallet";
-import { formatNumber } from "@/utils";
+import { formatCurrency, formatNumber, getPortfolioSummary } from "@/utils";
 
 export function PortfolioStats() {
   const { address } = useMainWallet();
   const { data: balanceData, isLoading: isBalanceLoading } = useGetBalance({ address });
   const { data: positions, isLoading: isPortfolioLoading } = useActivePositions();
 
-  console.log("balanceData", balanceData);
-
   const stats = useMemo(() => {
     if (!positions || balanceData === undefined) return null;
 
-    const availableBalance = Number(balanceData) / 1_000_000;
-    let totalPositionValue = 0;
-    let totalPnl = 0;
-
-    for (const pos of positions) {
-      const midPriceCents = pos.latestMidPrice ? pos.latestMidPrice / 100 : 50;
-
-      if (pos.yesShares > 0) {
-        const avgPriceCents = pos.avgPriceYes ? pos.avgPriceYes / 100 : 50;
-        const currentPriceCents = midPriceCents;
-        totalPositionValue += (pos.yesShares * currentPriceCents) / 100;
-        totalPnl += ((currentPriceCents - avgPriceCents) * pos.yesShares) / 100;
-      }
-
-      if (pos.noShares > 0) {
-        const avgPriceCents = pos.avgPriceNo ? pos.avgPriceNo / 100 : 50;
-        const currentPriceCents = 100 - midPriceCents;
-        totalPositionValue += (pos.noShares * currentPriceCents) / 100;
-        totalPnl += ((currentPriceCents - avgPriceCents) * pos.noShares) / 100;
-      }
-    }
-
-    const totalValue = availableBalance + totalPositionValue;
-    const pnlPercent = totalValue > 0 ? (totalPnl / (totalValue - totalPnl)) * 100 : 0;
+    const summary = getPortfolioSummary(balanceData, positions);
+    const absPnl = summary.totalPnl < BigInt(0) ? -summary.totalPnl : summary.totalPnl;
 
     return {
-      totalValue: `$${formatNumber(totalValue, 2, 2)}`,
-      unrealizedPnl: `${totalPnl >= 0 ? "+" : "-"}$${formatNumber(Math.abs(totalPnl), 2, 2)}`,
-      unrealizedPnlPercent: `${pnlPercent >= 0 ? "+" : "-"}${formatNumber(Math.abs(pnlPercent), 1, 1)}%`,
-      availableBalance: `$${formatNumber(availableBalance, 2, 2)}`,
-      pnlPositive: totalPnl >= 0,
+      totalValue: formatCurrency(summary.totalValue),
+      unrealizedPnl: `${summary.pnlPositive ? "+" : "-"}${formatCurrency(absPnl)}`,
+      unrealizedPnlPercent: `${summary.pnlPercent >= 0 ? "+" : "-"}${formatNumber(Math.abs(summary.pnlPercent), 1, 1)}%`,
+      availableBalance: formatCurrency(summary.availableBalance),
+      pnlPositive: summary.pnlPositive,
     };
   }, [positions, balanceData]);
 

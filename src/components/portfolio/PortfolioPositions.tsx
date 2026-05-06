@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useActivePositions } from "@/api/portfolio";
 import { Button } from "@/components/ui/button";
-import { formatNumber } from "@/utils";
 import {
   Table,
   TableBody,
@@ -13,62 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { flattenPositions, formatCents, formatCurrency, formatNumber } from "@/utils";
 
 export function PortfolioPositions() {
   const { data: positions, isLoading } = useActivePositions();
 
   const flattenedPositions = useMemo(() => {
     if (!positions) return [];
-    const rows: any[] = [];
-
-    for (const pos of positions) {
-      const midPriceCents = pos.latestMidPrice ? pos.latestMidPrice / 100 : 50;
-
-      if (pos.yesShares > 0) {
-        const avgPriceCents = pos.avgPriceYes ? pos.avgPriceYes / 100 : 50;
-        const currentPriceCents = midPriceCents;
-        const valueUsd = (pos.yesShares * currentPriceCents) / 100;
-        const pnlUsd = ((currentPriceCents - avgPriceCents) * pos.yesShares) / 100;
-        const pnlPercent = avgPriceCents > 0 ? ((currentPriceCents - avgPriceCents) / avgPriceCents) * 100 : 0;
-
-        rows.push({
-          id: `${pos.marketId}-yes`,
-          marketId: pos.marketId,
-          question: pos.question,
-          outcome: "YES",
-          shares: pos.yesShares,
-          avgPriceCents,
-          currentPriceCents,
-          valueUsd,
-          pnlUsd,
-          pnlPercent,
-          pnlPositive: pnlUsd >= 0,
-        });
-      }
-
-      if (pos.noShares > 0) {
-        const avgPriceCents = pos.avgPriceNo ? pos.avgPriceNo / 100 : 50;
-        const currentPriceCents = 100 - midPriceCents;
-        const valueUsd = (pos.noShares * currentPriceCents) / 100;
-        const pnlUsd = ((currentPriceCents - avgPriceCents) * pos.noShares) / 100;
-        const pnlPercent = avgPriceCents > 0 ? ((currentPriceCents - avgPriceCents) / avgPriceCents) * 100 : 0;
-
-        rows.push({
-          id: `${pos.marketId}-no`,
-          marketId: pos.marketId,
-          question: pos.question,
-          outcome: "NO",
-          shares: pos.noShares,
-          avgPriceCents,
-          currentPriceCents,
-          valueUsd,
-          pnlUsd,
-          pnlPercent,
-          pnlPositive: pnlUsd >= 0,
-        });
-      }
-    }
-    return rows;
+    return flattenPositions(positions);
   }, [positions]);
 
   if (isLoading && !positions) return null;
@@ -123,7 +74,7 @@ export function PortfolioPositions() {
                 <TableCell className="text-center px-4 py-4">
                   <div className="flex flex-col">
                     <span className="text-sm font-sans font-bold text-white">
-                      {formatNumber(pos.shares, 0, 0)}
+                      {formatNumber(pos.quantity, 0, 0)}
                     </span>
                     <span
                       className={`text-sm font-sans font-bold uppercase tracking-widest ${
@@ -135,13 +86,13 @@ export function PortfolioPositions() {
                   </div>
                 </TableCell>
                 <TableCell className="text-center text-sm font-sans font-bold text-white px-4 py-4">
-                  {formatNumber(pos.avgPriceCents, 1, 1)}¢
+                  {formatCents(pos.avgPrice)}¢
                 </TableCell>
                 <TableCell className="text-center text-sm font-sans font-bold text-white px-4 py-4">
-                  {formatNumber(pos.currentPriceCents, 1, 1)}¢
+                  {formatCents(pos.currentPrice)}¢
                 </TableCell>
                 <TableCell className="text-center text-sm font-sans font-bold text-white px-4 py-4">
-                  ${formatNumber(pos.valueUsd, 2, 2)}
+                  {formatCurrency(pos.value)}
                 </TableCell>
                 <TableCell
                   className={`text-center px-4 py-4 ${
@@ -150,7 +101,7 @@ export function PortfolioPositions() {
                 >
                   <div className="flex flex-col">
                     <span className="text-sm font-sans font-bold">
-                      {pos.pnlPositive ? "+" : "-"}${formatNumber(Math.abs(pos.pnlUsd), 2, 2)}
+                      {pos.pnlPositive ? "+" : "-"}{formatCurrency(pos.pnl < BigInt(0) ? -pos.pnl : pos.pnl)}
                     </span>
                     <span className="text-sm font-sans font-bold">
                       ({pos.pnlPositive ? "+" : "-"}{formatNumber(Math.abs(pos.pnlPercent), 1, 1)}%)

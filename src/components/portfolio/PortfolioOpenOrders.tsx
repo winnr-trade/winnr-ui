@@ -1,13 +1,11 @@
 "use client";
 
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { useCancelOrder } from "@/api/orderbook/cancelOrder";
 import { type UserOrder, useGetUserOrders } from "@/api/orderbook/getUserOrders";
 import { Button } from "@/components/ui/button";
-import { useMainWallet } from "@/hooks/useMainWallet";
-import { formatCents, formatNumber } from "@/utils";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -16,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useMainWallet } from "@/hooks/useMainWallet";
+import { formatCents, formatNumber } from "@/utils";
 
 export function PortfolioOpenOrders() {
   const { address } = useMainWallet();
@@ -65,20 +65,24 @@ export function PortfolioOpenOrders() {
           <TableBody>
             {isLoading ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={7} className="p-12 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse">
+                <TableCell
+                  colSpan={7}
+                  className="p-12 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse"
+                >
                   Loading orders...
                 </TableCell>
               </TableRow>
             ) : openOrders.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={7} className="p-12 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground">
+                <TableCell
+                  colSpan={7}
+                  className="p-12 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground"
+                >
                   No open orders
                 </TableCell>
               </TableRow>
             ) : (
-              openOrders.map((order) => (
-                <OrderItem key={order.id} order={order} />
-              ))
+              openOrders.map((order) => <OrderItem key={order.id} order={order} />)
             )}
           </TableBody>
         </Table>
@@ -100,7 +104,7 @@ function OrderItem({ order }: { order: UserOrder }) {
   const handleCancelOrder = () => {
     toast.promise(cancelOrder.mutateAsync({ orderId: order.id }), {
       loading: "Canceling order...",
-      success: "Order canceled successfully",
+      success: "Order cancelled successfully",
       error: (err: Error) => `Failed to cancel order: ${err.message}`,
     });
   };
@@ -109,7 +113,7 @@ function OrderItem({ order }: { order: UserOrder }) {
     <TableRow className="border-b border-border/50 hover:bg-surface-container transition-colors group">
       <TableCell className="px-4 py-4 w-[20%]">
         <div className="flex items-start justify-between gap-3">
-          <Link 
+          <Link
             href={`/markets/${order.marketId}`}
             className="group/link text-sm font-sans font-bold text-white hover:text-white transition-colors leading-tight"
           >
@@ -151,4 +155,3 @@ function OrderItem({ order }: { order: UserOrder }) {
     </TableRow>
   );
 }
-
