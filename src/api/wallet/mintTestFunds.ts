@@ -10,9 +10,11 @@ export function useMintTestFunds() {
       const response = await axios.post("/api/faucet", { address });
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("10,000 Test USDC minted successfully");
-      queryClient.invalidateQueries({ queryKey: ["balance"] });
+      // Allow rollup state to settle before refetching balance
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await queryClient.refetchQueries({ queryKey: ["balance"] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.error || error.message || "Failed to mint test funds";

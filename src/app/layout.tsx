@@ -4,6 +4,7 @@ import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletModal } from "@/components/wallet/WalletModal";
+import { AppInitializer } from "@/components/providers/AppInitializer";
 import QueryProvider from "@/providers/QueryProvider";
 import SolanaProvider from "@/providers/SolanaProvider";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
         <SolanaProvider>
           <QueryProvider>
             <TopNav />
+            <AppInitializer />
             <WalletModal />
             <Toaster />
             <main className="flex-1">{children}</main>
