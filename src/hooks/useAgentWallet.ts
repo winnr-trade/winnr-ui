@@ -3,12 +3,13 @@
 import { Keypair } from "@solana/web3.js";
 import { Ed25519Signer } from "@sovereign-sdk/signers";
 import { bytesToHex } from "@sovereign-sdk/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import bs58 from "bs58";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useGetAgentPolicy } from "@/api/agentWallet/getAgentPolicy";
 import { rollup } from "@/api/utils";
-import { useLocalStorage } from "./useLocalStorage";
+import { useAgentStore } from "@/store/useAgentStore";
 import { useMainWallet } from "./useMainWallet";
 
 export function useAgentWallet() {
@@ -18,12 +19,11 @@ export function useAgentWallet() {
     signMessage: mainSignMessage,
     connected,
   } = useMainWallet();
+  const queryClient = useQueryClient();
   const [isRegistering, setIsRegistering] = useState(false);
 
-  const [agentPrivateKey, setAgentPrivateKey] = useLocalStorage<string | null>(
-    ownerAddress ? `winnr_agent_key_${ownerAddress}` : "winnr_agent_key_temp",
-    null,
-  );
+  const { agentPrivateKeys, setAgentPrivateKey } = useAgentStore();
+  const agentPrivateKey = ownerAddress ? agentPrivateKeys[ownerAddress] : null;
 
   const { agentSigner, agentAddress } = useMemo(() => {
     if (!agentPrivateKey) return { agentSigner: null, agentAddress: null };
@@ -73,12 +73,12 @@ export function useAgentWallet() {
 
       // Generate a random keypair for the agent
       const agentKeypair = Keypair.generate();
-      const agentPrivateKey = bs58.encode(agentKeypair.secretKey);
-      const agentAddress = agentKeypair.publicKey.toBase58();
+      const newAgentPrivateKey = bs58.encode(agentKeypair.secretKey);
+      const newAgentAddress = agentKeypair.publicKey.toBase58();
 
       const seed = agentKeypair.secretKey.slice(0, 32);
       const seedHex = bytesToHex(seed);
-      const agentSigner = new Ed25519Signer(seedHex);
+      const newAgentSigner = new Ed25519Signer(seedHex);
 
       // Register agent address
       const scopesBinary = "11100000000000000000000000000000";
@@ -86,25 +86,35 @@ export function useAgentWallet() {
       const scopesHex = scopes.toString(16).padStart(8, "0");
       const expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 7; // 7 days in milliseconds
       const nonce = await rollup.agentWallet.getNonce({ owner: mainPublicKey.toBase58() });
-      const message = `Winnr Agent Wallet Registration\nagent: ${agentAddress}\nscopes: 0x${scopesHex}\nexpires_at: ${expiresAt}\nnonce: ${nonce}\nversion: 1`;
+      const message = `Winnr Agent Wallet Registration\nagent: ${newAgentAddress}\nscopes: 0x${scopesHex}\nexpires_at: ${expiresAt}\nnonce: ${nonce}\nversion: 1`;
       const encodedMessage = new TextEncoder().encode(message);
       const signature = await mainSignMessage(encodedMessage);
 
       await rollup.agentWallet.registerAgent(
         {
-          agent: agentAddress,
+          agent: newAgentAddress,
           scopes: scopes,
           expiresAt: expiresAt,
           nonce: nonce,
           owner: mainPublicKey.toBase58(),
           signature: signature,
         },
-        agentSigner,
+        newAgentSigner,
       );
 
-      setAgentPrivateKey(agentPrivateKey);
+      // Save the new agent key — this triggers a re-render with updated agentAddress/agentSigner
+      if (ownerAddress) {
+        setAgentPrivateKey(ownerAddress, newAgentPrivateKey);
+      }
 
-      await refetch();
+      // Seed the query cache with the policy we just registered.
+      // This avoids the race condition where refetch() fires before
+      // React propagates the new agentAddress through useMemo → useGetAgentPolicy.
+      queryClient.setQueryData(
+        ["agentPolicy", ownerAddress, newAgentAddress],
+        { expiresAt, scopes },
+      );
+
       toast.success("Trading session enabled successfully");
     } catch (error: any) {
       console.error("Failed to enable trading:", error);
