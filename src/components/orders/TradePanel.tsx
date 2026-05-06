@@ -130,7 +130,9 @@ export function TradePanel({ marketId }: TradePanelProps) {
 
         {/* Action Toggles: BUY/SELL & MARKET/LIMIT */}
         <div className="flex justify-between items-center">
-          <div className={`flex border rounded-none overflow-hidden transition-colors ${side === Side.Bid ? "border-emerald-500" : "border-destructive"}`}>
+          <div
+            className={`flex border rounded-none overflow-hidden transition-colors ${side === Side.Bid ? "border-emerald-500" : "border-destructive"}`}
+          >
             <label className="contents">
               <input type="radio" className="hidden" value={Side.Bid} {...register("side")} />
               <Button
@@ -308,9 +310,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
             <span className="text-xs font-sans text-muted-foreground">
               {side === Side.Bid ? "Cost to buy" : "Proceeds"}
             </span>
-            <span className="text-xs font-sans font-bold text-white">
-              ${formatUsd(totalCost)}
-            </span>
+            <span className="text-xs font-sans font-bold text-white">${formatUsd(totalCost)}</span>
           </div>
 
           <div className="flex justify-between items-center">
