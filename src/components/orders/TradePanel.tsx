@@ -341,8 +341,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
             type="button"
             onClick={enableTrading}
             disabled={isRegistering}
-            variant="secondary"
-            className="w-full h-12 border border-border rounded-none mt-2 tracking-[0.2em] font-sans font-bold text-[11px] uppercase transition-all shadow-none"
+            className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white border-0 rounded-none mt-2 tracking-[0.2em] font-sans font-bold text-[11px] uppercase transition-all shadow-none"
           >
             {isRegistering ? <Loader2 className="size-4 animate-spin" /> : "ENABLE TRADING"}
           </Button>
