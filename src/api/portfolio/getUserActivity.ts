@@ -22,20 +22,25 @@ export const getUserActivity = async (
       const isBuyer = trade.buyer.toLowerCase() === address.toLowerCase();
       const question = trade.question || `Market #${trade.market_id}`;
       const trimmedQuestion = question.length > 30 ? `${question.substring(0, 27)}...` : question;
+      const kind = trade.settlement_kind?.toLowerCase();
 
-      // In binary markets, if price is < 50 and you are buyer, you bought YES? 
-      // Actually, we should probably check what exactly happened.
-      // For now, let's assume if you are buyer, you bought shares.
+      let action: string;
+      if (kind === "mint_pair") {
+        action = "Minted Shares";
+      } else if (kind === "merge_pair") {
+        action = "Merged Shares";
+      } else {
+        action = isBuyer ? "Bought Shares" : "Sold Shares";
+      }
+
+      const totalValue = (trade.price * trade.quantity) / 10000;
       
       return {
         id: trade.id.toString(),
-        action: `${isBuyer ? "Bought" : "Sold"} shares`,
-        subtext: `${trimmedQuestion}`,
-        amount: `$${((trade.price * trade.quantity) / 10000).toFixed(2)}`,
-        amountPositive: !isBuyer, // Selling is positive (getting money), Buying is negative?
-        // Actually usually "amountPositive" in UI means green color.
-        // Let's stick to the convention used in getPortfolioData.ts: o.side === "ask" was true.
-        // o.side === "ask" means you are SELLING. So amountPositive = true for selling.
+        action,
+        subtext: trimmedQuestion,
+        amount: `$${totalValue.toFixed(2)}`,
+        amountPositive: !isBuyer, // Receiving money (selling/merging) is positive
         date: formatFullDate(new Date(trade.timestamp).getTime()),
         icon: isBuyer ? "plus" : "arrow-right-left",
       };

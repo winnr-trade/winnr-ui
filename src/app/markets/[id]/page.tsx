@@ -11,7 +11,6 @@ import {
   RulesAndResolution,
 } from "@/components/market";
 import {
-  MarketDepthChart,
   OpenOrdersList,
   OrderBook,
   TradePanel,
@@ -70,8 +69,7 @@ export default function MarketPage() {
             <TabsContent value="chart" className="pt-6">
               <MarketPriceChart marketId={marketId} />
             </TabsContent>
-            <TabsContent value="orderbook" className="pt-6 flex flex-col gap-6">
-              <MarketDepthChart marketId={marketId} />
+            <TabsContent value="orderbook" className="pt-6">
               <OrderBook marketId={marketId} />
             </TabsContent>
           </Tabs>
