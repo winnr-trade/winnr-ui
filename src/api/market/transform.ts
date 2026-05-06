@@ -1,5 +1,5 @@
 import type { Market, Resolver } from "@/types";
-import { calculateProbability, priceToUnits } from "@/utils";
+import { calculateProbability, priceBasisToUnits } from "@/utils";
 
 export const transformMarketResponse = (m: any): Market => {
   let resolver: Resolver;
@@ -13,9 +13,8 @@ export const transformMarketResponse = (m: any): Market => {
     resolver = { type: "unknown", config: {} };
   }
 
-  const bestBid = m.bestBid ? priceToUnits(m.bestBid, 6) : null;
-  const bestAsk = m.bestAsk ? priceToUnits(m.bestAsk, 6) : null;
-
+  const bestBid = m.bestBid ? priceBasisToUnits(m.bestBid, 6) : null;
+  const bestAsk = m.bestAsk ? priceBasisToUnits(m.bestAsk, 6) : null;
   const probability = calculateProbability(bestBid, bestAsk);
 
   return {

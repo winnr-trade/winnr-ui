@@ -2,11 +2,12 @@ export interface PortfolioPosition {
   marketId: number;
   question: string;
   outcome?: string;
-  yesShares: number;
-  noShares: number;
-  avgPriceYes?: number;
-  avgPriceNo?: number;
-  latestMidPrice?: number;
+  quantityYes: number;
+  quantityNo: number;
+  totalCostYes: bigint;
+  totalCostNo: bigint;
+  bestBid: bigint | null;
+  bestAsk: bigint | null;
 }
 
 export interface PortfolioActivity {

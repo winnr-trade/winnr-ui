@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
-import { priceToUnits } from "@/utils";
+import { priceBasisToUnits } from "@/utils";
 
 export type OrderbookItem = [bigint, number]; // [price, size]
 export type OrderbookData = {
@@ -34,8 +34,14 @@ export function useOrderbook(params: { marketId: number }) {
 
         if (data.yes_bids && data.yes_asks) {
           setOrderbook({
-            bids: data.yes_bids.map((bid: [number, number]) => [priceToUnits(bid[0], 6), bid[1]]),
-            asks: data.yes_asks.map((ask: [number, number]) => [priceToUnits(ask[0], 6), ask[1]]),
+            bids: data.yes_bids.map((bid: [number, number]) => [
+              priceBasisToUnits(bid[0], 6),
+              bid[1],
+            ]),
+            asks: data.yes_asks.map((ask: [number, number]) => [
+              priceBasisToUnits(ask[0], 6),
+              ask[1],
+            ]),
           });
         }
       } catch (err) {

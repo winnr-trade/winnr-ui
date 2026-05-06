@@ -7,8 +7,6 @@ import { transformMarketResponse } from "./transform";
 
 export const getMarketDetail = async (id: number): Promise<Market> => {
   const m = await http.get(`/markets/${id}`).then((res) => keysToCamelCase(res.data.data));
-  console.log("m", m);
-
   return transformMarketResponse(m);
 };
 

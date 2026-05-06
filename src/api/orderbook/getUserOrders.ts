@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { rollup } from "@/api/utils";
-import { priceToUnits } from "@/utils";
+import { priceBasisToUnits } from "@/utils";
 
 export interface UserOrder {
   id: number;
@@ -29,7 +29,7 @@ export const getUserOrders = async (userAddress?: string, marketId?: number) => 
     outcome: order.outcome,
     side: order.side,
     canonicalSide: order.canonical_side,
-    canonicalPrice: priceToUnits(order.canonical_price, 6),
+    canonicalPrice: priceBasisToUnits(order.canonical_price, 6),
     originalQuantity: order.original_quantity,
     remainingQuantity: order.remaining_quantity,
     owner: order.owner,

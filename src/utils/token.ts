@@ -75,9 +75,13 @@ export function formatCents(value: number | string | bigint): string {
 }
 
 /** Converts 4-digit price units to base units of a given decimal (e.g. 4753, 6 -> 475300) */
-export function priceToUnits(price: number | string | bigint, decimals: number): bigint {
+export function priceBasisToUnits(price: number | string | bigint, decimals: number): bigint {
   const multiplier = BigInt(10) ** BigInt(Math.max(0, decimals - 4));
   return BigInt(price) * multiplier;
+}
+
+export function priceBasisToUsd(price: number | string | bigint): bigint {
+  return priceBasisToUnits(price, 6);
 }
 
 /** Converts base units of a given decimal back to 4-digit price units (e.g. 475300, 6 -> 4753) */
