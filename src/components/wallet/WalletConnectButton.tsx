@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Coins, Copy, LogOut, Wallet } from "lucide-react";
+import { ChevronDown, Coins, Copy, LogOut, Shield, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGetBalance } from "@/api/wallet/getBalance";
@@ -17,6 +17,7 @@ import { tokens } from "@/config/constants";
 import { useAgentWallet } from "@/hooks/useAgentWallet";
 import { useMainWallet } from "@/hooks/useMainWallet";
 import { useWalletUIStore } from "@/store/useWalletUIStore";
+import { Switch } from "@/components/ui/switch";
 import { formatBalance, truncateAddress } from "@/utils";
 
 export function WalletConnectButton() {
@@ -177,6 +178,28 @@ export function WalletConnectButton() {
                 </span>
               </div>
             </DropdownMenuItem>
+
+            <div className="h-px bg-border/30 my-1 mx-2" />
+
+            <div className="px-3 py-3 flex items-center justify-between group opacity-80 cursor-not-allowed">
+              <div className="flex items-center gap-4">
+                <div className="size-8 rounded-none border border-violet-500/20 flex items-center justify-center bg-violet-500/5">
+                  <Shield className="size-5 text-violet-400" />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-sans font-bold uppercase tracking-[0.15em] text-violet-300">
+                    Private Mode
+                  </span>
+                  <span className="text-[10px] text-muted-foreground normal-case tracking-normal font-medium opacity-70">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+              <Switch 
+                disabled 
+                className="data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]" 
+              />
+            </div>
 
             <div className="h-px bg-border/30 my-1 mx-2" />
 
