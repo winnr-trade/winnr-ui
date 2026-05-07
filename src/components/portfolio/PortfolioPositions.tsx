@@ -101,10 +101,12 @@ export function PortfolioPositions() {
                 >
                   <div className="flex flex-col">
                     <span className="text-sm font-sans font-bold">
-                      {pos.pnlPositive ? "+" : "-"}{formatCurrency(pos.pnl < BigInt(0) ? -pos.pnl : pos.pnl)}
+                      {pos.pnlPositive ? "+" : "-"}
+                      {formatCurrency(pos.pnl < BigInt(0) ? -pos.pnl : pos.pnl)}
                     </span>
                     <span className="text-sm font-sans font-bold">
-                      ({pos.pnlPositive ? "+" : "-"}{formatNumber(Math.abs(pos.pnlPercent), 1, 1)}%)
+                      ({pos.pnlPositive ? "+" : "-"}
+                      {formatNumber(Math.abs(pos.pnlPercent), 1, 1)}%)
                     </span>
                   </div>
                 </TableCell>
@@ -136,4 +138,3 @@ export function PortfolioPositions() {
     </div>
   );
 }
-

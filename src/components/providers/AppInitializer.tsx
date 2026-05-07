@@ -7,9 +7,5 @@ export function AppInitializer() {
   // Initialize global side effects
   useFaucetAutoOpen();
 
-  return (
-    <>
-      <FaucetModal />
-    </>
-  );
+  return <FaucetModal />;
 }

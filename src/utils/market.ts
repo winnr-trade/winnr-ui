@@ -113,11 +113,9 @@ export function getPortfolioSummary(balance: bigint, positions: PortfolioPositio
   const { totalPositionValue, totalPnl } = aggregatePositions(positions);
   const totalValue = balance + totalPositionValue;
   const basis = totalValue - totalPnl;
-  
+
   // Calculate PnL % with 2 decimal places of precision before converting to Number
-  const pnlPercent = basis > BigInt(0) 
-    ? Number((totalPnl * BigInt(10000)) / basis) / 100 
-    : 0;
+  const pnlPercent = basis > BigInt(0) ? Number((totalPnl * BigInt(10000)) / basis) / 100 : 0;
 
   return {
     totalValue,
@@ -154,7 +152,8 @@ export function flattenPositions(positions: PortfolioPosition[]): FlattenedPosit
       const avg = avgPrice(pos.totalCostYes, pos.quantityYes);
       const value = BigInt(pos.quantityYes) * midPrice;
       const pnl = (midPrice - avg) * BigInt(pos.quantityYes);
-      const pnlPercent = avg > BigInt(0) ? Number(((midPrice - avg) * BigInt(10000)) / avg) / 100 : 0;
+      const pnlPercent =
+        avg > BigInt(0) ? Number(((midPrice - avg) * BigInt(10000)) / avg) / 100 : 0;
 
       rows.push({
         id: `${pos.marketId}-yes`,

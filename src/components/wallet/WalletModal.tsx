@@ -36,11 +36,11 @@ export function WalletModal() {
     <Dialog open={isModalOpen} onOpenChange={closeModal}>
       <DialogContent className="sm:max-w-[440px] bg-surface-container/95 backdrop-blur-2xl border border-white/5 rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.6)] p-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20" />
-        
+
         <DialogHeader className="p-8 pb-6 text-center relative overflow-hidden">
           {/* Subtle background light */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 size-40 bg-primary/5 rounded-full blur-3xl" />
-          
+
           <DialogTitle className="text-2xl font-heading font-black text-center mb-2 text-white tracking-tighter relative z-10">
             CONNECT WALLET
           </DialogTitle>
@@ -51,7 +51,7 @@ export function WalletModal() {
 
         <div className="flex flex-col gap-2 p-6 pt-0 relative z-10">
           <div className="h-px bg-gradient-to-r from-transparent via-border/30 to-transparent mb-4" />
-          
+
           {wallets.length === 0 ? (
             <div className="text-center text-muted-foreground py-12 px-4 font-sans text-sm border border-dashed border-border/50 bg-white/[0.01]">
               No wallets detected. Please install a Solana wallet.
@@ -78,7 +78,7 @@ export function WalletModal() {
                       className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
                     />
                   </div>
-                  
+
                   <div className="flex flex-col items-start gap-0.5">
                     <span className="font-bold text-base font-heading tracking-tight text-white/90 group-hover:text-white transition-colors">
                       {wallet.adapter.name}
@@ -90,11 +90,13 @@ export function WalletModal() {
 
                   {connecting && wallet.readyState === "Installed" && (
                     <div className="ml-auto flex items-center gap-2">
-                      <span className="text-[10px] font-sans uppercase font-bold text-primary tracking-widest animate-pulse">Connecting</span>
+                      <span className="text-[10px] font-sans uppercase font-bold text-primary tracking-widest animate-pulse">
+                        Connecting
+                      </span>
                       <Loader2 className="size-4 animate-spin text-primary" />
                     </div>
                   )}
-                  
+
                   {wallet.readyState === "Installed" && !connecting && (
                     <div className="ml-auto">
                       <div className="size-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(255,255,255,0.5)]"></div>

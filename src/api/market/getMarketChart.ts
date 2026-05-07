@@ -20,7 +20,6 @@ export const getMarketChart = async (
     case "1w":
       startTime = now - 7 * 24 * 60 * 60 * 1000;
       break;
-    case "all":
     default:
       startTime = undefined; // No filter, fetch everything (limited by indexer limit)
       break;

@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,14 +19,7 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({
-  title,
-  description,
-  isOpen,
-  onClose,
-  children,
-  className,
-}: ModalProps) {
+export function Modal({ title, description, isOpen, onClose, children, className }: ModalProps) {
   const onChange = (open: boolean) => {
     if (!open) {
       onClose();
@@ -35,7 +28,12 @@ export function Modal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogContent className={cn("max-w-md bg-surface-container border-border rounded-none shadow-2xl", className)}>
+      <DialogContent
+        className={cn(
+          "max-w-md bg-surface-container border-border rounded-none shadow-2xl",
+          className,
+        )}
+      >
         {(title || description) && (
           <DialogHeader className="mb-4">
             {title && (

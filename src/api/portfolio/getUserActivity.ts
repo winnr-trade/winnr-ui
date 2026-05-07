@@ -34,7 +34,7 @@ export const getUserActivity = async (
       }
 
       const totalValue = (trade.price * trade.quantity) / 10000;
-      
+
       return {
         id: trade.id.toString(),
         action,

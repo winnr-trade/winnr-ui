@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useCancelOrder } from "@/api/orderbook/cancelOrder";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Coins, Copy, LogOut, ShieldCheck, Wallet } from "lucide-react";
+import { ChevronDown, Coins, Copy, LogOut, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGetBalance } from "@/api/wallet/getBalance";
@@ -158,7 +158,6 @@ export function WalletConnectButton() {
           </div>
 
           <div className="p-1 space-y-0.5">
-
             <DropdownMenuItem
               className="flex items-center gap-4 px-3 py-3 text-[11px] font-sans font-bold uppercase tracking-[0.15em] cursor-pointer hover:bg-primary/10 focus:bg-primary/10 text-white transition-all rounded-none outline-none group"
               onClick={() => handleMintTestUSDC()}

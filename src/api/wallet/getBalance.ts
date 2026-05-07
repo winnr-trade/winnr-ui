@@ -13,7 +13,10 @@ export const useGetBalance = (params: { address?: string; tokenId?: string }) =>
   tokenId = tokenId || usdcTokenId;
   return useQuery({
     queryKey: ["balance", address, tokenId],
-    queryFn: () => getBalance(address!, tokenId!),
+    queryFn: () => {
+      if (!address || !tokenId) throw new Error("Missing address or tokenId");
+      return getBalance(address, tokenId);
+    },
     enabled: !!address, // only run query if address exists
   });
 };

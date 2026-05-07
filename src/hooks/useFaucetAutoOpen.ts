@@ -12,16 +12,16 @@ export function useFaucetAutoOpen() {
   const hasCheckedRef = useRef(false);
 
   useEffect(() => {
-    // Only run this logic once when the component using this hook mounts 
+    // Only run this logic once when the component using this hook mounts
     // AND we have a successful balance fetch
     if (connected && isSuccess && balance !== undefined && !hasCheckedRef.current) {
       // 100 USDC threshold (assuming 6 decimals)
       const threshold = BigInt(100) * BigInt(10 ** 6);
-      
+
       if (balance < threshold) {
         openFaucetModal();
       }
-      
+
       hasCheckedRef.current = true;
     }
   }, [connected, isSuccess, balance, openFaucetModal]);

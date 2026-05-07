@@ -21,7 +21,7 @@ export function FaucetModal() {
     try {
       await mintTestFunds.mutateAsync(address);
       closeFaucetModal();
-    } catch (error) {
+    } catch (_error) {
       // Error is handled by the mutation toast
     }
   };

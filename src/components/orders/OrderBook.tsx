@@ -17,26 +17,32 @@ export function OrderBook({ marketId }: OrderBookProps) {
   const processedAsks = [...asks]
     .sort((a, b) => (a[0] < b[0] ? -1 : 1))
     .slice(0, 15)
-    .reduce((acc, [price, size], i) => {
-      const prevTotal = i === 0 ? 0 : acc[i - 1].total;
-      acc.push({ price, size, total: prevTotal + size });
-      return acc;
-    }, [] as { price: bigint; size: number; total: number }[]);
+    .reduce(
+      (acc, [price, size], i) => {
+        const prevTotal = i === 0 ? 0 : acc[i - 1].total;
+        acc.push({ price, size, total: prevTotal + size });
+        return acc;
+      },
+      [] as { price: bigint; size: number; total: number }[],
+    );
 
   // Process BIDS: highest to lowest, calculate cumulative depth
   const processedBids = [...bids]
     .sort((a, b) => (a[0] < b[0] ? 1 : -1))
     .slice(0, 15)
-    .reduce((acc, [price, size], i) => {
-      const prevTotal = i === 0 ? 0 : acc[i - 1].total;
-      acc.push({ price, size, total: prevTotal + size });
-      return acc;
-    }, [] as { price: bigint; size: number; total: number }[]);
+    .reduce(
+      (acc, [price, size], i) => {
+        const prevTotal = i === 0 ? 0 : acc[i - 1].total;
+        acc.push({ price, size, total: prevTotal + size });
+        return acc;
+      },
+      [] as { price: bigint; size: number; total: number }[],
+    );
 
   const maxTotal = Math.max(
     processedAsks.length > 0 ? processedAsks[processedAsks.length - 1].total : 0,
     processedBids.length > 0 ? processedBids[processedBids.length - 1].total : 0,
-    1 // Avoid division by zero
+    1, // Avoid division by zero
   );
 
   const yesPercent = probability;

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
+import { AppInitializer } from "@/components/providers/AppInitializer";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletModal } from "@/components/wallet/WalletModal";
-import { AppInitializer } from "@/components/providers/AppInitializer";
 import QueryProvider from "@/providers/QueryProvider";
 import SolanaProvider from "@/providers/SolanaProvider";
 

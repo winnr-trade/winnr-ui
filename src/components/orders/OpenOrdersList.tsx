@@ -5,10 +5,6 @@ import { useCancelOrder } from "@/api/orderbook/cancelOrder";
 import { type UserOrder, useGetUserOrders } from "@/api/orderbook/getUserOrders";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Heading } from "@/components/ui/typography";
-import { useMainWallet } from "@/hooks/useMainWallet";
-import { formatCents, formatNumber } from "@/utils";
-
 import {
   Table,
   TableBody,
@@ -17,6 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Heading } from "@/components/ui/typography";
+import { useMainWallet } from "@/hooks/useMainWallet";
+import { formatCents, formatNumber } from "@/utils";
 
 interface OpenOrdersListProps {
   marketId: number;
@@ -72,20 +71,24 @@ export function OpenOrdersList({ marketId }: OpenOrdersListProps) {
           <TableBody>
             {isLoading ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="p-8 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse">
+                <TableCell
+                  colSpan={5}
+                  className="p-8 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground animate-pulse"
+                >
                   Loading orders...
                 </TableCell>
               </TableRow>
             ) : openOrders.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="p-8 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="p-8 text-center text-xs tracking-widest uppercase font-sans text-muted-foreground"
+                >
                   No open orders
                 </TableCell>
               </TableRow>
             ) : (
-              openOrders.map((order) => (
-                <OrderItem key={order.id} order={order} />
-              ))
+              openOrders.map((order) => <OrderItem key={order.id} order={order} />)
             )}
           </TableBody>
         </Table>
@@ -107,7 +110,7 @@ function OrderItem({ order }: { order: UserOrder }) {
   const handleCancelOrder = () => {
     toast.promise(cancelOrder.mutateAsync({ orderId: order.id }), {
       loading: "Canceling order...",
-      success: "Order canceled successfully",
+      success: "Order cancelled successfully",
       error: (err: Error) => `Failed to cancel order: ${err.message}`,
     });
   };
@@ -150,4 +153,3 @@ function OrderItem({ order }: { order: UserOrder }) {
     </TableRow>
   );
 }
-

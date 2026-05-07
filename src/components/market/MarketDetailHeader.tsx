@@ -1,6 +1,5 @@
-import * as React from "react";
 import { Calendar, Share2 } from "lucide-react";
-import { toast } from "sonner";
+import * as React from "react";
 import { useMarketDetail } from "@/api/market";
 import { IconButton } from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";

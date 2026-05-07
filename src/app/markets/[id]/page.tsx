@@ -10,12 +10,7 @@ import {
   RecentActivity,
   RulesAndResolution,
 } from "@/components/market";
-import {
-  OpenOrdersList,
-  OrderBook,
-  TradePanel,
-  YourPosition,
-} from "@/components/orders";
+import { OpenOrdersList, OrderBook, TradePanel, YourPosition } from "@/components/orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function MarketPage() {

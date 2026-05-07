@@ -110,10 +110,10 @@ export function useAgentWallet() {
       // Seed the query cache with the policy we just registered.
       // This avoids the race condition where refetch() fires before
       // React propagates the new agentAddress through useMemo → useGetAgentPolicy.
-      queryClient.setQueryData(
-        ["agentPolicy", ownerAddress, newAgentAddress],
-        { expiresAt, scopes },
-      );
+      queryClient.setQueryData(["agentPolicy", ownerAddress, newAgentAddress], {
+        expiresAt,
+        scopes,
+      });
 
       toast.success("Trading session enabled successfully");
     } catch (error: any) {
