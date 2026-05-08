@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     const client = new RollupClient(rollupEndpoint, rollupChainId);
     const signer = new Ed25519Signer(minterKey);
-    const amount = parseUsd(10000);
+    const amount = parseUsd(5000);
 
     const callMessage = {
       bank: {

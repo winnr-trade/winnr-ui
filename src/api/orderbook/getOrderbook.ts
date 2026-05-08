@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
+import { rollupWsUrl } from "@/config/env";
 import { priceBasisToUnits } from "@/utils";
 
 export type OrderbookItem = [bigint, number]; // [price, size]
@@ -17,7 +18,7 @@ export function useOrderbook(params: { marketId: number }) {
     if (!Number.isFinite(marketId)) return;
 
     const ws = new ReconnectingWebSocket(
-      `ws://localhost:12346/modules/orderbook/ws?market_id=${marketId}`,
+      `${rollupWsUrl}/modules/orderbook/ws?market_id=${marketId}`,
     );
 
     ws.addEventListener("open", () => {
