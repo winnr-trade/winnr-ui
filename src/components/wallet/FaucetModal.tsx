@@ -8,7 +8,7 @@ import { Modal } from "@/components/ui/modal";
 import { tokens } from "@/config/constants";
 import { useMainWallet } from "@/hooks/useMainWallet";
 import { useWalletUIStore } from "@/store/useWalletUIStore";
-import { formatBalance } from "@/utils";
+import { formatBalance, parseUsd } from "@/utils";
 
 export function FaucetModal() {
   const { address, connected } = useMainWallet();
@@ -27,6 +27,7 @@ export function FaucetModal() {
   };
 
   const formattedBalance = balance ? formatBalance(balance, tokens.usdc.decimals) : "0.00";
+  const isBalanceTooHigh = balance !== undefined && balance >= parseUsd(500);
 
   return (
     <Modal
@@ -67,8 +68,8 @@ export function FaucetModal() {
           <div className="w-full flex flex-col gap-4">
             <Button
               onClick={handleMint}
-              disabled={mintTestFunds.isPending || !connected}
-              className="relative w-full h-14 bg-primary hover:bg-primary/90 text-black font-sans font-bold text-[10px] tracking-[0.2em] uppercase rounded-none border-0 overflow-hidden group transition-all duration-300 active:scale-95 shadow-[0_10px_20px_rgba(var(--primary-rgb),0.1)]"
+              disabled={mintTestFunds.isPending || !connected || isBalanceTooHigh}
+              className="relative w-full h-14 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:grayscale text-black font-sans font-bold text-[10px] tracking-[0.2em] uppercase rounded-none border-0 overflow-hidden group transition-all duration-300 active:scale-95 shadow-[0_10px_20px_rgba(var(--primary-rgb),0.1)]"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <span className="relative z-10 flex items-center justify-center gap-2.5">
@@ -80,7 +81,7 @@ export function FaucetModal() {
                 ) : (
                   <>
                     <Coins className="size-3.5" />
-                    CLAIM 10,000 USDC
+                    CLAIM 5,000 USDC
                   </>
                 )}
               </span>

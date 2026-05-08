@@ -13,12 +13,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { IconButton } from "@/components/ui/icon-button";
+import { Switch } from "@/components/ui/switch";
 import { tokens } from "@/config/constants";
 import { useAgentWallet } from "@/hooks/useAgentWallet";
 import { useMainWallet } from "@/hooks/useMainWallet";
 import { useWalletUIStore } from "@/store/useWalletUIStore";
-import { Switch } from "@/components/ui/switch";
-import { formatBalance, truncateAddress } from "@/utils";
+import { formatBalance, parseUsd, truncateAddress } from "@/utils";
 
 export function WalletConnectButton() {
   const { address, connected, publicKey, disconnect } = useMainWallet();
@@ -61,6 +61,7 @@ export function WalletConnectButton() {
     const keyString = publicKey.toBase58();
     const truncatedKey = truncateAddress(keyString);
     const formattedBalance = balance ? formatBalance(balance, tokens.usdc.decimals) : "0.00";
+    const isBalanceTooHigh = balance !== undefined && balance >= parseUsd(100);
 
     return (
       <DropdownMenu>
@@ -160,9 +161,9 @@ export function WalletConnectButton() {
 
           <div className="p-1 space-y-0.5">
             <DropdownMenuItem
-              className="flex items-center gap-4 px-3 py-3 text-[11px] font-sans font-bold uppercase tracking-[0.15em] cursor-pointer hover:bg-primary/10 focus:bg-primary/10 text-white transition-all rounded-none outline-none group"
+              className="flex items-center gap-4 px-3 py-3 text-[11px] font-sans font-bold uppercase tracking-[0.15em] cursor-pointer hover:bg-primary/10 focus:bg-primary/10 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-none outline-none group"
               onClick={() => handleMintTestUSDC()}
-              disabled={mintTestFunds.isPending}
+              disabled={mintTestFunds.isPending || isBalanceTooHigh}
             >
               <div className="size-8 rounded-none border border-primary/20 flex items-center justify-center bg-primary/5 group-hover:bg-primary/20 transition-colors">
                 <Coins
@@ -195,9 +196,9 @@ export function WalletConnectButton() {
                   </span>
                 </div>
               </div>
-              <Switch 
-                disabled 
-                className="data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]" 
+              <Switch
+                disabled
+                className="data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]"
               />
             </div>
 
