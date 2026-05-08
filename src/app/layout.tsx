@@ -27,7 +27,6 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Winnr",
   description: "Winnr - Home Of Information Markets",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -38,6 +37,26 @@ export const metadata: Metadata = {
   },
   icons: {
     apple: "/icon-512x512.png",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Winnr",
+    title: "Winnr",
+    description: "Winnr - Home Of Information Markets",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Winnr",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Winnr",
+    description: "Winnr - Home Of Information Markets",
+    images: ["/og.png"],
   },
 };
 
