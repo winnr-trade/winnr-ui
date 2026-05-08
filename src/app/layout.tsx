@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
+import { Footer } from "@/components/layout/Footer";
 import { AppInitializer } from "@/components/providers/AppInitializer";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletModal } from "@/components/wallet/WalletModal";
@@ -46,6 +47,7 @@ export default function RootLayout({
             <WalletModal />
             <Toaster />
             <main className="flex-1">{children}</main>
+            <Footer />
           </QueryProvider>
         </SolanaProvider>
       </body>
