@@ -22,11 +22,8 @@ export function TopNav() {
   return (
     <nav className="flex items-center justify-between px-6 h-18 bg-background border-b border-border">
       <div className="flex items-center gap-20 h-full">
-        <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-          <Logo className="w-8 h-8 text-primary" />
-          <span className="text-xl font-heading font-extrabold text-foreground tracking-tight lowercase">
-            winnr
-          </span>
+        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Logo className="h-7" />
         </Link>
         <div className="hidden md:flex items-center gap-10 h-full">
           <Link href="/" className={getLinkClasses("/")}>
