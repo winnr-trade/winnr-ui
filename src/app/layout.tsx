@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { TopNav } from "@/components/layout/TopNav";
 import { Footer } from "@/components/layout/Footer";
+import { TopNav } from "@/components/layout/TopNav";
 import { AppInitializer } from "@/components/providers/AppInitializer";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletModal } from "@/components/wallet/WalletModal";
@@ -26,8 +26,30 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Winnr",
-  description: "Winnr - Predict Like A Winnr.",
+  description: "Winnr - Home Of Information Markets",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Winnr",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: "/icon-512x512.png",
+  },
 };
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#00BB7E",
+};
+
+import { SerwistProvider } from "@serwist/turbopack/react";
 
 export default function RootLayout({
   children,
@@ -42,12 +64,14 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <SolanaProvider>
           <QueryProvider>
-            <TopNav />
-            <AppInitializer />
-            <WalletModal />
-            <Toaster />
-            <main className="flex-1">{children}</main>
-            <Footer />
+            <SerwistProvider swUrl="/serwist/sw.js">
+              <TopNav />
+              <AppInitializer />
+              <WalletModal />
+              <Toaster />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </SerwistProvider>
           </QueryProvider>
         </SolanaProvider>
       </body>
