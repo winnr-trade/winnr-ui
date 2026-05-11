@@ -2,7 +2,7 @@
 
 User interface for the [winnr.trade](https://winnr.trade) web application (Live at [try.winnr.trade](https://try.winnr.trade)).
 
-## 🏁 Getting Started
+## Getting Started
 
 ### Prerequisites
 
