@@ -196,9 +196,9 @@ export function WalletConnectButton() {
                   </span>
                 </div>
               </div>
-              <Switch
-                disabled
-                className="data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]"
+              <Switch 
+                disabled 
+                className="data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]" 
               />
             </div>
 
