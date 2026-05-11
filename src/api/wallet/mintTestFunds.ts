@@ -11,7 +11,7 @@ export function useMintTestFunds() {
       return response.data;
     },
     onSuccess: async () => {
-      toast.success("10,000 Test USDC minted successfully");
+      toast.success("5,000 Test USDC minted successfully");
       // Allow rollup state to settle before refetching balance
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await queryClient.refetchQueries({ queryKey: ["balance"] });
