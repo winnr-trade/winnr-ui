@@ -49,7 +49,7 @@ export function OrderBook({ marketId }: OrderBookProps) {
   const noPercent = 100 - probability;
 
   return (
-    <Card className="bg-transparent border border-border rounded-none shadow-none p-6 h-full flex flex-col gap-6">
+    <Card className="bg-transparent border border-border rounded-none shadow-none p-4 h-full flex flex-col gap-4">
       <div className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
         ORDER BOOK SUMMARY
       </div>
@@ -67,10 +67,10 @@ export function OrderBook({ marketId }: OrderBookProps) {
       </div>
 
       {/* Two columns: BIDS | ASKS */}
-      <div className="grid grid-cols-2 gap-8 mt-2">
+      <div className="grid grid-cols-2 gap-4 mt-2">
         {/* YES BIDS */}
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between text-[9px] text-muted-foreground font-sans font-bold uppercase tracking-widest mb-2 border-b border-border pb-2">
+        <div className="flex flex-col">
+          <div className="flex justify-between text-[9px] text-muted-foreground font-sans font-bold uppercase tracking-widest mb-2 border-b border-border pb-2 px-1">
             <span>YES BIDS</span>
             <span>SIZE</span>
           </div>
@@ -80,11 +80,11 @@ export function OrderBook({ marketId }: OrderBookProps) {
           {processedBids.map((bid) => (
             <div
               key={`bid-${bid.price.toString()}`}
-              className="relative flex justify-between items-center text-[11px] font-sans h-7 px-1"
+              className="relative flex justify-between items-center text-[11px] font-sans h-6 px-1"
             >
               {/* Depth Bar (Right aligned, grows left) */}
               <div
-                className="absolute right-0 top-[2px] bottom-[2px] bg-emerald-500/10 transition-all duration-300"
+                className="absolute right-0 top-[1px] bottom-[1px] bg-emerald-500/10 transition-all duration-300"
                 style={{ width: `${(bid.total / maxTotal) * 100}%` }}
               />
               <span className="relative z-10 text-emerald-500 font-bold">
@@ -96,8 +96,8 @@ export function OrderBook({ marketId }: OrderBookProps) {
         </div>
 
         {/* YES ASKS */}
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between text-[9px] text-muted-foreground font-sans font-bold uppercase tracking-widest mb-2 border-b border-border pb-2">
+        <div className="flex flex-col">
+          <div className="flex justify-between text-[9px] text-muted-foreground font-sans font-bold uppercase tracking-widest mb-2 border-b border-border pb-2 px-1">
             <span>YES ASKS</span>
             <span>SIZE</span>
           </div>
@@ -107,11 +107,11 @@ export function OrderBook({ marketId }: OrderBookProps) {
           {processedAsks.map((ask) => (
             <div
               key={`ask-${ask.price.toString()}`}
-              className="relative flex justify-between items-center text-[11px] font-sans h-7 px-1"
+              className="relative flex justify-between items-center text-[11px] font-sans h-6 px-1"
             >
               {/* Depth Bar (Left aligned, grows right) */}
               <div
-                className="absolute left-0 top-[2px] bottom-[2px] bg-destructive/10 transition-all duration-300"
+                className="absolute left-0 top-[1px] bottom-[1px] bg-destructive/10 transition-all duration-300"
                 style={{ width: `${(ask.total / maxTotal) * 100}%` }}
               />
               <span className="relative z-10 text-destructive font-bold">

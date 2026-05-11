@@ -5,3 +5,7 @@ export const tokens = {
     symbol: "USDC",
   },
 };
+
+export const socials = {
+  x: "https://x.com/winnr_trade",
+};
