@@ -18,7 +18,6 @@ import { tokens } from "@/config/constants";
 import { useAgentWallet } from "@/hooks/useAgentWallet";
 import { useMainWallet } from "@/hooks/useMainWallet";
 import { useWalletUIStore } from "@/store/useWalletUIStore";
-import { useAppStore } from "@/store/useAppStore";
 import { formatBalance, parseUsd, truncateAddress } from "@/utils";
 
 export function WalletConnectButton() {
@@ -26,7 +25,6 @@ export function WalletConnectButton() {
   const { openModal } = useWalletUIStore();
   const { data: balance } = useGetBalance({ address: address ?? undefined });
   const { isActive: isAgentActive, enableTrading, isRegistering } = useAgentWallet();
-  const { isPrivateMode, togglePrivateMode } = useAppStore();
   const mintTestFunds = useMintTestFunds();
   const [mounted, setMounted] = useState(false);
 
@@ -70,10 +68,10 @@ export function WalletConnectButton() {
         <DropdownMenuTrigger
           nativeButton={false}
           render={
-            <div className={`flex items-center h-10 cursor-pointer group ${isPrivateMode ? "ring-2 ring-violet-500/40" : ""}`}>
-              <div className={`h-full px-4 flex items-center bg-surface-container-low border text-white font-mono text-xs font-bold gap-4 hover:bg-surface-container-high transition-all duration-300 relative overflow-hidden group ${isPrivateMode ? "border-violet-500/50 shadow-[inset_0_0_12px_rgba(139,92,246,0.1)]" : "border-border/50 hover:border-primary/30"}`}>
+            <div className="flex items-center h-10 cursor-pointer group">
+              <div className="h-full px-4 flex items-center bg-surface-container-low border border-border/50 text-white font-mono text-xs font-bold gap-4 hover:bg-surface-container-high hover:border-primary/30 transition-all duration-300 relative overflow-hidden group">
                 {/* Glow effect on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${isPrivateMode ? "from-violet-500/0 via-violet-500/10 to-violet-500/0" : "from-primary/0 via-primary/5 to-primary/0"} translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000`} />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
                 <div className="flex items-center gap-2.5 relative z-10">
                   <div className="relative">
@@ -184,27 +182,23 @@ export function WalletConnectButton() {
 
             <div className="h-px bg-border/30 my-1 mx-2" />
 
-            <div 
-              className="px-3 py-3 flex items-center justify-between group cursor-pointer hover:bg-violet-500/5 transition-colors"
-              onClick={() => {
-                const newState = !isPrivateMode;
-                togglePrivateMode();
-                toast.success(`Private Mode ${newState ? "Activated" : "Deactivated"}`);
-              }}
-            >
+            <div className="px-3 py-3 flex items-center justify-between group opacity-80 cursor-not-allowed">
               <div className="flex items-center gap-4">
-                <div className={`size-8 rounded-none border flex items-center justify-center transition-colors ${isPrivateMode ? "border-violet-500/60 bg-violet-500/20" : "border-violet-500/20 bg-violet-500/5"}`}>
-                  <Shield className={`size-5 transition-colors ${isPrivateMode ? "text-violet-400" : "text-violet-400/50"}`} />
+                <div className="size-8 rounded-none border border-violet-500/20 flex items-center justify-center bg-violet-500/5">
+                  <Shield className="size-5 text-violet-400" />
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <span className={`text-xs font-sans font-bold uppercase tracking-[0.15em] transition-colors ${isPrivateMode ? "text-violet-300" : "text-violet-300/50"}`}>
+                  <span className="text-xs font-sans font-bold uppercase tracking-[0.15em] text-violet-300">
                     Private Mode
+                  </span>
+                  <span className="text-[10px] text-muted-foreground normal-case tracking-normal font-medium opacity-70">
+                    Coming Soon
                   </span>
                 </div>
               </div>
               <Switch 
-                checked={isPrivateMode}
-                className="pointer-events-none data-checked:bg-violet-500 data-unchecked:bg-violet-950 border-violet-500/50 shadow-[0_0_12px_rgba(139,92,246,0.15)]" 
+                disabled 
+                className="data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]" 
               />
             </div>
 
@@ -228,11 +222,11 @@ export function WalletConnectButton() {
   return (
     <Button
       onClick={openModal}
-      className={`relative h-10 px-6 font-sans font-bold text-[10px] tracking-[0.2em] uppercase rounded-none border bg-surface-container-low text-white overflow-hidden group transition-all duration-300 hover:bg-surface-container-high shadow-[0_0_20px_rgba(0,0,0,0.3)] ${isPrivateMode ? "border-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.3)] text-violet-100" : "border-primary/20 hover:border-primary hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]"}`}
+      className="relative h-10 px-6 font-sans font-bold text-[10px] tracking-[0.2em] uppercase rounded-none border border-primary/20 bg-surface-container-low text-white overflow-hidden group transition-all duration-300 hover:border-primary hover:bg-surface-container-high shadow-[0_0_20px_rgba(0,0,0,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]"
     >
-      <div className={`absolute inset-0 bg-gradient-to-r ${isPrivateMode ? "from-violet-500/0 via-violet-500/20 to-violet-500/0" : "from-primary/0 via-primary/5 to-primary/0"} translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000`} />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
       <span className="relative z-10 flex items-center gap-2.5">
-        <Wallet className={`size-3.5 group-hover:scale-110 transition-transform duration-300 ${isPrivateMode ? "text-violet-400" : "text-primary"}`} />
+        <Wallet className="size-3.5 text-primary group-hover:scale-110 transition-transform duration-300" />
         CONNECT WALLET
       </span>
     </Button>
