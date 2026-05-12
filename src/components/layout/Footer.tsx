@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
-import { socials, docsLink } from "@/config/constants";
+import { docsLink, socials } from "@/config/constants";
 
 export function Footer() {
   return (

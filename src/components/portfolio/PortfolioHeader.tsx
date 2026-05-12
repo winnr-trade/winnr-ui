@@ -28,9 +28,9 @@ export function PortfolioHeader() {
               Coming Soon
             </span>
           </div>
-          <Switch 
-            disabled 
-            className="ml-4 data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]" 
+          <Switch
+            disabled
+            className="ml-4 data-unchecked:bg-violet-950 border-violet-500/50 data-disabled:opacity-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]"
           />
         </div>
         <Button className="bg-white text-black hover:bg-white/90 rounded-none h-12 px-6 font-sans font-bold text-[11px] uppercase tracking-[0.2em]">
