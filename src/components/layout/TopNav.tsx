@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
 import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
+import { docsLink } from "@/config/constants";
+import { MobileNav } from "./MobileNav";
 
 export function TopNav() {
   const pathname = usePathname();
@@ -35,11 +37,19 @@ export function TopNav() {
           <Link href="/stake" className={getLinkClasses("/stake")}>
             Stake
           </Link>
+          <a
+            href={docsLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-sans font-bold text-muted-foreground hover:text-foreground h-full flex items-center border-b-2 border-transparent tracking-widest uppercase transition-all"
+          >
+            Docs
+          </a>
         </div>
       </div>
-      <div className="flex items-center gap-6">
-        {/* Note: WalletConnectButton will be restyled globally via Button component */}
+      <div className="flex items-center gap-4">
         <WalletConnectButton />
+        <MobileNav />
       </div>
     </nav>
   );

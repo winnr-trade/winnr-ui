@@ -6,6 +6,8 @@ export const tokens = {
   },
 };
 
+export const docsLink = "https://docs.winnr.trade";
+
 export const socials = {
   x: "https://x.com/winnr_trade",
 };
