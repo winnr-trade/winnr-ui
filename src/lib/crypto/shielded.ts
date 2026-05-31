@@ -1,95 +1,84 @@
-import { hkdf } from '@noble/hashes/hkdf.js';
-import { sha256 } from '@noble/hashes/sha2.js';
-import { babyjubjub } from '@noble/curves/misc.js';
-import { bytesToNumberBE, numberToBytesBE } from '@noble/curves/utils';
-
-// ─── Constants ────────────────────────────────────────────────────────────────
+import { babyjubjub } from "@noble/curves/misc.js";
+import { bytesToNumberBE, numberToBytesBE } from "@noble/curves/utils";
+import { hkdf } from "@noble/hashes/hkdf.js";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { poseidonHash } from "./hash";
 
 const DOMAIN = "v1-winnr-shielded";
 const ORDER = babyjubjub.Point.CURVE().n;
 
 function modField(bytes: Uint8Array): Uint8Array {
-    const scalar = bytesToNumberBE(bytes) % ORDER;
-    return numberToBytesBE(scalar, 32);
+  const scalar = bytesToNumberBE(bytes) % ORDER;
+  return numberToBytesBE(scalar, 32);
 }
 
+export class ShieldedWallet {
+  /** 32-byte master secret — never expose this outside key-derivation code. */
+  readonly masterSecret: Uint8Array;
+  /** 32-byte spending key — authorises creating / nullifying notes. */
+  readonly spendKey: Uint8Array;
+  /** 32-byte viewing key — allows reading note contents without spending. */
+  readonly viewKey: Uint8Array;
+  /** 32-byte stealth secret — root for all stealth address derivation, derived
+   *  from spendKey (not masterSecret) to separate signing authority from
+   *  derivation root. */
+  readonly stealthSecret: Uint8Array;
+  /** poseidonHash of Point calc from spendKey scalar mul */
+  readonly address: bigint;
 
-
-/**
- * The message the user must sign with their main wallet to register a shielded
- * wallet.  The resulting signature is used as the entropy source for all key
- * derivations below.
- */
-export const shieldedRegistrationMessage = (walletAddress: string) =>
-    `Winnr Shielded Wallet Registration\nmain wallet: ${walletAddress}\nversion: 1`;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface ShieldedWallet {
-    /** 32-byte master secret — never expose this outside key-derivation code. */
+  constructor(params: {
     masterSecret: Uint8Array;
-    /** 32-byte spending key — authorises creating / nullifying notes. */
-    spendingKey: Uint8Array;
-    /** 32-byte viewing key — allows reading note contents without spending. */
-    viewingKey: Uint8Array;
-    /** 32-byte stealth secret — root for all stealth address derivation, derived
-     *  from spendingKey (not masterSecret) to separate signing authority from
-     *  derivation root. */
+    spendKey: Uint8Array;
+    viewKey: Uint8Array;
     stealthSecret: Uint8Array;
-}
+  }) {
+    this.masterSecret = params.masterSecret;
+    this.spendKey = params.spendKey;
+    this.viewKey = params.viewKey;
+    this.stealthSecret = params.stealthSecret;
 
-// ─── Derivation ───────────────────────────────────────────────────────────────
+    const spendKeyScalar = bytesToNumberBE(params.spendKey);
+    const p = babyjubjub.Point.BASE.multiply(spendKeyScalar);
+    this.address = poseidonHash([p.x, p.y]);
+  }
 
-/**
- * Derives a ShieldedWallet from the raw bytes of the signature
- *
- * Derivation tree (HKDF-SHA256):
- *
- *   signature
- *     └─ masterSecret  (IKM = signature,     salt = DOMAIN, info = "master")
- *          ├─ spendingKey (IKM = masterSecret, salt = DOMAIN, info = "spend")
- *          └─ viewingKey  (IKM = masterSecret, salt = DOMAIN, info = "view")
- */
-export const deriveShieldedWallet = (signature: Uint8Array): ShieldedWallet => {
+  /**
+   * Derivation tree (HKDF-SHA256):
+   *
+   *   masterSecret
+   *     ├─ spendKey     (IKM = masterSecret, salt = DOMAIN, info = "spend")
+   *     │    └─ stealthSecret (IKM = spendKey, salt = DOMAIN, info = "stealth")
+   *     └─ viewKey      (IKM = masterSecret, salt = DOMAIN, info = "view")
+   */
+  static fromMasterKey(masterSecret: Uint8Array): ShieldedWallet {
     const salt = new TextEncoder().encode(DOMAIN);
 
-    // Step 1 — master secret
-    const masterSecret = hkdf(
-        sha256,
-        signature,                            // IKM  — entropy source
-        salt,                                 // salt — fixed domain string
-        new TextEncoder().encode("master"),   // info — purpose label
-        32,
+    const spendKey = modField(
+      hkdf(sha256, masterSecret, salt, new TextEncoder().encode("spend"), 48),
     );
 
-    // Step 2 — spending key
-    const spendingKey = modField(hkdf(
-        sha256,
-        masterSecret,                         // IKM
-        salt,                                 // same salt
-        new TextEncoder().encode("spend"),    // different info → different output
-        48,
-    ));
-
-    // Step 3 — viewing key
-    const viewingKey = modField(hkdf(
-        sha256,
-        masterSecret,                         // IKM
-        salt,                                 // same salt
-        new TextEncoder().encode("view"),     // different info → different output
-        48,
-    ));
-
-    // Step 4 — stealth secret (root for all stealth address derivation)
-    // Derived from spendingKey, not masterSecret — separates signing authority
-    // from the derivation root used by stealth addresses.
-    const stealthSecret = hkdf(
-        sha256,
-        spendingKey,                          // IKM
-        salt,                                 // same salt
-        new TextEncoder().encode("stealth"),  // different info → different output
-        32,
+    const viewKey = modField(
+      hkdf(sha256, masterSecret, salt, new TextEncoder().encode("view"), 48),
     );
 
-    return { masterSecret, spendingKey, viewingKey, stealthSecret };
-};
+    const stealthSecret = hkdf(sha256, spendKey, salt, new TextEncoder().encode("stealth"), 32);
+
+    return new ShieldedWallet({
+      masterSecret,
+      spendKey,
+      viewKey,
+      stealthSecret,
+    });
+  }
+
+  /**
+   * Derives a full ShieldedWallet from a raw signature.
+   * Use this when creating the wallet for the first time.
+   * Use `fromMasterKey` when recovering from a stored masterSecret.
+   */
+  static fromSignature(signature: Uint8Array): ShieldedWallet {
+    const salt = new TextEncoder().encode(DOMAIN);
+    const masterSecret = hkdf(sha256, signature, salt, new TextEncoder().encode("master"), 32);
+    return ShieldedWallet.fromMasterKey(masterSecret);
+  }
+}
