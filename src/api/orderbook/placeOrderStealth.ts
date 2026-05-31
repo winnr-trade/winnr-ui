@@ -1,6 +1,6 @@
 import { numberToBytesBE } from "@noble/ciphers/utils.js";
 import { Keypair } from "@solana/web3.js";
-import type { Signer } from "@sovereign-sdk/signers";
+import { Ed25519Signer } from "@sovereign-sdk/signers";
 import { bytesToHex } from "@sovereign-sdk/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
@@ -42,7 +42,6 @@ export interface StealthOrderParams {
  */
 export const placeOrderStealth = async (
   params: StealthOrderParams,
-  signer: Signer,
   ctx: {
     mainAddress: string;
     shieldedWallet: ShieldedWallet;
@@ -100,6 +99,7 @@ export const placeOrderStealth = async (
 
   // --- 6. Submit to rollup ---
   const stealthAddress = Keypair.fromSeed(stealthPrivateKey).publicKey.toBase58();
+  const stealthSigner = new Ed25519Signer(bytesToHex(stealthPrivateKey));
 
   const root = `0x${bytesToHex(numberToBytesBE(tree.root, 32))}`;
   const commitment = `0x${bytesToHex(numberToBytesBE(publicInputs.outputCommitment, 32))}`;
@@ -122,7 +122,7 @@ export const placeOrderStealth = async (
       noteMemo: Array.from(noteMemo),
       detectionTag: detectionTagHex,
     },
-    signer,
+    stealthSigner,
   );
 };
 
@@ -163,7 +163,7 @@ export const usePlaceOrderStealth = () => {
         throw new Error("Main wallet is not connected.");
       }
 
-      return placeOrderStealth(params, signerRef.current, {
+      return placeOrderStealth(params, {
         mainAddress: mainAddressRef.current,
         shieldedWallet: walletRef.current,
         generateStealthParams: generateStealthParamsRef.current,
