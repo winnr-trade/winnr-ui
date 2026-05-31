@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useMarketDetail } from "@/api/market";
 import { useGetShieldedNote } from "@/api/notes";
-import { usePlaceOrderStealth } from "@/api/orderbook";
+import { usePlaceOrderStealthBuy, usePlaceOrderStealthSell } from "@/api/orderbook";
 import { usePlaceOrder } from "@/api/orderbook/placeOrder";
 import { useGetBalance } from "@/api/wallet/getBalance";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,8 @@ export function TradePanel({ marketId }: TradePanelProps) {
     shieldedWallet: isEnabled ? wallet : null,
   });
   const placeOrder = usePlaceOrder();
-  const placeOrderStealth = usePlaceOrderStealth();
+  const placeOrderStealthBuy = usePlaceOrderStealthBuy();
+  const placeOrderStealthSell = usePlaceOrderStealthSell();
 
   const {
     register,
@@ -110,7 +111,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
         orderType: values.orderType,
       });
     } else if (values.side === Side.Bid) {
-      orderPromise = placeOrderStealth.mutateAsync({
+      orderPromise = placeOrderStealthBuy.mutateAsync({
         marketId,
         outcome: values.outcome,
         side: values.side,
@@ -120,9 +121,14 @@ export function TradePanel({ marketId }: TradePanelProps) {
         orderType: values.orderType,
       });
     } else {
-      // --- Private SELL: normal placeOrder signed by the stealth key ---
-      // TODO: load stealth private key on the fly and pass custom signer
-      throw new Error("Private sell not yet implemented");
+      orderPromise = placeOrderStealthSell.mutateAsync({
+        marketId,
+        outcome: values.outcome,
+        price:
+          values.orderType === OrderType.Market ? currentPrice : parseCents(values.limitPrice || 0),
+        quantity: Math.floor(values.shares),
+        orderType: values.orderType,
+      });
     }
 
     toast.promise(orderPromise, {

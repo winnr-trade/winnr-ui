@@ -3,4 +3,5 @@ export * from "./getBuyQuote";
 export * from "./getOrderbook";
 export * from "./getUserOrders";
 export * from "./placeOrder";
-export * from "./placeOrderStealth";
+export * from "./placeOrderStealthBuy";
+export * from "./placeOrderStealthSell";

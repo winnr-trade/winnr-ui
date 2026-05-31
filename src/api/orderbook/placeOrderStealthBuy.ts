@@ -15,7 +15,8 @@ import { useShieldedWallet } from "@/hooks/useShieldedWallet";
 import type { ShieldedWallet } from "@/lib/crypto/shielded";
 import { MerkleTree } from "@/lib/crypto/tree";
 import { generateTxProof } from "@/lib/crypto/tx/proof";
-import type { OrderType, Outcome, Side } from "@/lib/rollup/types";
+import type { OrderType } from "@/lib/rollup/types";
+import { Outcome, Side } from "@/lib/rollup/types";
 import { unitsToPrice } from "@/utils";
 
 // ---------------------------------------------------------------------------
@@ -23,7 +24,7 @@ import { unitsToPrice } from "@/utils";
 // ---------------------------------------------------------------------------
 
 /** Parameters the caller supplies — identical to regular order params. */
-export interface StealthOrderParams {
+export interface StealthBuyOrderParams {
   marketId: number;
   outcome: Outcome;
   side: Side;
@@ -37,11 +38,11 @@ export interface StealthOrderParams {
 // ---------------------------------------------------------------------------
 
 /**
- * Prepares a stealth order (derives keys, builds ZK proof) and submits it
+ * Prepares a stealth buy order (derives keys, builds ZK proof) and submits it
  * to the rollup in a single call.
  */
-export const placeOrderStealth = async (
-  params: StealthOrderParams,
+export const placeOrderStealthBuy = async (
+  params: StealthBuyOrderParams,
   ctx: {
     mainAddress: string;
     shieldedWallet: ShieldedWallet;
@@ -130,7 +131,7 @@ export const placeOrderStealth = async (
 // React-Query hook
 // ---------------------------------------------------------------------------
 
-export const usePlaceOrderStealth = () => {
+export const usePlaceOrderStealthBuy = () => {
   const { signer, isActive } = useAgentWallet();
   const { address: mainAddress } = useMainWallet();
   const { wallet, isEnabled, generateStealthParams } = useShieldedWallet();
@@ -152,7 +153,7 @@ export const usePlaceOrderStealth = () => {
   generateStealthParamsRef.current = generateStealthParams;
 
   return useMutation({
-    mutationFn: async (params: StealthOrderParams) => {
+    mutationFn: async (params: StealthBuyOrderParams) => {
       if (!isActiveRef.current || !signerRef.current) {
         throw new Error("Trading session not active. Please enable trading.");
       }
@@ -163,7 +164,7 @@ export const usePlaceOrderStealth = () => {
         throw new Error("Main wallet is not connected.");
       }
 
-      return placeOrderStealth(params, {
+      return placeOrderStealthBuy(params, {
         mainAddress: mainAddressRef.current,
         shieldedWallet: walletRef.current,
         generateStealthParams: generateStealthParamsRef.current,
