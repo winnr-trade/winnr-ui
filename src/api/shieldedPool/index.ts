@@ -1,0 +1,1 @@
+export { useHasShieldedAccount } from "./getShieldedAccount";

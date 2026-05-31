@@ -1,15 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useMarketDetail } from "@/api/market";
+import { useGetShieldedNote } from "@/api/notes";
+import { usePlaceOrderStealth } from "@/api/orderbook";
 import { usePlaceOrder } from "@/api/orderbook/placeOrder";
 import { useGetBalance } from "@/api/wallet/getBalance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAgentWallet } from "@/hooks/useAgentWallet";
 import { useMainWallet } from "@/hooks/useMainWallet";
+import { useShieldedWallet } from "@/hooks/useShieldedWallet";
 import { OrderType, Outcome, Side } from "@/lib/rollup/types";
 import { formatCents, formatNumber, formatUsd, parseCents, parseUsd } from "@/utils";
 import { deriveMarketState } from "@/utils/market";
@@ -29,11 +32,17 @@ interface TradePanelProps {
 }
 
 export function TradePanel({ marketId }: TradePanelProps) {
+  const { isEnabled, wallet } = useShieldedWallet();
   const { address } = useMainWallet();
   const { isActive: isAgentActive, enableTrading, isRegistering } = useAgentWallet();
   const { data: balanceData } = useGetBalance({ address });
   const { data: market } = useMarketDetail({ id: marketId });
+  const { data: shieldedNote } = useGetShieldedNote({
+    mainAddress: address,
+    shieldedWallet: isEnabled ? wallet : null,
+  });
   const placeOrder = usePlaceOrder();
+  const placeOrderStealth = usePlaceOrderStealth();
 
   const {
     register,
@@ -69,6 +78,7 @@ export function TradePanel({ marketId }: TradePanelProps) {
   const limitPrice = watch("limitPrice");
 
   const userBalance = formatUsd(balanceData || 0);
+  const shieldedBalance = shieldedNote ? formatUsd(shieldedNote.amount) : null;
 
   const yesPrice = side === Side.Bid ? buyYesPrice : sellYesPrice;
   const noPrice = side === Side.Bid ? buyNoPrice : sellNoPrice;
@@ -87,15 +97,33 @@ export function TradePanel({ marketId }: TradePanelProps) {
       return;
     }
 
-    const orderPromise = placeOrder.mutateAsync({
-      marketId,
-      outcome: values.outcome,
-      side: values.side,
-      price:
-        values.orderType === OrderType.Market ? currentPrice : parseCents(values.limitPrice || 0),
-      quantity: Math.floor(values.shares),
-      orderType: values.orderType,
-    });
+    let orderPromise: Promise<unknown>;
+
+    if (!isEnabled) {
+      orderPromise = placeOrder.mutateAsync({
+        marketId,
+        outcome: values.outcome,
+        side: values.side,
+        price:
+          values.orderType === OrderType.Market ? currentPrice : parseCents(values.limitPrice || 0),
+        quantity: Math.floor(values.shares),
+        orderType: values.orderType,
+      });
+    } else if (values.side === Side.Bid) {
+      orderPromise = placeOrderStealth.mutateAsync({
+        marketId,
+        outcome: values.outcome,
+        side: values.side,
+        price:
+          values.orderType === OrderType.Market ? currentPrice : parseCents(values.limitPrice || 0),
+        quantity: Math.floor(values.shares),
+        orderType: values.orderType,
+      });
+    } else {
+      // --- Private SELL: normal placeOrder signed by the stealth key ---
+      // TODO: load stealth private key on the fly and pass custom signer
+      throw new Error("Private sell not yet implemented");
+    }
 
     toast.promise(orderPromise, {
       loading: "Placing order...",
@@ -126,6 +154,12 @@ export function TradePanel({ marketId }: TradePanelProps) {
           <span className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-muted-foreground">
             EXECUTE ORDER
           </span>
+          {isEnabled && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-sm bg-violet-500/15 border border-violet-500/40 text-[9px] font-sans font-bold tracking-[0.15em] uppercase text-violet-400">
+              <ShieldCheck className="size-2.5" />
+              PRIVATE
+            </span>
+          )}
         </div>
 
         {/* Action Toggles: BUY/SELL & MARKET/LIMIT */}
@@ -284,9 +318,16 @@ export function TradePanel({ marketId }: TradePanelProps) {
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
               SHARES TO {side === Side.Bid ? "BUY" : "SELL"}
             </span>
-            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
-              Available: ${formatNumber(userBalance)}
-            </span>
+            {isEnabled ? (
+              <span className="flex items-center gap-1 text-[10px] font-sans font-bold uppercase tracking-widest text-violet-400">
+                <ShieldCheck className="size-2.5" />
+                {shieldedBalance !== null ? `$${formatNumber(shieldedBalance)}` : "Loading..."}
+              </span>
+            ) : (
+              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-muted-foreground">
+                Available: ${formatNumber(userBalance)}
+              </span>
+            )}
           </div>
           <div className="relative flex items-center">
             <Input
