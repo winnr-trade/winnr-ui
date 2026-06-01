@@ -10,8 +10,15 @@ import {
   RecentActivity,
   RulesAndResolution,
 } from "@/components/market";
-import { OpenOrdersList, OrderBook, TradePanel, YourPosition } from "@/components/orders";
+import {
+  OpenOrdersList,
+  OrderBook,
+  StealthOpenOrdersList,
+  TradePanel,
+  YourPosition,
+} from "@/components/orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useShieldedWallet } from "@/hooks/useShieldedWallet";
 
 export default function MarketPage() {
   const params = useParams();
@@ -19,6 +26,7 @@ export default function MarketPage() {
 
   const { data: market, isLoading, error } = useMarketDetail({ id: marketId });
   const [activeTab, setActiveTab] = useState<"chart" | "orderbook">("chart");
+  const { isEnabled } = useShieldedWallet();
 
   if (isLoading) {
     return <MarketDetailSkeleton />;
@@ -69,7 +77,11 @@ export default function MarketPage() {
             </TabsContent>
           </Tabs>
 
-          <OpenOrdersList marketId={marketId} />
+          {isEnabled ? (
+            <StealthOpenOrdersList marketId={marketId} />
+          ) : (
+            <OpenOrdersList marketId={marketId} />
+          )}
 
           <RulesAndResolution marketId={marketId} />
 

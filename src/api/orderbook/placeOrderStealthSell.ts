@@ -15,10 +15,6 @@ import type { OrderType } from "@/lib/rollup/types";
 import { Outcome, Side } from "@/lib/rollup/types";
 import { unitsToPrice } from "@/utils";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 export interface StealthSellOrderParams {
   marketId: number;
   outcome: Outcome;
@@ -26,10 +22,6 @@ export interface StealthSellOrderParams {
   quantity: number;
   orderType: OrderType;
 }
-
-// ---------------------------------------------------------------------------
-// Core async function
-// ---------------------------------------------------------------------------
 
 /**
  * Executes a private sell order.
@@ -73,13 +65,11 @@ export const placeOrderStealthSell = async (
 
   const totalAvailable = targetShares.reduce((sum, item) => sum + item.balance, 0);
   if (totalAvailable === 0) {
-    throw new Error("No stealth positions found for the selected outcome.");
+    throw new Error("No positions found for the selected outcome.");
   }
 
   if (totalAvailable < quantity) {
-    throw new Error(
-      `Insufficient stealth position. Requested: ${quantity}, Available: ${totalAvailable}`,
-    );
+    throw new Error(`Insufficient position. Requested: ${quantity}, Available: ${totalAvailable}`);
   }
 
   // 4. Fetch the latest user note to get the maximum nonce
@@ -91,8 +81,7 @@ export const placeOrderStealthSell = async (
   // 5. Derive private keys for the target stealth addresses
   const addressToPrivateKey: Record<string, Uint8Array> = {};
   const addressesToFind = new Set(targetShares.map((item) => item.address));
-
-  for (let nonce = 1n; nonce <= latestNote.nonce; nonce++) {
+  for (let nonce = latestNote.nonce; nonce >= 1n; nonce--) {
     if (addressesToFind.size === 0) break;
     const stealthPrivateKey = deriveStealthKey(shieldedWallet.stealthSecret, nonce);
     const derivedAddr = Keypair.fromSeed(stealthPrivateKey).publicKey.toBase58();
@@ -112,6 +101,8 @@ export const placeOrderStealthSell = async (
   // 6. Execute sell orders starting from the largest position
   let remainingQuantity = quantity;
   const results = [];
+
+  console.log("targetShares", targetShares);
 
   for (const item of targetShares) {
     if (remainingQuantity <= 0) break;

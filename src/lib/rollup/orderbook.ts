@@ -94,7 +94,13 @@ export class Orderbook {
       },
     };
 
-    return this.rollup.call(callMessage, { signer });
+    try {
+      const res = await this.rollup.call(callMessage, { signer });
+      console.log("res", res);
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+      throw error;
+    }
   }
 
   async cancelOrder(params: { orderId: number }, signer: Signer) {

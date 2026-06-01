@@ -5,3 +5,5 @@ export * from "./getUserOrders";
 export * from "./placeOrder";
 export * from "./placeOrderStealthBuy";
 export * from "./placeOrderStealthSell";
+export * from "./getStealthOrders";
+export * from "./getMarketStealthOrders";

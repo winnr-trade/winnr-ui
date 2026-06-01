@@ -15,8 +15,7 @@ import { useShieldedWallet } from "@/hooks/useShieldedWallet";
 import type { ShieldedWallet } from "@/lib/crypto/shielded";
 import { MerkleTree } from "@/lib/crypto/tree";
 import { generateTxProof } from "@/lib/crypto/tx/proof";
-import type { OrderType } from "@/lib/rollup/types";
-import { Outcome, Side } from "@/lib/rollup/types";
+import { OrderType, Outcome, Side } from "@/lib/rollup/types";
 import { unitsToPrice } from "@/utils";
 
 // ---------------------------------------------------------------------------
@@ -76,9 +75,22 @@ export const placeOrderStealthBuy = async (
     detectionNonce,
   });
 
-  // --- 3. Get quote for required collateral ---
-  const quote = await getBuyQuote({ marketId, outcome, quantity });
-  const requiredCollateral = quote.collateralRequired;
+  // --- 3. Compute collateral and effective order price ---
+  // Chain locks: price_bps * qty * 10^6 / 10000 == price * qty (price in 6-decimal base units).
+  // For limit orders the price is known. For market orders we derive an effective price from
+  // the quote so it covers fills across all price levels: ceil(fillCost / qty).
+  let orderPrice = price;
+  let requiredCollateral: bigint;
+
+  if (orderType === OrderType.Market) {
+    const quote = await getBuyQuote({ marketId, outcome, quantity });
+    const fillCost = BigInt(quote.collateralRequired);
+    // Ceiling division ensures effectivePrice * quantity >= fillCost.
+    orderPrice = (fillCost + BigInt(quantity) - 1n) / BigInt(quantity);
+    requiredCollateral = orderPrice * BigInt(quantity);
+  } else {
+    requiredCollateral = price * BigInt(quantity);
+  }
 
   if (inputNote.amount < requiredCollateral) {
     throw new Error(
@@ -117,7 +129,7 @@ export const placeOrderStealthBuy = async (
       marketId,
       outcome,
       side,
-      price: unitsToPrice(price, 6),
+      price: unitsToPrice(orderPrice, 6),
       quantity,
       orderType,
       noteMemo: Array.from(noteMemo),
