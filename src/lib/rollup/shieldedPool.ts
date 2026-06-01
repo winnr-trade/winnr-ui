@@ -61,6 +61,40 @@ export class ShieldedPool {
 
   async deposit(
     params: {
+      proof: Uint8Array;
+      root: Uint8Array;
+      amount: bigint;
+      commitment: Uint8Array;
+      nullifier: Uint8Array;
+      memo: Uint8Array;
+    },
+    signer: Signer,
+  ) {
+    const callMessage = {
+      shielded_pool: {
+        deposit: {
+          proof: params.proof,
+          root: params.root,
+          amount: params.amount,
+          commitment: params.commitment,
+          nullifier: params.nullifier,
+          memo: params.memo,
+        },
+      },
+    };
+
+    try {
+      const res = await this.rollup.call(callMessage, { signer });
+      return res;
+    } catch (error) {
+      console.log({ error });
+      console.log(JSON.stringify(error, null, 2));
+      throw error;
+    }
+  }
+
+  async depositViaSignature(
+    params: {
       owner: string;
       signature: Uint8Array;
       proof: Uint8Array;
@@ -74,7 +108,7 @@ export class ShieldedPool {
   ) {
     const callMessage = {
       shielded_pool: {
-        deposit: {
+        deposit_via_signature: {
           owner: params.owner,
           signature: params.signature,
           proof: params.proof,

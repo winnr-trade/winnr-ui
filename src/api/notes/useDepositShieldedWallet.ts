@@ -62,7 +62,7 @@ export function useDepositShieldedWallet() {
       const seed = kp.secretKey.slice(0, 32);
       const seedHex = bytesToHex(seed);
       const signer = new Ed25519Signer(seedHex);
-      await rollup.shieldedPool.deposit(
+      await rollup.shieldedPool.depositViaSignature(
         {
           proof,
           root: numberToBytesBE(tree.root, 32),
