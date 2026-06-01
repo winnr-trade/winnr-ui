@@ -3,7 +3,9 @@
 import { Keypair } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Shield } from "lucide-react";
+import { toast } from "sonner";
 import { getUserNote } from "@/api/notes";
+import { useCollectStealthAddress } from "@/api/notes/useCollectStealthAddress";
 import { getBalance } from "@/api/wallet/getBalance";
 import { Button } from "@/components/ui/button";
 import {
@@ -99,11 +101,7 @@ export function StealthAddresses() {
   });
 
   // Only renders in private mode
-  if (!isEnabled) return null;
-
-  const handleCollect = (_address: string) => {
-    // TODO: implement collect logic
-  };
+  if (!isEnabled || !wallet) return null;
 
   return (
     <div className="flex flex-col mb-12">
@@ -144,36 +142,7 @@ export function StealthAddresses() {
             <TableBody>
               {entries && entries.length > 0 ? (
                 entries.map((entry) => (
-                  <TableRow
-                    key={entry.address}
-                    className="border-b border-border/50 hover:bg-surface-container transition-colors"
-                  >
-                    <TableCell className="px-4 py-4">
-                      <span className="text-sm font-mono text-violet-300" title={entry.address}>
-                        {truncateAddress(entry.address, 6, 6)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center px-4 py-4">
-                      <span className="text-sm font-sans font-bold text-muted-foreground">
-                        #{entry.nonce.toString()}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center px-4 py-4">
-                      <span className="text-sm font-sans font-bold text-white">
-                        {formatCurrency(entry.balance)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right px-4 py-4">
-                      <Button
-                        variant="outline"
-                        size="xs"
-                        className="text-violet-400 tracking-widest uppercase border-violet-500/30 bg-violet-500/5 hover:text-violet-300 hover:border-violet-400 hover:bg-violet-500/15 transition-colors shadow-none rounded-none"
-                        onClick={() => handleCollect(entry.address)}
-                      >
-                        COLLECT
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  <StealthAddressRow key={entry.address} entry={entry} wallet={wallet} />
                 ))
               ) : (
                 <TableRow className="hover:bg-transparent">
@@ -189,5 +158,61 @@ export function StealthAddresses() {
         )}
       </div>
     </div>
+  );
+}
+
+function StealthAddressRow({
+  entry,
+  wallet,
+}: {
+  entry: StealthAddressEntry;
+  wallet: ShieldedWallet;
+}) {
+  const collectMutation = useCollectStealthAddress();
+
+  const handleCollect = () => {
+    toast.promise(
+      collectMutation.mutateAsync({
+        nonce: entry.nonce,
+        amount: entry.balance,
+        wallet,
+      }),
+      {
+        loading: "Collecting balance...",
+        success: "Balance collected to shielded wallet",
+        error: (err) => `Failed to collect: ${err.message}`,
+      },
+    );
+  };
+
+  return (
+    <TableRow className="border-b border-border/50 hover:bg-surface-container transition-colors">
+      <TableCell className="px-4 py-4">
+        <span className="text-sm font-mono text-violet-300" title={entry.address}>
+          {truncateAddress(entry.address, 6, 6)}
+        </span>
+      </TableCell>
+      <TableCell className="text-center px-4 py-4">
+        <span className="text-sm font-sans font-bold text-muted-foreground">
+          #{entry.nonce.toString()}
+        </span>
+      </TableCell>
+      <TableCell className="text-center px-4 py-4">
+        <span className="text-sm font-sans font-bold text-white">
+          {formatCurrency(entry.balance)}
+        </span>
+      </TableCell>
+      <TableCell className="text-right px-4 py-4">
+        <Button
+          variant="outline"
+          size="xs"
+          className="text-violet-400 tracking-widest uppercase border-violet-500/30 bg-violet-500/5 hover:text-violet-300 hover:border-violet-400 hover:bg-violet-500/15 transition-colors shadow-none rounded-none"
+          onClick={handleCollect}
+          disabled={collectMutation.isPending}
+        >
+          {collectMutation.isPending ? "COLLECTING..." : "COLLECT"}
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }
