@@ -15,6 +15,7 @@ import { AgentWallet } from "./agentWallet";
 import { ChainState } from "./chainState";
 import { Market } from "./market";
 import { Orderbook } from "./orderbook";
+import { ShieldedPool } from "./shieldedPool";
 
 export class RollupClient {
   rollup!: Rollup<any, any>;
@@ -23,6 +24,7 @@ export class RollupClient {
   market!: Market;
   orderbook!: Orderbook;
   agentWallet!: AgentWallet;
+  shieldedPool!: ShieldedPool;
 
   //   private readonly ready: Promise<void>;
 
@@ -33,6 +35,7 @@ export class RollupClient {
     this.market = new Market(this.rollup);
     this.orderbook = new Orderbook(this.rollup);
     this.agentWallet = new AgentWallet(this.rollup);
+    this.shieldedPool = new ShieldedPool(this.rollup);
   }
 }
 

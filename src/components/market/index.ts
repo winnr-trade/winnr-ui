@@ -5,4 +5,5 @@ export { MarketDetailSkeleton } from "./MarketDetailSkeleton";
 export { MarketPriceChart } from "./MarketPriceChart";
 export { RecentActivity } from "./RecentActivity";
 export { RulesAndResolution } from "./RulesAndResolution";
+export { TopHolders } from "./TopHolders";
 export { TrendingMarkets } from "./TrendingMarkets";

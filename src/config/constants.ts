@@ -11,3 +11,11 @@ export const docsLink = "https://docs.winnr.trade";
 export const socials = {
   x: "https://x.com/winnr_trade",
 };
+
+export const circuitPath = {
+  zkey: "/main.zkey",
+  wasm: "/main.wasm",
+};
+
+// Depth of the shielded-pool Merkle tree — must match the circuit.
+export const TREE_DEPTH = 32;

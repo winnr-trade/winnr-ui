@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 import { Footer } from "@/components/layout/Footer";
 import { TopNav } from "@/components/layout/TopNav";
 import { AppInitializer } from "@/components/providers/AppInitializer";
@@ -81,6 +82,7 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${manrope.variable} ${inter.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+        <Script src="/snarkjs.js" strategy="lazyOnload" />
         <SolanaProvider>
           <QueryProvider>
             <SerwistProvider swUrl="/serwist/sw.js">

@@ -6,9 +6,14 @@ import { PortfolioHeader } from "@/components/portfolio/PortfolioHeader";
 import { PortfolioOpenOrders } from "@/components/portfolio/PortfolioOpenOrders";
 import { PortfolioPositions } from "@/components/portfolio/PortfolioPositions";
 import { PortfolioStats } from "@/components/portfolio/PortfolioStats";
+import { StealthAddresses } from "@/components/portfolio/StealthAddresses";
+import { StealthOpenOrders } from "@/components/portfolio/StealthOpenOrders";
+import { StealthPositions } from "@/components/portfolio/StealthPositions";
+import { useShieldedWallet } from "@/hooks/useShieldedWallet";
 
 export default function PortfolioPage() {
   const { isLoading, error } = useActivePositions();
+  const { isEnabled } = useShieldedWallet();
 
   if (isLoading) {
     return (
@@ -30,8 +35,10 @@ export default function PortfolioPage() {
     <div className="container mx-auto p-6 md:p-12 max-w-6xl">
       <PortfolioHeader />
       <PortfolioStats />
-      <PortfolioPositions />
-      <PortfolioOpenOrders />
+      <StealthAddresses />
+      <StealthPositions />
+      {!isEnabled && <PortfolioPositions />}
+      {isEnabled ? <StealthOpenOrders /> : <PortfolioOpenOrders />}
       <PortfolioActivity />
     </div>
   );
