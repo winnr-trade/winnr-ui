@@ -3,6 +3,7 @@ export * from "./getClosingSoon";
 export * from "./getFeaturedMarket";
 export * from "./getMarketChart";
 export * from "./getMarketDetail";
+export * from "./getMarketHolders";
 export * from "./getMarketStats";
 export * from "./getNewestMarkets";
 export * from "./getRecentTrades";

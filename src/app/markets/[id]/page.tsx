@@ -9,6 +9,7 @@ import {
   MarketPriceChart,
   RecentActivity,
   RulesAndResolution,
+  TopHolders,
 } from "@/components/market";
 import {
   OpenOrdersList,
@@ -25,7 +26,7 @@ export default function MarketPage() {
   const marketId = Number(params.id || 0);
 
   const { data: market, isLoading, error } = useMarketDetail({ id: marketId });
-  const [activeTab, setActiveTab] = useState<"chart" | "orderbook">("chart");
+  const [activeTab, setActiveTab] = useState<"chart" | "orderbook" | "holders">("chart");
   const { isEnabled } = useShieldedWallet();
 
   if (isLoading) {
@@ -49,7 +50,7 @@ export default function MarketPage() {
 
           <Tabs
             value={activeTab}
-            onValueChange={(v) => setActiveTab(v as "chart" | "orderbook")}
+            onValueChange={(v) => setActiveTab(v as "chart" | "orderbook" | "holders")}
             className="w-full"
           >
             <TabsList
@@ -68,12 +69,21 @@ export default function MarketPage() {
               >
                 Orderbook
               </TabsTrigger>
+              <TabsTrigger
+                value="holders"
+                className="pb-4 px-2 text-[10px] font-sans font-bold uppercase tracking-[0.2em] rounded-none after:bottom-0 data-active:after:bg-emerald-500 data-active:text-white"
+              >
+                Top Holders
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="chart" className="pt-6">
               <MarketPriceChart marketId={marketId} />
             </TabsContent>
             <TabsContent value="orderbook" className="pt-6">
               <OrderBook marketId={marketId} />
+            </TabsContent>
+            <TabsContent value="holders" className="pt-6">
+              <TopHolders marketId={marketId} />
             </TabsContent>
           </Tabs>
 
