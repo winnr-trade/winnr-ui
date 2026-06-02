@@ -18,7 +18,7 @@ export function PortfolioHeader() {
         <div className="border border-violet-500/20 bg-violet-500/5">
           <PrivateModeSwitch />
         </div>
-        <Button className="bg-white text-black hover:bg-white/90 rounded-none h-12 px-6 font-sans font-bold text-[11px] uppercase tracking-[0.2em]">
+        <Button disabled className="bg-white/50 text-black/50 cursor-not-allowed rounded-none h-12 px-6 font-sans font-bold text-[11px] uppercase tracking-[0.2em]">
           Deposit Funds
         </Button>
       </div>
