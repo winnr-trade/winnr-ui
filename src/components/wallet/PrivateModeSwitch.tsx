@@ -16,7 +16,7 @@ export function PrivateModeSwitch() {
   };
 
   return (
-    <div className="px-3 py-3 flex items-center justify-between group">
+    <div className="px-3 py-3 flex items-center justify-between gap-4 group">
       <div className="flex items-center gap-4">
         <div className="size-8 rounded-none border border-violet-500/20 flex items-center justify-center bg-violet-500/5">
           <Shield className={`size-5 ${isEnabling ? "animate-pulse" : ""} text-violet-400`} />
