@@ -24,7 +24,7 @@ export interface UseShieldedWalletReturn {
   isEnabled: boolean;
   wallet: ShieldedWallet | null;
   isEnabling: boolean;
-  enable: () => Promise<void>;
+  enable: () => Promise<ShieldedWallet | null>;
   disable: () => void;
   generateStealthParams: (params: {
     marketId: number;
@@ -35,29 +35,27 @@ export interface UseShieldedWalletReturn {
 
 export function useShieldedWallet(): UseShieldedWalletReturn {
   const { address: mainAddress, signMessage, connected } = useMainWallet();
-  const { getMasterSecret, setMasterSecret } = useShieldedStore();
+  const { getMasterSecret, setMasterSecret, enabledWallets, setEnabledWallet } = useShieldedStore();
   const { mutateAsync: register } = useRegisterShieldedWallet();
-
-  // Recover from persisted store on mount if available.
-  const [wallet, setWallet] = useState<ShieldedWallet | null>(() => {
-    if (!mainAddress) return null;
-    const hex = getMasterSecret(mainAddress);
-    return hex ? ShieldedWallet.fromMasterKey(hexToBytes(hex)) : null;
-  });
 
   const [isEnabling, setIsEnabling] = useState(false);
 
-  const enable = async () => {
+  const isEnabledFlag = mainAddress ? (enabledWallets[mainAddress] ?? false) : false;
+  const hex = mainAddress ? getMasterSecret(mainAddress) : null;
+
+  const wallet =
+    !mainAddress || !isEnabledFlag || !hex ? null : ShieldedWallet.fromMasterKey(hexToBytes(hex));
+
+  const enable = async (): Promise<ShieldedWallet | null> => {
     if (!connected || !mainAddress || !signMessage) {
       toast.error("Connect your wallet before enabling private mode.");
-      return;
+      return null;
     }
 
     try {
       setIsEnabling(true);
 
       let derivedWallet: ShieldedWallet;
-      const hex = getMasterSecret(mainAddress);
       if (hex) {
         derivedWallet = ShieldedWallet.fromMasterKey(hexToBytes(hex));
       } else {
@@ -74,20 +72,24 @@ export function useShieldedWallet(): UseShieldedWalletReturn {
         toast.info("Shielded account registered.");
       }
 
-      setWallet(derivedWallet);
+      setEnabledWallet(mainAddress, true);
       toast.success("Private mode enabled.");
+      return derivedWallet;
     } catch (err: unknown) {
       console.error("Shielded wallet enable failed:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
       toast.error(errorMessage ?? "Failed to enable private mode.");
+      return null;
     } finally {
       setIsEnabling(false);
     }
   };
 
   const disable = () => {
-    setWallet(null);
-    toast.success("Private mode disabled.");
+    if (mainAddress) {
+      setEnabledWallet(mainAddress, false);
+      toast.success("Private mode disabled.");
+    }
   };
 
   const generateStealthParams = (params: {
