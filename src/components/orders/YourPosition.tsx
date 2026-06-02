@@ -2,8 +2,10 @@
 
 import { useMarketDetail } from "@/api/market";
 import { useGetShares } from "@/api/market/getShares";
+import { useGetStealthShares } from "@/api/stealthOrder";
 import { Card } from "@/components/ui/card";
 import { useMainWallet } from "@/hooks/useMainWallet";
+import { useShieldedWallet } from "@/hooks/useShieldedWallet";
 import { formatNumber, formatUsd } from "@/utils";
 import { deriveMarketState } from "@/utils/market";
 
@@ -13,11 +15,19 @@ interface YourPositionProps {
 
 export function YourPosition({ marketId }: YourPositionProps) {
   const { address } = useMainWallet();
+  const { isEnabled } = useShieldedWallet();
   const { data: market } = useMarketDetail({ id: marketId });
-  const { data: shares } = useGetShares({
+
+  const { data: mainShares } = useGetShares({
     marketId,
-    address,
+    address: isEnabled ? undefined : address,
   });
+
+  const { data: stealthShares } = useGetStealthShares({
+    marketId: isEnabled ? marketId : null,
+  });
+
+  const shares = isEnabled ? stealthShares : mainShares;
 
   if (!address || !shares) {
     return null;
